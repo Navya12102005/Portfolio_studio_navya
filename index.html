@@ -473,7 +473,7 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
 
 <!-- V5: HORIZON SLICE SLIDER -->
 <section id="horizon"><div id="hzS"></div>
-  <div class="hz-ui"><span class="n" id="hzN">01 <small>/ 03</small></span><span class="bt"><button id="hzP" aria-label="previous">←</button><button id="hzX" aria-label="next">→</button></span></div>
+  <div class="hz-ui"><span class="n" id="hzN">01 <small>/ 09</small></span><span class="bt"><button id="hzP" aria-label="previous">←</button><button id="hzX" aria-label="next">→</button></span></div>
 </section>
 
 <!-- DOMAINS -->
@@ -962,7 +962,13 @@ const io2=new IntersectionObserver(es=>{if(es[0].isIntersecting){show(k);io2.dis
 (()=>{const host=$('#hzS');if(!host)return;
   const D=[{k:'chapter one · biology',t:'beyond the<br>lab',d:'bio',sky:['#1a0f0a','#5c2a12'],glow:'#ff9a3c',rock:['#3a1a0e','#140806']},
            {k:'chapter two · code',t:'your next<br>launch',d:'tech',sky:['#05070f','#1b2440'],glow:'#c7b2ff',rock:['#2a1810','#0d0705']},
-           {k:'chapter three · marketing',t:'through the<br>noise',d:'mkt',sky:['#0f0716','#4a1c3a'],glow:'#ffb35a',rock:['#3d1c18','#120706']}];
+           {k:'chapter three · marketing',t:'through the<br>noise',d:'mkt',sky:['#0f0716','#4a1c3a'],glow:'#ffb35a',rock:['#3d1c18','#120706']},
+           {k:'project · medtech AI',t:'scans that<br>explain',d:'#ring',l:'see the project',sky:['#02101a','#0c3a4a'],glow:'#3df5c6',rock:['#0f2a30','#040c0e']},
+           {k:'result · instagram growth',t:'+300%<br>reach',d:'#ring',l:'see the project',sky:['#1a0710','#5a1430'],glow:'#ff6ec7',rock:['#3a0f20','#12040a']},
+           {k:'result · excel ops',t:'10 hours<br>saved weekly',d:'#ring',l:'see the project',sky:['#0a1408','#2a4a14'],glow:'#d4ff3a',rock:['#1c2a0e','#080c04']},
+           {k:'service · AI automation',t:'robots do<br>the boring',d:'#services',l:'hire for this',sky:['#060a1c','#1a2b6a'],glow:'#7f8cff',rock:['#141a3a','#05060f']},
+           {k:'service · content & growth',t:'stories that<br>sell',d:'#services',l:'hire for this',sky:['#160a04','#6a3010'],glow:'#ffc35a',rock:['#3a1a08','#120803']},
+           {k:'the next chapter',t:'your brand<br>here',d:'#contact',l:"let's talk",sky:['#0c0414','#3a1660'],glow:'#f5c03a',rock:['#24103a','#0a0412']}];
   let seed=3;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
   const jag=(y0,amp,step,dir)=>{let p='',x=-20;while(x<=1020){p+=`L${x.toFixed(0)},${(y0+dir*rnd()*amp).toFixed(0)} `;x+=step*(.5+rnd())}return p};
   function bg(o,i){seed=7+i*13;let stars='';for(let k=0;k<120;k++)stars+=`<circle cx="${rnd()*1000}" cy="${rnd()*560}" r="${rnd()*1.4}" fill="#fff" opacity="${rnd()}"/>`;
@@ -974,8 +980,8 @@ const io2=new IntersectionObserver(es=>{if(es[0].isIntersecting){show(k);io2.dis
       <linearGradient id="hr${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${o.rock[0]}"/><stop offset="1" stop-color="${o.rock[1]}"/></linearGradient></defs>
       <rect width="1000" height="1000" fill="url(#hs${i})"/>${stars}<rect width="1000" height="1000" fill="url(#hg${i})"/>
       <path d="${far}" fill="${o.rock[0]}" opacity=".7"/><path d="${top}" fill="url(#hr${i})"/><path d="${left}" fill="url(#hr${i})"/><path d="${right}" fill="url(#hr${i})"/><path d="${ledge}" fill="${o.rock[1]}"/>
-      <g transform="translate(${i===1?620:360},${785}) scale(1.1)" fill="#000"><circle cx="0" cy="-34" r="6"/><path d="M-5,-27 L6,-27 L9,-6 L22,-4 L22,2 L-6,2 Z"/></g></svg>`}
-  host.innerHTML=D.map((o,i)=>`<div class="hz" data-i="${i}">${bg(o,i)}<div class="tx"><div class="kick">${o.k}</div><h2>${o.t}</h2><span class="go" data-d="${o.d}">explore ${o.d==='mkt'?'marketing':o.d} ↓</span></div></div>`).join('');
+      <g transform="translate(${[360,620,300,700,450,580,330,640,500][i]},${785}) scale(1.1)" fill="#000"><circle cx="0" cy="-34" r="6"/><path d="M-5,-27 L6,-27 L9,-6 L22,-4 L22,2 L-6,2 Z"/></g></svg>`}
+  host.innerHTML=D.map((o,i)=>`<div class="hz" data-i="${i}">${bg(o,i)}<div class="tx"><div class="kick">${o.k}</div><h2>${o.t}</h2><span class="go" data-d="${o.d}">${o.l||'explore '+(o.d==='mkt'?'marketing':o.d)} ↓</span></div></div>`).join('');
   const sl=[...host.children];let cur=0,busy=false,tm;sl[0].classList.add('cur');
   const ease=t=>1-Math.pow(1-t,4);
   function go(n){if(busy)return;n=(n+sl.length)%sl.length;if(n===cur)return;busy=true;const inc=sl[n],S=6;inc.classList.add('in');const t0=performance.now();
@@ -985,7 +991,7 @@ const io2=new IntersectionObserver(es=>{if(es[0].isIntersecting){show(k);io2.dis
       if(t<1)requestAnimationFrame(f);else{sl[cur].classList.remove('cur');inc.classList.remove('in');inc.classList.add('cur');inc.style.clipPath='';cur=n;busy=false;$('#hzN').innerHTML=`0${n+1} <small>/ 0${sl.length}</small>`}})(t0);
     clearTimeout(tm);tm=setTimeout(()=>go(cur+1),5500)}
   $('#hzX').onclick=()=>go(cur+1);$('#hzP').onclick=()=>go(cur-1);
-  host.addEventListener('click',e=>{const g=e.target.closest('.go');if(!g)return;const t=$(`.tab[data-d="${g.dataset.d}"]`);t&&t.click();$('#work').scrollIntoView({behavior:'smooth'})});
+  host.addEventListener('click',e=>{const g=e.target.closest('.go');if(!g)return;if(g.dataset.d[0]==='#'){$(g.dataset.d).scrollIntoView({behavior:'smooth'});return}const t=$(`.tab[data-d="${g.dataset.d}"]`);t&&t.click();$('#work').scrollIntoView({behavior:'smooth'})});
   const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){clearTimeout(tm);tm=setTimeout(()=>go(cur+1),4000)}else clearTimeout(tm)},{threshold:.5});io.observe($('#horizon'));
 })();
 
