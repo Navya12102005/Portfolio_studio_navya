@@ -7,7 +7,7 @@
 <meta name="description" content="Navya Gupta — AI/ML & prompt engineer, bioengineer, and growth marketer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800;900&family=Instrument+Serif:ital@0;1&family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800;900&family=Instrument+Serif:ital@0;1&family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Honk:MORF@0..45&family=Nabla&family=Climate+Crisis:YEAR@1979..2048&display=swap" rel="stylesheet">
 <style>
 :root{
   --blue:#1a2bff; --ink:#0a0a0a; --paper:#f2f0ea; --lime:#d4ff3a; --pink:#ff6ec7; --aqua:#3df5c6; --orange:#ff5a1f;
@@ -147,7 +147,7 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 .say span.on{opacity:1;transform:none}
 
 /* prologue */
-#prologue{background:var(--paper);color:var(--ink)}
+#prologue{background:transparent;color:var(--paper)}
 .pro{text-align:center;padding:0 5vw}
 .pro .l1{font-family:var(--serif);font-style:italic;font-size:clamp(1.6rem,4vw,3.4rem);opacity:calc(1 - var(--p,0)*3)}
 .pro .l2{font-size:clamp(2.6rem,9vw,8rem);font-weight:900;letter-spacing:-.05em;line-height:.9;margin-top:20px}
@@ -157,7 +157,7 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 .pro .l3.on{opacity:.6}
 
 /* ch1 lab */
-#ch1{background:#04110d;color:var(--aqua)}
+#ch1{background:transparent;color:var(--aqua)}
 #helix{width:min(380px,70vw);height:90svh}
 #helix path{fill:none;stroke-width:3;stroke-linecap:round}
 #helix line{stroke:#3df5c655;stroke-width:2}
@@ -167,8 +167,8 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 @media(max-width:700px){.seq{top:22%;right:4vw;font-size:1.3rem}}
 
 /* ch2 code */
-#ch2{background:#000;color:var(--lime)}
-#rain{position:absolute;inset:0;width:100%;height:100%;opacity:.35}
+#ch2{background:transparent;color:var(--lime)}
+#rain{position:absolute;inset:0;width:100%;height:100%;opacity:.12}
 .code-win{position:relative;z-index:4;width:min(620px,90vw);background:#0d0d0dee;border:1px solid #d4ff3a44;border-radius:14px;box-shadow:0 0 80px #d4ff3a22;overflow:hidden}
 .code-win .tb{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid #ffffff14}
 .code-win .tb i{width:11px;height:11px;border-radius:50%;background:#ff5f57}.code-win .tb i+i{background:#febc2e}.code-win .tb i+i+i{background:#28c840}
@@ -178,7 +178,7 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 @media(max-width:700px){.code-win{margin-top:-18vh}}
 
 /* ch3 market */
-#ch3{background:var(--pink);color:#000}
+#ch3{background:transparent;color:#fff}
 .phone{width:min(270px,62vw);aspect-ratio:9/18;background:#000;border-radius:40px;padding:10px;position:relative;box-shadow:0 40px 80px #0005;transform:rotate(calc(-8deg + var(--p,0)*12deg))}
 .screen{width:100%;height:100%;border-radius:32px;background:linear-gradient(170deg,#ffd84a,#ff6ec7 55%,#7b5cff);position:relative;overflow:hidden;color:#fff}
 .screen .post{position:absolute;inset:auto 14px 70px 14px;font-weight:800;font-size:1.3rem;line-height:1.05}
@@ -186,13 +186,13 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 .notif{position:absolute;left:8px;right:8px;background:#fffffff0;color:#000;border-radius:14px;padding:9px 11px;font-size:.72rem;box-shadow:0 8px 20px #0003;transform:translateY(-140%);opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1)}
 .notif.on{transform:none;opacity:1}
 .chart{position:absolute;right:4vw;top:22%;width:min(380px,40vw)}
-.chart path{fill:none;stroke:#000;stroke-width:4;stroke-linecap:round}
+.chart path{fill:none;stroke:var(--pink);filter:drop-shadow(0 0 8px var(--pink));stroke-width:4;stroke-linecap:round}
 .chart .lbl{font-family:var(--pixel);font-size:clamp(1.6rem,4vw,3rem)}
 .heart{position:absolute;font-size:1.6rem;pointer-events:none}
 @media(max-width:700px){.chart{top:14%;width:44vw}}
 
 /* ch4 merge */
-#ch4{background:var(--ink)}
+#ch4{background:transparent}
 .venn{position:relative;width:min(560px,92vw);aspect-ratio:1}
 .orb{position:absolute;width:52%;aspect-ratio:1;border-radius:50%;mix-blend-mode:screen;display:grid;place-items:center;font-family:var(--pixel);font-size:clamp(.7rem,1.6vw,1rem);color:#000;filter:blur(calc((1 - var(--p,0))*0px))}
 .orb span{background:#000;color:#fff;padding:4px 8px;border-radius:6px}
@@ -200,7 +200,7 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 .orb.a{background:var(--aqua)}.orb.b{background:var(--lime)}.orb.c{background:var(--pink)}
 .core{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) scale(var(--core,0));font-family:var(--serif);font-style:italic;font-size:clamp(2rem,5vw,3.6rem);color:#000;background:#fff;padding:6px 22px;border-radius:999px;z-index:3;white-space:nowrap;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
 
-@media(min-width:901px){.code-win{margin-left:34vw;width:min(520px,44vw)}.phone{margin-left:22vw}.chart{right:auto;left:4vw;top:20%}}
+@media(min-width:901px){.code-win{margin-left:34vw;width:min(520px,44vw)}.phone{margin-left:22vw;margin-top:22vh;width:220px}.chart{right:auto;left:4vw;top:20%}}
 @media(max-width:900px){.phone{margin-top:-22vh;width:min(200px,48vw)}.say{background:#0009;color:#fff;padding:12px 14px;border-radius:14px;backdrop-filter:blur(6px)}}
 /* HUD */
 .hud{position:fixed;left:50%;bottom:18px;transform:translate(-50%,140%);z-index:150;display:flex;align-items:center;gap:10px;background:#0a0a0aee;color:#fff;border:1px solid #ffffff22;border-radius:999px;padding:8px 14px 8px 10px;font-family:var(--mono);font-size:.7rem;transition:transform .5s cubic-bezier(.19,1,.22,1);backdrop-filter:blur(10px)}
@@ -211,12 +211,47 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 /* fun */
 .burst{position:fixed;pointer-events:none;z-index:1500;font-size:1.4rem;left:0;top:0}
 .toast{max-width:90vw;text-align:center}
+/* ============ V3: 3D WORLD + RARE FONTS ============ */
+#world{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;opacity:0;transition:opacity .8s}
+#world.on{opacity:1}
+body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
+#work,#services,.contact,footer{background-color:var(--ink)}
+.scene{z-index:1}
+.scene .stick::before{content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 50%,transparent 40%,#0a0a0acc 100%);pointer-events:none}
+#helix,#cells,.orb{display:none!important}
+.ctitle{position:absolute;top:110px;left:4vw;z-index:5;font-family:'Climate Crisis',sans-serif;font-size:clamp(2.6rem,9vw,8.5rem);line-height:.85;text-transform:uppercase;letter-spacing:-.02em;font-variation-settings:'YEAR' var(--yr,1979);color:var(--cc,#fff);mix-blend-mode:difference;pointer-events:none}
+.chap{top:84px}
+.honk{font-family:'Honk',system-ui;font-weight:400;font-variation-settings:'MORF' var(--morf,15);text-transform:none}
+.nabla{font-family:'Nabla',system-ui;font-weight:400}
+.pro .l2 b{font-family:'Honk',system-ui;font-weight:400;font-variation-settings:'MORF' 15;letter-spacing:0}
+.pro .l2 b em{font-family:'Honk'!important;font-style:normal}
+.core{background:none!important;font-family:'Honk',system-ui!important;font-style:normal!important;font-size:clamp(4rem,13vw,11rem)!important;font-variation-settings:'MORF' var(--morf,0);top:50%!important}
+.chart .lbl{font-family:'Nabla',system-ui;font-size:3.4rem}
+.seq #seqTxt{font-family:'Nabla',system-ui}
+/* preloader */
+.pre{position:fixed;inset:0;z-index:3000;background:#0a0a0a;display:grid;place-items:center;transition:clip-path 1.2s cubic-bezier(.77,0,.18,1);clip-path:circle(150% at 50% 50%)}
+.pre.out{clip-path:circle(0% at 50% 50%)}
+.pre .w{font-family:'Honk',system-ui;font-size:clamp(4rem,18vw,15rem);font-variation-settings:'MORF' var(--morf,0);line-height:1}
+.pre .n{position:absolute;bottom:6vh;right:5vw;font-family:'Nabla',system-ui;font-size:clamp(3rem,8vw,6rem)}
+.pre .t{position:absolute;bottom:7vh;left:5vw;font-family:var(--mono);font-size:.75rem;color:#888;max-width:240px}
+/* sticker-style popups */
+.toast{background:#fff!important;color:#000!important;border-radius:18px!important;padding:12px 18px 12px 12px!important;display:flex;align-items:center;gap:12px;font-family:var(--sans)!important;font-weight:600;font-size:.88rem!important;box-shadow:6px 6px 0 #000,0 20px 40px #0006;border:2px solid #000;transform:translate(-50%,-220px) rotate(-6deg)!important;transition:transform .6s cubic-bezier(.34,1.7,.5,1)!important}
+.toast.show{transform:translate(-50%,0) rotate(-2deg)!important}
+.toast .ic{font-family:'Honk',system-ui;font-size:2.2rem;line-height:1;font-weight:400}
+/* label cursor */
+.lc{position:fixed;left:0;top:0;z-index:2500;pointer-events:none;width:14px;height:14px;border-radius:50%;background:#fff;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:width .35s cubic-bezier(.34,1.56,.64,1),height .35s cubic-bezier(.34,1.56,.64,1);display:grid;place-items:center}
+.lc span{font-family:var(--pixel);font-size:.65rem;color:#000;opacity:0;transition:opacity .2s}
+.lc.lab{width:78px;height:78px}.lc.lab span{opacity:1}
+@media(hover:none){.lc{display:none}}
 .skew{transition:transform .2s}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<div class="pre" id="pre"><div class="w">navya</div><div class="t">loading a girl who refused to pick one lane…</div><div class="n" id="preN">0</div></div>
+<canvas id="world"></canvas>
+<div class="lc" id="lc"><span id="lcT">view</span></div>
 
 <nav>
   <a href="#top" class="brand">navya.exe</a>
@@ -258,6 +293,7 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 <section class="scene" id="ch1" data-ch="1" data-name="the lab">
   <div class="stick">
     <span class="chap">ch.01 — the lab</span>
+    <h2 class="ctitle" style="--cc:#3df5c6">the lab</h2>
     <div id="cells"></div>
     <svg id="helix" viewBox="0 0 200 600" preserveAspectRatio="xMidYMid meet"></svg>
     <div class="seq"><span id="seqTxt">ATGCGTAC</span><small id="seqSub">decoding life…</small></div>
@@ -269,6 +305,7 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
   <div class="stick">
     <canvas id="rain"></canvas>
     <span class="chap">ch.02 — the code</span>
+    <h2 class="ctitle" style="--cc:#d4ff3a">the code</h2>
     <div class="code-win"><div class="tb"><i></i><i></i><i></i></div><pre id="codeOut"></pre></div>
     <div class="say" id="say2"><span>so i taught myself to code.</span><span>python. ML models. prompts that make AI <em>behave.</em></span><span>then i started shipping apps in a weekend.</span></div>
   </div>
@@ -277,6 +314,7 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 <section class="scene" id="ch3" data-ch="3" data-name="the market">
   <div class="stick">
     <span class="chap">ch.03 — the plot twist</span>
+    <h2 class="ctitle" style="--cc:#ff6ec7">plot twist</h2>
     <svg class="chart" viewBox="0 0 300 200"><path id="chartLine" d="M10,180 C60,170 80,150 110,140 S160,120 180,90 S240,40 290,15"/><text class="lbl" x="150" y="195" text-anchor="middle" id="growth">+0%</text></svg>
     <div class="phone"><div class="screen" id="screen">
       <div class="notif" style="top:14px">📩 <b>new client:</b> "can you run our socials?"</div>
@@ -293,11 +331,12 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 <section class="scene" id="ch4" data-ch="4" data-name="the merge">
   <div class="stick">
     <span class="chap" style="color:#fff">ch.04 — the merge</span>
+    <h2 class="ctitle" style="--cc:#ffffff">the merge</h2>
     <div class="venn">
       <div class="orb a" id="oa"><span>bio</span></div>
       <div class="orb b" id="ob"><span>tech</span></div>
       <div class="orb c" id="oc"><span>marketing</span></div>
-      <div class="core">navya.</div>
+      <div class="core honk">navya</div>
     </div>
     <div class="say" id="say4" style="color:#fff"><span>most people pick one lane.</span><span>i built where all three <em>overlap.</em></span><span>here's the proof ↓</span></div>
   </div>
@@ -388,6 +427,7 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 <div class="toast" id="toast"></div>
 <div class="hud" id="hud"><span id="hudName">prologue</span><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
 
+<script src="vendor/three.min.js"></script>
 <script>
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -494,7 +534,8 @@ const ws=[...lead.querySelectorAll('.w8')];
 addEventListener('scroll',()=>{const r=lead.getBoundingClientRect(),p=Math.min(Math.max((innerHeight*.8-r.top)/(r.height+innerHeight*.2),0),1);ws.forEach((w,i)=>w.classList.toggle('lit',i/ws.length<p))},{passive:true});
 
 /* ===== keyboard: real keys press too ===== */
-const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)};
+let tT;const icons=['ding!','ooh','yay','psst','wow'];
+const toast=m=>{const t=$('#toast');t.innerHTML=`<span class="ic">${icons[Math.random()*icons.length|0]}</span><span>${m}</span>`;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2600)};
 $('#esc').onclick=()=>toast('no escape — let\'s work together ✦');
 $('#cv').onclick=()=>toast('cv dropping soon ✦');
 addEventListener('keydown',e=>{const map={h:'hire me',e:'esc',s:'services',c:'cv'};const k=[...$$('.key')].find(x=>x.textContent===map[e.key.toLowerCase()]);if(k&&!e.metaKey&&!e.ctrlKey&&document.activeElement.tagName!=='INPUT'){k.classList.add('down');setTimeout(()=>k.classList.remove('down'),120)}});
@@ -582,6 +623,77 @@ let lastY=scrollY,sk=0;(function skewLoop(){const v=scrollY-lastY;lastY=scrollY;
 function confetti(){const cs=['#d4ff3a','#ff6ec7','#3df5c6','#1a2bff','#ff5a1f'];for(let i=0;i<120;i++){const c=document.createElement('div');c.className='burst';Object.assign(c.style,{width:'8px',height:'14px',background:cs[i%5],left:Math.random()*innerWidth+'px',top:'-20px',borderRadius:'2px'});document.body.appendChild(c);c.animate([{transform:'translateY(0) rotate(0)'},{transform:`translate(${(Math.random()-.5)*200}px,${innerHeight+60}px) rotate(${Math.random()*720}deg)`}],{duration:1800+Math.random()*1600,easing:'cubic-bezier(.25,.46,.45,.94)'}).onfinish=()=>c.remove()}}
 let ended=false;addEventListener('scroll',()=>{if(!ended&&innerHeight+scrollY>=document.body.scrollHeight-40){ended=true;confetti();toast('you made it to the end ✦ that\'s rare. let\'s talk.')}},{passive:true});
 
+
+/* =================== V3: PRELOADER =================== */
+(()=>{const pre=$('#pre'),w=pre.querySelector('.w');let n=0;
+  const it=setInterval(()=>{n=Math.min(100,n+Math.ceil(Math.random()*9));$('#preN').textContent=n;w.style.setProperty('--morf',Math.round(n*.45));
+    if(n>=100){clearInterval(it);setTimeout(()=>pre.classList.add('out'),350);setTimeout(()=>{pre.style.display='none'},1700)}},70)})();
+
+/* =================== V3: LABEL CURSOR =================== */
+(()=>{const lc=$('#lc'),lt=$('#lcT');let x=0,y=0,cx=0,cy=0;
+  addEventListener('pointermove',e=>{x=e.clientX;y=e.clientY});
+  (function f(){cx+=(x-cx)*.2;cy+=(y-cy)*.2;lc.style.left=cx+'px';lc.style.top=cy+'px';requestAnimationFrame(f)})();
+  const lab=(sel,txt)=>$$(sel).forEach(el=>{el.addEventListener('pointerenter',()=>{lt.textContent=txt;lc.classList.add('lab')});el.addEventListener('pointerleave',()=>lc.classList.remove('lab'))});
+  lab('.sticker','drag');lab('.svc','hire');lab('.key','press');lab('.b','peek');lab('.tab','switch');lab('nav a','go');lab('.slab','wow');lab('.btn','click');
+})();
+
+/* =================== V3: MORPHING FONT TITLES =================== */
+function fontTick(){
+  $$('.scene').forEach(sc=>{const p=prog(sc),t=sc.querySelector('.ctitle');if(t)t.style.setProperty('--yr',Math.round(1979+p*69));});
+  const m=Math.round((Math.sin(performance.now()/600)+1)*22);$$('.pro .l2 b').forEach(b=>b.style.fontVariationSettings=`'MORF' ${m}`);
+  const core=$('.core');core&&core.style.setProperty('--morf',m);
+  requestAnimationFrame(fontTick)}
+fontTick();
+
+/* =================== V3: 3D PARTICLE WORLD =================== */
+(()=>{if(!window.THREE)return;
+const N=innerWidth<700?5000:9000;
+const cv=$('#world'),renderer=new THREE.WebGLRenderer({canvas:cv,antialias:false,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(55,1,.1,100);cam.position.z=9;
+const C=h=>new THREE.Color(h);const aq=C('#3df5c6'),li=C('#d4ff3a'),pk=C('#ff6ec7'),wh=C('#ffffff'),dk=C('#2b3a0a');
+const R=Math.random,TAU=Math.PI*2;
+const shapes=[
+  i=>{const arm=i%3,r=Math.pow(R(),.6)*4.2,a=arm/3*TAU+r*1.1+R()*.5;return[Math.cos(a)*r,(R()-.5)*.5*(5-r)*.3,Math.sin(a)*r,[aq,li,pk][arm]]},
+  i=>{const t=(i/N)*TAU*3.2,y=(i/N)*9-4.5,s=i%2?1:-1;if(i%9===0){const u=R()*2-1;return[Math.cos(t)*1.4*u,y,Math.sin(t)*1.4*u,wh]}return[Math.cos(t)*1.4*s+(R()-.5)*.12,y,Math.sin(t)*1.4*s+(R()-.5)*.12,s>0?aq:li]},
+  i=>{const g=11,a=i%(g*g*g),x=a%g,y=(a/g|0)%g,z=a/(g*g)|0,e=[x,y,z].filter(v=>v===0||v===g-1).length;const k=4.4/(g-1);return[(x-(g-1)/2)*k+(R()-.5)*.04,(y-(g-1)/2)*k,(z-(g-1)/2)*k,e>=2?li:(R()<.15?wh:dk)]},
+  i=>{const t=R()*TAU,sh=Math.pow(R(),.35);const x=16*Math.pow(Math.sin(t),3),y=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t);return[x*.2*sh,y*.2*sh+.3,(R()-.5)*1.2*sh,R()<.2?wh:pk]},
+  i=>{const k=i%3,c=[[-1.1,.7,0],[1.1,.7,0],[0,-1.1,0]][k],u=R()*2-1,a=R()*TAU,r=1.9*Math.cbrt(R()),q=Math.sqrt(1-u*u);return[c[0]+r*q*Math.cos(a),c[1]+r*q*Math.sin(a),c[2]+r*u,[aq,li,pk][k]]},
+];
+const S=shapes.map(fn=>{const p=new Float32Array(N*3),c=new Float32Array(N*3);for(let i=0;i<N;i++){const[x,y,z,col]=fn(i);p.set([x,y,z],i*3);c.set([col.r,col.g,col.b],i*3)}return{p,c}});
+const geo=new THREE.BufferGeometry(),pos=new Float32Array(S[0].p),col=new Float32Array(S[0].c),rnd=new Float32Array(N);for(let i=0;i<N;i++)rnd[i]=R();
+geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('color',new THREE.BufferAttribute(col,3));geo.setAttribute('rnd',new THREE.BufferAttribute(rnd,1));
+const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexColors:true,
+  uniforms:{uT:{value:0},uPx:{value:renderer.getPixelRatio()},uMouse:{value:new THREE.Vector3(99,99,0)},uBurst:{value:0}},
+  vertexShader:`attribute float rnd;varying vec3 vC;varying float vA;uniform float uT,uPx,uBurst;uniform vec3 uMouse;
+  void main(){vec3 p=position;p+=0.06*vec3(sin(uT*1.3+rnd*40.),cos(uT*1.1+rnd*30.),sin(uT*.9+rnd*20.));
+    vec4 mv=modelViewMatrix*vec4(p,1.);vec4 cp=projectionMatrix*mv;vec2 ndc=cp.xy/cp.w;vec2 d=ndc-uMouse.xy;float f=smoothstep(.28,0.,length(d));
+    cp.xy+=normalize(d+1e-4)*f*.18*cp.w;cp.xy+=normalize(ndc+1e-4)*uBurst*rnd*1.2*cp.w;
+    gl_Position=cp;gl_PointSize=(1.6+rnd*2.6+f*5.)*uPx*(9./-mv.z);vC=color+f*.6;vA=.55+rnd*.45;}`,
+  fragmentShader:`varying vec3 vC;varying float vA;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;gl_FragColor=vec4(vC,vA*smoothstep(.5,.0,d));}`});
+const pts=new THREE.Points(geo,mat);scene.add(pts);
+const dg=new THREE.BufferGeometry(),dp=new Float32Array(1500*3);for(let i=0;i<dp.length;i++)dp[i]=(R()-.5)*40;dg.setAttribute('position',new THREE.BufferAttribute(dp,3));
+const dust=new THREE.Points(dg,new THREE.PointsMaterial({size:.03,color:0x8888aa,transparent:true,opacity:.6}));scene.add(dust);
+function size(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();pts.position.x=w>900?2.3:0;pts.scale.setScalar(w>900?1:.72)}size();addEventListener('resize',size);
+const mouse={x:99,y:99,tx:0,ty:0};addEventListener('pointermove',e=>{mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight*2-1)});
+let burst=0;addEventListener('click',()=>{if(cv.classList.contains('on'))burst=1});
+const ss=t=>t*t*(3-2*t);let cur=0,on=false;
+const story=[...$$('.scene')];
+function frame(t){requestAnimationFrame(frame);
+  const first=story[0].getBoundingClientRect(),last=story[story.length-1].getBoundingClientRect();
+  const vis=first.top<innerHeight&&last.bottom>0;if(vis!==on){on=vis;cv.classList.toggle('on',on)}if(!on)return;
+  let target=0;story.forEach((sc,i)=>{const r=sc.getBoundingClientRect();if(r.top<innerHeight*.6){const p=prog(sc);target=i+ss(clamp((p-.6)/.4))}});
+  target=Math.min(target,shapes.length-1);cur+=(target-cur)*.08;
+  const a=Math.floor(cur),b=Math.min(a+1,shapes.length-1),k=ss(cur-a);const A=S[a],B=S[b];
+  for(let i=0;i<N*3;i++){const sc=rnd[(i/3)|0]*.25;const kk=clamp((k-sc)/(1-.25));pos[i]=A.p[i]+(B.p[i]-A.p[i])*kk;col[i]=A.c[i]+(B.c[i]-A.c[i])*kk}
+  geo.attributes.position.needsUpdate=true;geo.attributes.color.needsUpdate=true;
+  const tt=t/1000;mat.uniforms.uT.value=tt;burst*=.92;mat.uniforms.uBurst.value=burst;
+  mat.uniforms.uMouse.value.set(mouse.x,mouse.y,0);
+  mouse.tx+=(mouse.y*.35-mouse.tx)*.05;mouse.ty+=(mouse.x*.5-mouse.ty)*.05;
+  pts.rotation.y=tt*(a===1?.5:.15)+mouse.ty;pts.rotation.x=mouse.tx+(a===2?.35:0);dust.rotation.y=tt*.02;
+  renderer.render(scene,cam);}
+requestAnimationFrame(frame);
+})();
 setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'})+' IST · bhopal',1000);
 </script>
 </body>
