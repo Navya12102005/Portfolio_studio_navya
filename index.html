@@ -137,6 +137,82 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 .rv.in{opacity:1;transform:none}
 .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);background:var(--lime);color:#000;font-family:var(--pixel);font-size:.8rem;padding:12px 18px;border-radius:999px;z-index:300;transition:transform .4s cubic-bezier(.19,1,.22,1)}
 .toast.show{transform:translate(-50%,0)}
+/* ================= STORY ================= */
+.scene{height:260vh;padding:0;position:relative}
+.stick{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center}
+.chap{font-family:var(--pixel);font-size:.8rem;letter-spacing:.06em;position:absolute;top:84px;left:4vw;z-index:5}
+.say{position:absolute;left:4vw;bottom:9vh;max-width:min(560px,90vw);font-size:clamp(1.3rem,2.8vw,2.3rem);line-height:1.15;letter-spacing:-.02em;font-weight:600;z-index:5}
+.say em{font-family:var(--serif);font-weight:400}
+.say span{display:block;opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s cubic-bezier(.19,1,.22,1)}
+.say span.on{opacity:1;transform:none}
+
+/* prologue */
+#prologue{background:var(--paper);color:var(--ink)}
+.pro{text-align:center;padding:0 5vw}
+.pro .l1{font-family:var(--serif);font-style:italic;font-size:clamp(1.6rem,4vw,3.4rem);opacity:calc(1 - var(--p,0)*3)}
+.pro .l2{font-size:clamp(2.6rem,9vw,8rem);font-weight:900;letter-spacing:-.05em;line-height:.9;margin-top:20px}
+.pro .l2 b{display:inline-block;opacity:0;transform:translateY(60px) rotate(8deg);transition:all .7s cubic-bezier(.34,1.56,.64,1)}
+.pro .l2 b.on{opacity:1;transform:none}
+.pro .l3{font-family:var(--mono);font-size:.85rem;margin-top:30px;opacity:0;transition:opacity .6s}
+.pro .l3.on{opacity:.6}
+
+/* ch1 lab */
+#ch1{background:#04110d;color:var(--aqua)}
+#helix{width:min(380px,70vw);height:90svh}
+#helix path{fill:none;stroke-width:3;stroke-linecap:round}
+#helix line{stroke:#3df5c655;stroke-width:2}
+.seq{position:absolute;right:4vw;top:50%;transform:translateY(-50%);font-family:var(--pixel);font-size:clamp(1.4rem,4vw,3.4rem);text-align:right;line-height:1.1}
+.seq small{display:block;font-family:var(--mono);font-size:.7rem;opacity:.6;margin-top:10px}
+.cell{position:absolute;border-radius:50%;border:1.5px solid #3df5c688;background:#3df5c611}
+@media(max-width:700px){.seq{top:22%;right:4vw;font-size:1.3rem}}
+
+/* ch2 code */
+#ch2{background:#000;color:var(--lime)}
+#rain{position:absolute;inset:0;width:100%;height:100%;opacity:.35}
+.code-win{position:relative;z-index:4;width:min(620px,90vw);background:#0d0d0dee;border:1px solid #d4ff3a44;border-radius:14px;box-shadow:0 0 80px #d4ff3a22;overflow:hidden}
+.code-win .tb{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid #ffffff14}
+.code-win .tb i{width:11px;height:11px;border-radius:50%;background:#ff5f57}.code-win .tb i+i{background:#febc2e}.code-win .tb i+i+i{background:#28c840}
+.code-win pre{font-family:var(--mono);font-size:clamp(.7rem,1.6vw,.9rem);padding:18px;min-height:260px;white-space:pre-wrap;color:#e8e8e8}
+.code-win pre .k{color:var(--pink)}.code-win pre .s{color:var(--lime)}.code-win pre .c{color:#777}
+.code-win pre::after{content:"▋";color:var(--lime);animation:blink 1s infinite}
+@media(max-width:700px){.code-win{margin-top:-18vh}}
+
+/* ch3 market */
+#ch3{background:var(--pink);color:#000}
+.phone{width:min(270px,62vw);aspect-ratio:9/18;background:#000;border-radius:40px;padding:10px;position:relative;box-shadow:0 40px 80px #0005;transform:rotate(calc(-8deg + var(--p,0)*12deg))}
+.screen{width:100%;height:100%;border-radius:32px;background:linear-gradient(170deg,#ffd84a,#ff6ec7 55%,#7b5cff);position:relative;overflow:hidden;color:#fff}
+.screen .post{position:absolute;inset:auto 14px 70px 14px;font-weight:800;font-size:1.3rem;line-height:1.05}
+.screen .likes{position:absolute;bottom:22px;left:14px;font-family:var(--mono);font-size:.8rem}
+.notif{position:absolute;left:8px;right:8px;background:#fffffff0;color:#000;border-radius:14px;padding:9px 11px;font-size:.72rem;box-shadow:0 8px 20px #0003;transform:translateY(-140%);opacity:0;transition:all .5s cubic-bezier(.34,1.56,.64,1)}
+.notif.on{transform:none;opacity:1}
+.chart{position:absolute;right:4vw;top:22%;width:min(380px,40vw)}
+.chart path{fill:none;stroke:#000;stroke-width:4;stroke-linecap:round}
+.chart .lbl{font-family:var(--pixel);font-size:clamp(1.6rem,4vw,3rem)}
+.heart{position:absolute;font-size:1.6rem;pointer-events:none}
+@media(max-width:700px){.chart{top:14%;width:44vw}}
+
+/* ch4 merge */
+#ch4{background:var(--ink)}
+.venn{position:relative;width:min(560px,92vw);aspect-ratio:1}
+.orb{position:absolute;width:52%;aspect-ratio:1;border-radius:50%;mix-blend-mode:screen;display:grid;place-items:center;font-family:var(--pixel);font-size:clamp(.7rem,1.6vw,1rem);color:#000;filter:blur(calc((1 - var(--p,0))*0px))}
+.orb span{background:#000;color:#fff;padding:4px 8px;border-radius:6px}
+.orb.a span{transform:translate(-55%,-40%)}.orb.b span{transform:translate(55%,-40%)}.orb.c span{transform:translateY(55%)}
+.orb.a{background:var(--aqua)}.orb.b{background:var(--lime)}.orb.c{background:var(--pink)}
+.core{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) scale(var(--core,0));font-family:var(--serif);font-style:italic;font-size:clamp(2rem,5vw,3.6rem);color:#000;background:#fff;padding:6px 22px;border-radius:999px;z-index:3;white-space:nowrap;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+
+@media(min-width:901px){.code-win{margin-left:34vw;width:min(520px,44vw)}.phone{margin-left:22vw}.chart{right:auto;left:4vw;top:20%}}
+@media(max-width:900px){.phone{margin-top:-22vh;width:min(200px,48vw)}.say{background:#0009;color:#fff;padding:12px 14px;border-radius:14px;backdrop-filter:blur(6px)}}
+/* HUD */
+.hud{position:fixed;left:50%;bottom:18px;transform:translate(-50%,140%);z-index:150;display:flex;align-items:center;gap:10px;background:#0a0a0aee;color:#fff;border:1px solid #ffffff22;border-radius:999px;padding:8px 14px 8px 10px;font-family:var(--mono);font-size:.7rem;transition:transform .5s cubic-bezier(.19,1,.22,1);backdrop-filter:blur(10px)}
+.hud.show{transform:translate(-50%,0)}
+.hud .dots{display:flex;gap:4px}.hud .dots i{width:16px;height:4px;border-radius:2px;background:#ffffff33;transition:background .3s}
+.hud .dots i.on{background:var(--lime)}
+
+/* fun */
+.burst{position:fixed;pointer-events:none;z-index:1500;font-size:1.4rem;left:0;top:0}
+.toast{max-width:90vw;text-align:center}
+.skew{transition:transform .2s}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
@@ -169,6 +245,63 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 <div class="ticker"><div class="track" id="tk">
   <span>✦ python</span><span>✦ vibe coding</span><span>✦ prompt engineering</span><span>✦ bioinformatics</span><span>✦ ai × medtech</span><span>✦ digital marketing</span><span>✦ excel ops</span><span>✦ executive assistant</span>
 </div></div>
+
+<!-- ===== STORY ===== -->
+<section class="scene" id="prologue" data-ch="0" data-name="prologue">
+  <div class="stick"><div class="pro">
+    <p class="l1">once upon a time, a girl couldn't choose just one thing…</p>
+    <h2 class="l2"><b>science.</b> <b>code.</b> <b><em style="font-family:var(--serif);font-weight:400">stories.</em></b></h2>
+    <p class="l3">so she decided to master all three. keep scrolling ↓</p>
+  </div></div>
+</section>
+
+<section class="scene" id="ch1" data-ch="1" data-name="the lab">
+  <div class="stick">
+    <span class="chap">ch.01 — the lab</span>
+    <div id="cells"></div>
+    <svg id="helix" viewBox="0 0 200 600" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="seq"><span id="seqTxt">ATGCGTAC</span><small id="seqSub">decoding life…</small></div>
+    <div class="say" id="say1"><span>it started in a bioengineering lab.</span><span>where i learned life is just <em>code</em> written in A, T, G, C.</span><span>and i thought — what if AI could read it?</span></div>
+  </div>
+</section>
+
+<section class="scene" id="ch2" data-ch="2" data-name="the code">
+  <div class="stick">
+    <canvas id="rain"></canvas>
+    <span class="chap">ch.02 — the code</span>
+    <div class="code-win"><div class="tb"><i></i><i></i><i></i></div><pre id="codeOut"></pre></div>
+    <div class="say" id="say2"><span>so i taught myself to code.</span><span>python. ML models. prompts that make AI <em>behave.</em></span><span>then i started shipping apps in a weekend.</span></div>
+  </div>
+</section>
+
+<section class="scene" id="ch3" data-ch="3" data-name="the market">
+  <div class="stick">
+    <span class="chap">ch.03 — the plot twist</span>
+    <svg class="chart" viewBox="0 0 300 200"><path id="chartLine" d="M10,180 C60,170 80,150 110,140 S160,120 180,90 S240,40 290,15"/><text class="lbl" x="150" y="195" text-anchor="middle" id="growth">+0%</text></svg>
+    <div class="phone"><div class="screen" id="screen">
+      <div class="notif" style="top:14px">📩 <b>new client:</b> "can you run our socials?"</div>
+      <div class="notif" style="top:66px">💸 <b>invoice paid</b> · ₹25,000</div>
+      <div class="notif" style="top:118px">📊 <b>report ready:</b> weekly MIS.xlsx</div>
+      <div class="notif" style="top:170px">🔥 your reel is trending</div>
+      <div class="post">turning science<br>into stories<br>people pay for.</div>
+      <div class="likes">♥ <span id="likes">0</span> likes</div>
+    </div></div>
+    <div class="say" id="say3"><span>plot twist: great work nobody sees is just a diary.</span><span>so i learned <em>marketing,</em> storytelling &amp; excel ops.</span><span>now the work gets seen — and paid.</span></div>
+  </div>
+</section>
+
+<section class="scene" id="ch4" data-ch="4" data-name="the merge">
+  <div class="stick">
+    <span class="chap" style="color:#fff">ch.04 — the merge</span>
+    <div class="venn">
+      <div class="orb a" id="oa"><span>bio</span></div>
+      <div class="orb b" id="ob"><span>tech</span></div>
+      <div class="orb c" id="oc"><span>marketing</span></div>
+      <div class="core">navya.</div>
+    </div>
+    <div class="say" id="say4" style="color:#fff"><span>most people pick one lane.</span><span>i built where all three <em>overlap.</em></span><span>here's the proof ↓</span></div>
+  </div>
+</section>
 
 <!-- 3D RING -->
 <section class="ring-sec" id="ring">
@@ -253,6 +386,7 @@ footer{padding:24px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 
 <footer><span>© 2026 navya gupta</span><span id="clock">bhopal</span><span>made with python brain &amp; marketing heart</span></footer>
 <div class="toast" id="toast"></div>
+<div class="hud" id="hud"><span id="hudName">prologue</span><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
 
 <script>
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
@@ -364,6 +498,89 @@ const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');setT
 $('#esc').onclick=()=>toast('no escape — let\'s work together ✦');
 $('#cv').onclick=()=>toast('cv dropping soon ✦');
 addEventListener('keydown',e=>{const map={h:'hire me',e:'esc',s:'services',c:'cv'};const k=[...$$('.key')].find(x=>x.textContent===map[e.key.toLowerCase()]);if(k&&!e.metaKey&&!e.ctrlKey&&document.activeElement.tagName!=='INPUT'){k.classList.add('down');setTimeout(()=>k.classList.remove('down'),120)}});
+
+/* =================== STORY ENGINE =================== */
+const clamp=(v,a=0,b=1)=>Math.min(Math.max(v,a),b);
+const scenes=[...$$('.scene')];
+const prog=el=>{const r=el.getBoundingClientRect();return clamp(-r.top/(r.height-innerHeight))};
+const lines3=(id,p)=>$$(id+' span').forEach((s,i,a)=>s.classList.toggle('on',p>i/(a.length+.5)+.05));
+
+// helix build
+const hx=$('#helix');let A='',B='',rungs='';
+for(let y=0;y<=600;y+=6){const t=y/600*Math.PI*6,x1=100+70*Math.sin(t),x2=100-70*Math.sin(t);A+=(y?'L':'M')+x1+','+y;B+=(y?'L':'M')+x2+','+y;if(y%30===0)rungs+=`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`}
+hx.innerHTML=rungs+`<path d="${A}" stroke="#3df5c6"/><path d="${B}" stroke="#d4ff3a"/>`;
+const hp=[...hx.querySelectorAll('path')],hl=[...hx.querySelectorAll('line')];hp.forEach(p=>{const L=p.getTotalLength();p.style.strokeDasharray=L;p.dataset.l=L});
+const cells=$('#cells');for(let i=0;i<9;i++){const c=document.createElement('div');c.className='cell';const s=30+Math.random()*90;Object.assign(c.style,{width:s+'px',height:s+'px',left:Math.random()*90+'%',top:Math.random()*90+'%'});c.animate([{transform:'scale(1)'},{transform:'scale(1.25) translate(10px,-14px)'}],{duration:2500+i*300,iterations:Infinity,direction:'alternate',easing:'ease-in-out'});cells.appendChild(c)}
+const target1='ATGC → AI';let seqDone=false;
+
+// code text
+const code=`<span class="c"># navya.py — the origin story</span>
+<span class="k">import</span> curiosity, python, ambition
+
+<span class="k">def</span> build(idea):
+    model = train(<span class="s">"medical_scans"</span>)
+    prompt = engineer(<span class="s">"make AI behave"</span>)
+    app = ship(idea, deadline=<span class="s">"48h"</span>)
+    <span class="k">return</span> app
+
+build(<span class="s">"something people need"</span>)
+<span class="s">>>> ✓ deployed. users: growing</span>`;
+const codeTokens=code.split(/(<[^>]+>)/);const codeLen=code.replace(/<[^>]+>/g,'').length;
+function codeAt(n){let out='',c=0;for(const t of codeTokens){if(t.startsWith('<')){out+=t;continue}if(c+t.length<=n){out+=t;c+=t.length}else{out+=t.slice(0,n-c);c=n;break}}return out+(c<codeLen?'</span>'.repeat(0):'')}
+// matrix rain
+const rc=$('#rain'),rx=rc.getContext('2d');let cols=[];
+function rsz(){rc.width=rc.clientWidth;rc.height=rc.clientHeight;cols=Array(Math.ceil(rc.width/16)).fill(0).map(()=>Math.random()*-50)}rsz();addEventListener('resize',rsz);
+let rainOn=false;(function rain(){if(rainOn){rx.fillStyle='#0000001a';rx.fillRect(0,0,rc.width,rc.height);rx.fillStyle='#d4ff3a';rx.font='14px JetBrains Mono';cols.forEach((y,i)=>{rx.fillText('01ATGC{}<>/=λ'[Math.random()*13|0],i*16,y*16);cols[i]=y*16>rc.height&&Math.random()>.97?0:y+1})}setTimeout(()=>requestAnimationFrame(rain),45)})();
+
+// chart
+const cl=$('#chartLine'),cL=cl.getTotalLength();cl.style.strokeDasharray=cL;
+let lastHeart=0;
+function heart(){const h=document.createElement('div');h.className='heart';h.textContent=['❤️','💖','🔥','✨','💸'][Math.random()*5|0];const ph=$('.phone').getBoundingClientRect();h.style.left=ph.right-40+'px';h.style.top=ph.bottom-60+'px';h.style.position='fixed';document.body.appendChild(h);h.animate([{transform:'translate(0,0) scale(.6)',opacity:1},{transform:`translate(${(Math.random()-.5)*120}px,-260px) scale(1.3)`,opacity:0}],{duration:1600,easing:'ease-out'}).onfinish=()=>h.remove()}
+
+// HUD + unlocks
+const hud=$('#hud'),dots=[...$$('#hud i')];const seen=new Set();
+const chapterNames=['prologue','the lab','the code','the plot twist','the merge','the proof'];
+function storyTick(){
+  let active=-1;
+  scenes.forEach(sc=>{const p=prog(sc),r=sc.getBoundingClientRect(),vis=r.top<innerHeight&&r.bottom>0;sc.style.setProperty('--p',p);if(!vis)return;const ch=+sc.dataset.ch;if(r.top<innerHeight*.5)active=ch;
+    if(ch===0){$$('.pro .l2 b').forEach((b,i)=>b.classList.toggle('on',p>.12+i*.18));$('.pro .l3').classList.toggle('on',p>.7)}
+    if(ch===1){hp.forEach(h=>h.style.strokeDashoffset=h.dataset.l*(1-clamp(p*1.4)));hl.forEach((l,i)=>l.style.opacity=i/hl.length<p*1.4?1:0);lines3('#say1',p);
+      const n=Math.floor(clamp((p-.45)*2.5)*target1.length);$('#seqTxt').textContent=p<.45?Array(8).fill().map(()=>'ATGC'[Math.random()*4|0]).join(''):target1.slice(0,n)+Array(Math.max(0,target1.length-n)).fill().map(()=>'ATGC'[Math.random()*4|0]).join('');
+      $('#seqSub').textContent=p<.85?'decoding life…':'bioengineering × machine learning';
+      if(p>.85&&!seqDone){seqDone=true;toast('🧬 decoded: you found the origin')}}
+    if(ch===2){rainOn=true;$('#codeOut').innerHTML=codeAt(Math.floor(clamp(p*1.3)*codeLen));lines3('#say2',p)}
+    if(ch===3){cl.style.strokeDashoffset=cL*(1-clamp(p*1.3));$('#growth').textContent='+'+Math.round(clamp(p*1.3)*300)+'%';$('#likes').textContent=Math.round(clamp(p*1.2)*12480).toLocaleString('en-IN');
+      $$('.notif').forEach((nf,i)=>nf.classList.toggle('on',p>.12+i*.17));lines3('#say3',p);if(p>.1&&p<.95&&performance.now()-lastHeart>220){lastHeart=performance.now();heart()}}
+    if(ch===4){const s=1-clamp(p*1.4),d=12+30*s;
+      $('#oa').style.cssText=`left:${24-d}%;top:${10-d*.6}%`;$('#ob').style.cssText=`left:${24+d}%;top:${10-d*.6}%`;$('#oc').style.cssText=`left:24%;top:${34+d}%`;
+      $('.venn').style.setProperty('--core',p>.7?1:0);lines3('#say4',p)}
+  });
+  if(scenes[2].getBoundingClientRect().bottom<0||scenes[2].getBoundingClientRect().top>innerHeight)rainOn=false;
+  const ringR=$('#ring').getBoundingClientRect();if(ringR.top<innerHeight*.5&&ringR.bottom>0)active=5;
+  hud.classList.toggle('show',active>=0&&active<=5);
+  if(active>=0){$('#hudName').textContent='ch.0'+active+' · '+chapterNames[active];dots.forEach((d,i)=>d.classList.toggle('on',i<=active));
+    if(!seen.has(active)&&active>0){seen.add(active);toast('🔓 chapter unlocked: '+chapterNames[active])}}
+}
+addEventListener('scroll',storyTick,{passive:true});storyTick();
+
+/* =================== SURPRISES =================== */
+// 1. click anywhere → emoji burst
+const em=['✨','💖','🧬','⚡','💸','🔥','🌸'];
+addEventListener('click',e=>{if(e.target.closest('a,button,.sticker'))return;for(let i=0;i<10;i++){const b=document.createElement('div');b.className='burst';b.textContent=em[Math.random()*em.length|0];b.style.left=e.clientX+'px';b.style.top=e.clientY+'px';document.body.appendChild(b);const a=Math.random()*Math.PI*2,d=60+Math.random()*90;b.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:1},{transform:`translate(calc(-50% + ${Math.cos(a)*d}px),calc(-50% + ${Math.sin(a)*d}px)) scale(1.2) rotate(${Math.random()*180}deg)`,opacity:0}],{duration:900,easing:'cubic-bezier(.19,1,.22,1)'}).onfinish=()=>b.remove()}});
+// 2. leave the tab → title begs
+const T=document.title;addEventListener('visibilitychange',()=>document.title=document.hidden?'👀 come back, the story isn\'t over…':T);
+// 3. idle nudge
+let idle;const nudges=['psst… the plot twist is coming 👀','scroll — it gets better ✦','still here? good taste.'];let ni=0;
+const resetIdle=()=>{clearTimeout(idle);idle=setTimeout(()=>{if(scrollY<document.body.scrollHeight-innerHeight*1.5)toast(nudges[ni++%3])},14000)};['scroll','pointermove','keydown'].forEach(e=>addEventListener(e,resetIdle,{passive:true}));resetIdle();
+// 4. first sticker drag
+let dragged=false;stickers.forEach(s=>s.addEventListener('pointerdown',()=>{if(!dragged){dragged=true;toast('curious, huh? i like that ✦')}}));
+// 5. secret word: type "navya" or "hire"
+let buf='';addEventListener('keydown',e=>{buf=(buf+e.key.toLowerCase()).slice(-5);if(buf.endsWith('navya')){confetti();toast('🎉 secret unlocked: you know my name')}if(buf.endsWith('hire')){confetti();toast('say less → scrolling to contact');setTimeout(()=>$('#contact').scrollIntoView({behavior:'smooth'}),600)}});
+// 6. scroll-speed skew on sections
+let lastY=scrollY,sk=0;(function skewLoop(){const v=scrollY-lastY;lastY=scrollY;sk+=(clamp(v*.08,-5,5)-sk)*.15;$$('#work .b, .svc h3').forEach(el=>el.style.transform=Math.abs(sk)>.05?`skewY(${sk}deg)`:'');requestAnimationFrame(skewLoop)})();
+// 7. the ending → confetti
+function confetti(){const cs=['#d4ff3a','#ff6ec7','#3df5c6','#1a2bff','#ff5a1f'];for(let i=0;i<120;i++){const c=document.createElement('div');c.className='burst';Object.assign(c.style,{width:'8px',height:'14px',background:cs[i%5],left:Math.random()*innerWidth+'px',top:'-20px',borderRadius:'2px'});document.body.appendChild(c);c.animate([{transform:'translateY(0) rotate(0)'},{transform:`translate(${(Math.random()-.5)*200}px,${innerHeight+60}px) rotate(${Math.random()*720}deg)`}],{duration:1800+Math.random()*1600,easing:'cubic-bezier(.25,.46,.45,.94)'}).onfinish=()=>c.remove()}}
+let ended=false;addEventListener('scroll',()=>{if(!ended&&innerHeight+scrollY>=document.body.scrollHeight-40){ended=true;confetti();toast('you made it to the end ✦ that\'s rare. let\'s talk.')}},{passive:true});
 
 setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'})+' IST · bhopal',1000);
 </script>
