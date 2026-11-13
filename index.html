@@ -7,7 +7,7 @@
 <meta name="description" content="Navya Gupta — AI/ML & prompt engineer, bioengineer, and growth marketer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800;900&family=Instrument+Serif:ital@0;1&family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Honk:MORF@0..45&family=Nabla&family=Climate+Crisis:YEAR@1979..2048&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800;900&family=Instrument+Serif:ital@0;1&family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Anton&family=Honk:MORF@0..45&family=Nabla&family=Climate+Crisis:YEAR@1979..2048&display=swap" rel="stylesheet">
 <style>
 :root{
   --blue:#1a2bff; --ink:#0a0a0a; --paper:#f2f0ea; --lime:#d4ff3a; --pink:#ff6ec7; --aqua:#3df5c6; --orange:#ff5a1f;
@@ -289,6 +289,57 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
 #nebula{position:absolute;inset:0;width:100%;height:100%;z-index:0}
 .contact>*:not(#nebula){position:relative;z-index:1}
 .contact{background:#08040f!important;overflow:hidden}
+/* ===== V5: LAYERED STACK TEXT ===== */
+.stack{position:relative}
+.stack::before,.stack::after{display:none!important}
+.stack{color:#fff;transition:text-shadow .1s}
+/* ===== V5: HORIZON SLICE SLIDER ===== */
+#horizon{height:100svh;padding:0;position:relative;overflow:hidden;background:#000;z-index:2}
+.hz{position:absolute;inset:0;display:grid;place-items:center;text-align:center;visibility:hidden}
+.hz.cur,.hz.in{visibility:visible}.hz.in{z-index:3}
+.hz svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.hz .tx{position:relative;z-index:2;padding:0 5vw;transition:transform 1.4s cubic-bezier(.19,1,.22,1)}
+.hz.in .tx{transform:scale(1.18)}
+.hz .kick{font-family:'Instrument Serif',serif;font-style:italic;color:#f5c03a;font-size:clamp(1rem,2vw,1.4rem)}
+.hz h2{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;color:#f5c03a;font-size:clamp(3.2rem,11vw,10.5rem);line-height:.92;letter-spacing:.01em;text-shadow:0 6px 50px #0009}
+.hz .go{display:inline-block;margin-top:22px;font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;color:#fff;border-bottom:1px solid #f5c03a;padding-bottom:4px;cursor:pointer}
+.hz-ui{position:absolute;z-index:5;left:4vw;right:4vw;bottom:26px;display:flex;justify-content:space-between;align-items:center;font-family:'Anton',sans-serif;color:#f5c03a}
+.hz-ui .n{font-size:1.4rem}.hz-ui .n small{font-size:.8rem;color:#fff8}
+.hz-ui .bt{display:flex;gap:8px}.hz-ui button{width:42px;height:42px;border-radius:50%;border:1px solid #f5c03a88;background:#0006;color:#f5c03a;cursor:pointer}
+/* ===== V5: LIFE WALL ===== */
+#life{height:330vh;padding:0;background:#f4efe6;color:#111;position:relative;z-index:2}
+#life .stk{position:sticky;top:0;height:100svh;overflow:hidden;display:grid;place-items:center}
+.wall{display:grid;grid-template-columns:repeat(5,18vw);grid-auto-rows:18vh;gap:1.4vw;will-change:transform}
+.tile{border-radius:10px;position:relative;overflow:hidden;padding:10px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 10px 30px #0002;transition:transform .4s}
+.tile:hover{transform:translateY(-4px) rotate(-1deg)}
+.tile .em{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:min(6vh,5vw);filter:drop-shadow(0 6px 10px #0003)}
+.tile .cap{font-size:min(1.4vh,1vw);font-weight:600;color:#111;background:#ffffffcc;align-self:flex-start;padding:3px 7px;border-radius:999px}
+.tile.me{justify-content:flex-end;padding:1.2vh 1.2vw;color:#fff}
+.tile.me h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:min(2.2vh,1.8vw);line-height:1;text-shadow:0 2px 8px #0006}
+.tile.me .sun{position:absolute;width:30%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#fff6d8,#ffcf7a 50%,transparent 70%);left:60%;top:16%}
+.tile.me .hill{position:absolute;left:-40%;right:10%;bottom:-30%;height:60%;border-radius:50%;background:#e8743e}
+.tile.me .hill.b{left:30%;right:-40%;bottom:-38%;height:62%;background:#b8452a}
+.tile.me .girl{position:absolute;left:28%;bottom:30%;width:6%}
+.life-h{position:absolute;inset:auto 0 7vh 0;text-align:center;pointer-events:none;opacity:0;transition:opacity .6s}
+.life-h.on{opacity:1}
+.life-h h2{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(2.6rem,7vw,6rem);text-transform:uppercase;line-height:.9}
+.life-h p{font-family:var(--mono);font-size:.75rem;margin-top:10px;background:#111;color:#fff;display:inline-block;padding:6px 12px;border-radius:999px}
+/* ===== V5: AURORA GARDEN ABOUT ===== */
+.about{background:#050812!important;color:#fff!important;min-height:110svh;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:flex-end;padding:120px 5vw!important}
+#garden{position:absolute;inset:0;width:100%;height:100%;z-index:0;cursor:crosshair}
+.about>.label{position:absolute;top:100px;left:4vw;z-index:2;color:#fff}
+.bottle{position:relative;z-index:2;width:min(460px,92vw);background:linear-gradient(160deg,#ffffff1f,#ffffff08);border:1px solid #ffffff30;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-radius:26px;padding:28px;box-shadow:0 30px 80px #0008;transform:translateY(60px) scale(.94);opacity:0;transition:all 1s cubic-bezier(.19,1,.22,1)}
+.bottle.in{transform:none;opacity:1}
+.bottle .brand2{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;opacity:.7;text-transform:uppercase}
+.bottle h3{font-family:'Instrument Serif',serif;font-weight:400;font-size:2.6rem;line-height:1;margin:14px 0 4px}
+.bottle .sub{font-family:var(--mono);font-size:.7rem;color:var(--pink);letter-spacing:.15em;text-transform:uppercase}
+.bottle .lead{font-size:clamp(1rem,1.6vw,1.2rem)!important;line-height:1.5!important;font-weight:400!important;letter-spacing:0!important;margin-top:16px}
+.bottle .notes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px}
+.bottle .notes div{border:1px solid #ffffff22;border-radius:12px;padding:10px;font-size:.72rem}
+.bottle .notes small{display:block;font-family:var(--mono);opacity:.55;font-size:.58rem;text-transform:uppercase;margin-bottom:3px}
+.bottle .hint{font-family:var(--mono);font-size:.62rem;opacity:.5;margin-top:16px}
+.hl{color:#000}
+@media(max-width:800px){.about{justify-content:center}}
 /* label cursor */
 .lc{position:fixed;left:0;top:0;z-index:2500;pointer-events:none;width:14px;height:14px;border-radius:50%;background:#fff;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:width .35s cubic-bezier(.34,1.56,.64,1),height .35s cubic-bezier(.34,1.56,.64,1);display:grid;place-items:center}
 .lc span{font-family:var(--pixel);font-size:.65rem;color:#000;opacity:0;transition:opacity .2s}
@@ -420,10 +471,15 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
   </div>
 </section>
 
+<!-- V5: HORIZON SLICE SLIDER -->
+<section id="horizon"><div id="hzS"></div>
+  <div class="hz-ui"><span class="n" id="hzN">01 <small>/ 03</small></span><span class="bt"><button id="hzP" aria-label="previous">←</button><button id="hzX" aria-label="next">→</button></span></div>
+</section>
+
 <!-- DOMAINS -->
 <section id="work">
   <div class="dom-head rv">
-    <div><p class="label">(02) three worlds, one operator</p><h2 class="glitch" data-t="domains">domains</h2></div>
+    <div><p class="label">(02) three worlds, one operator</p><h2 class="glitch stack" data-t="domains" style="font-family:'Anton',sans-serif;font-weight:400">domains</h2></div>
     <div class="tabs">
       <button class="tab on" data-d="tech" style="--c:var(--lime)">tech</button>
       <button class="tab" data-d="bio" style="--c:var(--aqua)">bio</button>
@@ -469,10 +525,24 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
   </div>
 </section>
 
-<!-- ABOUT -->
+<!-- V5: LIFE WALL -->
+<section id="life"><div class="stk">
+  <div class="wall" id="wall"></div>
+  <div class="life-h" id="lifeH"><h2 class="stack" id="lifeT" style="color:#111">a life beyond the screen</h2><p>travel · food · fashion · money · stories</p></div>
+</div></section>
+
+<!-- V5: AURORA GARDEN ABOUT -->
 <section class="about" id="about">
-  <p class="label" style="margin-bottom:30px">(04) about</p>
-  <p class="lead" id="lead">hi, i'm navya — a bioengineering student at VIT Bhopal who refuses to pick one lane. i build <span class="hl" style="--c:var(--aqua)">AI for healthcare,</span> write code that <span class="hl" style="--c:var(--lime)">actually ships,</span> and turn complex ideas into <em>stories that sell.</em> engineer's brain, <span class="hl" style="--c:var(--pink)">marketer's mouth.</span></p>
+  <canvas id="garden"></canvas>
+  <p class="label">(04) about · move your cursor through the meadow</p>
+  <div class="bottle" id="bottle">
+    <div class="brand2"><span>navya gupta</span><span>bloom edition · 2026</span></div>
+    <h3>Eau de Ambition</h3>
+    <div class="sub">bioengineer · coder · storyteller</div>
+    <p class="lead" id="lead">hi, i'm navya — a bioengineering student at VIT Bhopal who refuses to pick one lane. i build <span class="hl" style="--c:var(--aqua)">AI for healthcare,</span> write code that <span class="hl" style="--c:var(--lime)">actually ships,</span> and turn complex ideas into <em>stories that sell.</em> engineer's brain, <span class="hl" style="--c:var(--pink)">marketer's mouth.</span></p>
+    <div class="notes"><div><small>top note</small>curiosity</div><div><small>heart note</small>AI × biology</div><div><small>base note</small>hustle</div></div>
+    <p class="hint">✿ every flower here grew where your cursor walked</p>
+  </div>
 </section>
 
 <!-- CONTACT KEYBOARD -->
@@ -480,7 +550,7 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
   <canvas id="nebula"></canvas>
   <div>
     <p class="label">(05) let's build</p>
-    <h2 class="glitch" data-t="say hi">say hi</h2>
+    <h2 class="glitch stack" data-t="say hi" style="font-family:'Anton',sans-serif;font-weight:400">say hi</h2>
     <p>Got a product to launch, a dataset to tame or a brand to grow? Press a key. I reply within 24 hours.</p>
   </div>
   <div class="board" id="board">
@@ -879,6 +949,94 @@ const io2=new IntersectionObserver(es=>{if(es[0].isIntersecting){show(k);io2.dis
   const rs=()=>{const w=sec.clientWidth,h=sec.clientHeight;r.setSize(w,h,false);u.uR.value.set(w*r.getPixelRatio(),h*r.getPixelRatio())};rs();addEventListener('resize',rs);
   sec.addEventListener('pointermove',e=>{const b=sec.getBoundingClientRect();u.uM.value.set((e.clientX-b.left)/b.width,1-(e.clientY-b.top)/b.height)});
   (function f(t){requestAnimationFrame(f);const b=sec.getBoundingClientRect();if(b.bottom<0||b.top>innerHeight)return;u.uT.value=t/1000;r.render(sc,cam)})(0);
+})();
+
+/* =================== V5: LAYERED STACK TEXT =================== */
+(()=>{const els=[...$$('.stack')];if(!els.length)return;const pal=['#1a2bff','#ff6ec7','#d4ff3a','#3df5c6'];let ang=-0.8,ta=-0.8;
+  addEventListener('pointermove',e=>{ta=Math.atan2(e.clientY-innerHeight/2,e.clientX-innerWidth/2)+Math.PI});
+  (function f(){requestAnimationFrame(f);ang+=(ta-ang)*.06;const sh=[];for(let i=1;i<=8;i++){const d=i*2.2;sh.push(`${(Math.cos(ang)*d).toFixed(1)}px ${(Math.sin(ang)*d).toFixed(1)}px 0 ${pal[Math.floor((i-1)/2)%4]}`)}
+    const v=sh.join(',');els.forEach(el=>el.style.textShadow=v)})();
+})();
+
+/* =================== V5: HORIZON SLICE SLIDER =================== */
+(()=>{const host=$('#hzS');if(!host)return;
+  const D=[{k:'chapter one · biology',t:'beyond the<br>lab',d:'bio',sky:['#1a0f0a','#5c2a12'],glow:'#ff9a3c',rock:['#3a1a0e','#140806']},
+           {k:'chapter two · code',t:'your next<br>launch',d:'tech',sky:['#05070f','#1b2440'],glow:'#c7b2ff',rock:['#2a1810','#0d0705']},
+           {k:'chapter three · marketing',t:'through the<br>noise',d:'mkt',sky:['#0f0716','#4a1c3a'],glow:'#ffb35a',rock:['#3d1c18','#120706']}];
+  let seed=3;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
+  const jag=(y0,amp,step,dir)=>{let p='',x=-20;while(x<=1020){p+=`L${x.toFixed(0)},${(y0+dir*rnd()*amp).toFixed(0)} `;x+=step*(.5+rnd())}return p};
+  function bg(o,i){seed=7+i*13;let stars='';for(let k=0;k<120;k++)stars+=`<circle cx="${rnd()*1000}" cy="${rnd()*560}" r="${rnd()*1.4}" fill="#fff" opacity="${rnd()}"/>`;
+    const top=`M-20,-20 ${jag(110,120,40,1)} L1020,-20Z`,left=`M-20,-20 L${180+rnd()*60},0 ${'L'+(120+rnd()*80)+',200 L'+(60+rnd()*60)+',420 L'+(150+rnd()*40)+',640 L'+(80)+',1000'} L-20,1000Z`,right=`M1020,-20 L${800-rnd()*60},0 L${860-rnd()*60},240 L${930-rnd()*40},460 L${850},700 L${920},1000 L1020,1000Z`;
+    const ledge=`M-20,1000 L-20,${820} ${jag(800,60,50,-1)} L1020,1000Z`,far=`M-20,1000 L-20,700 ${jag(690,90,30,-1)} L1020,1000Z`;
+    return `<svg class="bg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice"><defs>
+      <linearGradient id="hs${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${o.sky[0]}"/><stop offset="1" stop-color="${o.sky[1]}"/></linearGradient>
+      <radialGradient id="hg${i}" cx="50%" cy="72%" r="45%"><stop offset="0" stop-color="${o.glow}" stop-opacity=".9"/><stop offset="1" stop-color="${o.glow}" stop-opacity="0"/></radialGradient>
+      <linearGradient id="hr${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${o.rock[0]}"/><stop offset="1" stop-color="${o.rock[1]}"/></linearGradient></defs>
+      <rect width="1000" height="1000" fill="url(#hs${i})"/>${stars}<rect width="1000" height="1000" fill="url(#hg${i})"/>
+      <path d="${far}" fill="${o.rock[0]}" opacity=".7"/><path d="${top}" fill="url(#hr${i})"/><path d="${left}" fill="url(#hr${i})"/><path d="${right}" fill="url(#hr${i})"/><path d="${ledge}" fill="${o.rock[1]}"/>
+      <g transform="translate(${i===1?620:360},${785}) scale(1.1)" fill="#000"><circle cx="0" cy="-34" r="6"/><path d="M-5,-27 L6,-27 L9,-6 L22,-4 L22,2 L-6,2 Z"/></g></svg>`}
+  host.innerHTML=D.map((o,i)=>`<div class="hz" data-i="${i}">${bg(o,i)}<div class="tx"><div class="kick">${o.k}</div><h2>${o.t}</h2><span class="go" data-d="${o.d}">explore ${o.d==='mkt'?'marketing':o.d} ↓</span></div></div>`).join('');
+  const sl=[...host.children];let cur=0,busy=false,tm;sl[0].classList.add('cur');
+  const ease=t=>1-Math.pow(1-t,4);
+  function go(n){if(busy)return;n=(n+sl.length)%sl.length;if(n===cur)return;busy=true;const inc=sl[n],S=6;inc.classList.add('in');const t0=performance.now();
+    (function f(now){const t=Math.min(1,(now-t0)/1300);let topP=[],botP=[];
+      for(let i=0;i<S;i++){const h=ease(Math.min(1,Math.max(0,t*1.7-i*.12)))*100,x0=i/S*100,x1=(i+1)/S*100,a=i%2?100-h:0,b=i%2?100:h;topP.push(`${x0}% ${a}%`,`${x1}% ${a}%`);botP.unshift(`${x1}% ${b}%`,`${x0}% ${b}%`)}
+      inc.style.clipPath=`polygon(${topP.concat(botP).join(',')})`;
+      if(t<1)requestAnimationFrame(f);else{sl[cur].classList.remove('cur');inc.classList.remove('in');inc.classList.add('cur');inc.style.clipPath='';cur=n;busy=false;$('#hzN').innerHTML=`0${n+1} <small>/ 0${sl.length}</small>`}})(t0);
+    clearTimeout(tm);tm=setTimeout(()=>go(cur+1),5500)}
+  $('#hzX').onclick=()=>go(cur+1);$('#hzP').onclick=()=>go(cur-1);
+  host.addEventListener('click',e=>{const g=e.target.closest('.go');if(!g)return;const t=$(`.tab[data-d="${g.dataset.d}"]`);t&&t.click();$('#work').scrollIntoView({behavior:'smooth'})});
+  const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){clearTimeout(tm);tm=setTimeout(()=>go(cur+1),4000)}else clearTimeout(tm)},{threshold:.5});io.observe($('#horizon'));
+})();
+
+/* =================== V5: LIFE WALL (zoom out) =================== */
+(()=>{const wall=$('#wall');if(!wall)return;
+  const T=[['✈️','next stop: bali','#9fd8ff','#ffe1a8'],['🍜','street-food hunter','#ffb38a','#ffe6b3'],['👗','fashion is a language','#ffc2e0','#f6e2ff'],['📈','reading the markets','#c8f7c5','#e5fff0'],['🎤','public speaking','#ffd6a5','#ffadad'],
+    ['🧬','lab days','#bdf7ea','#d8e9ff'],['☕','café coder','#e7c9a9','#fff1dc'],['🎬','making reels','#ffadad','#ffd6ff'],['💸','money mindset','#d9f99d','#fef9c3'],['🏔️','mountains > malls','#bfdbfe','#e0f2fe'],
+    ['🤖','AI tinkerer','#c7d2fe','#e0e7ff'],['🗣️','negotiation nerd','#fecaca','#fde68a'],null,['📸','golden-hour photos','#fed7aa','#fecdd3'],['🧠','prompt crafter','#ddd6fe','#fbcfe8'],
+    ['🌸','slow sundays','#fbcfe8','#fce7f3'],['📚','always learning','#bbf7d0','#fef3c7'],['🛍️','thrift finds','#fde68a','#fbcfe8'],['🎧','lo-fi + focus','#a5f3fc','#c7d2fe'],['🍰','dessert critic','#fecdd3','#fef3c7'],
+    ['🌍','12 cities & counting','#bae6fd','#bbf7d0'],['💼','future founder','#e5e7eb','#c7d2fe'],['🎨','design eye','#fbcfe8','#a5f3fc'],['🚀','big skies','#c4b5fd','#fda4af'],['🏆','hackathon hunter','#fde68a','#fed7aa']];
+  wall.innerHTML=T.map(t=>t?`<div class="tile" style="background:radial-gradient(at 25% 25%,${t[2]},transparent 65%),radial-gradient(at 80% 80%,${t[3]},transparent 60%),#fffaf2"><span class="em">${t[0]}</span><span class="cap">${t[1]}</span></div>`
+   :`<div class="tile me" style="background:linear-gradient(180deg,#7ec8ff 0%,#ffd3a5 60%,#ff9a6b 100%)"><div class="sun"></div><div class="hill"></div><div class="hill b"></div><svg class="girl" viewBox="0 0 40 110"><path fill="#2a1410" d="M20 4a7 7 0 1 1 0 14a7 7 0 1 1 0-14zM13 20h14l6 34h-5l-2-14-1 22 9 46H6l9-46-1-22-2 14H7z"/></svg><h3>small town girl.<br>big skies.</h3></div>`).join('');
+  const sec=$('#life'),H=$('#lifeH');const sc=()=>{const vw=innerWidth,vh=innerHeight;return Math.max(vw/(vw*.18),vh/(vh*.18))*1.02};
+  function tick(){const p=prog(sec),e=1-Math.pow(1-clamp(p/.75),3),S=sc();wall.style.transform=`scale(${S+(0.92-S)*e}) rotate(${(1-e)*0}deg)`;H.classList.toggle('on',p>.72)}
+  addEventListener('scroll',tick,{passive:true});addEventListener('resize',tick);tick();
+})();
+
+/* =================== V5: AURORA GARDEN =================== */
+(()=>{const cv=$('#garden');if(!cv)return;const x=cv.getContext('2d'),sec=$('#about');let W,H,trees=[],fl=[],ff=[];
+  function rs(){W=cv.width=cv.clientWidth;H=cv.height=cv.clientHeight;trees=[];for(let i=0;i<34;i++){const d=Math.random();trees.push({x:Math.random()*W,h:H*(.12+d*.28),w:18+d*30,d})}trees.sort((a,b)=>a.d-b.d);
+    ff=Array.from({length:40},()=>({x:Math.random()*W,y:H*.5+Math.random()*H*.5,p:Math.random()*6}))}
+  rs();addEventListener('resize',rs);
+  const cols=[['#ff5c7a','#ffd1dc'],['#ff9a3c','#ffe0b3'],['#c56bff','#f0d6ff'],['#ff6ec7','#ffe0f2'],['#ffd23f','#fff4c2']];
+  const spawn=(px,big)=>{const gy=H*.78+Math.random()*H*.2;fl.push({x:px+(Math.random()-.5)*40,y:gy,h:(big?90:40)+Math.random()*90,g:0,c:cols[Math.random()*cols.length|0],n:5+(Math.random()*4|0),lup:Math.random()<.35,sw:Math.random()*6});if(fl.length>160)fl.shift()};
+  for(let i=0;i<26;i++)spawn(Math.random()*innerWidth,false);
+  let last=0;sec.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect(),now=performance.now();if(now-last>45){last=now;spawn(e.clientX-r.left,e.clientY-r.top>H*.6)}});
+  sec.addEventListener('click',e=>{const r=cv.getBoundingClientRect();for(let i=0;i<6;i++)spawn(e.clientX-r.left,true)});
+  function frame(t){requestAnimationFrame(frame);const r=sec.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)return;
+    const sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#03040c');sky.addColorStop(.55,'#0a1630');sky.addColorStop(1,'#050812');x.fillStyle=sky;x.fillRect(0,0,W,H);
+    // aurora curtains
+    x.globalCompositeOperation='lighter';
+    [['61,245,198',.0,.18],['120,255,170',1.7,.14],['170,110,255',3.1,.12]].forEach(([c,o,a])=>{for(let px=0;px<W;px+=3){const yy=H*.18+Math.sin(px*.004+t/2600+o)*H*.07+Math.sin(px*.011+t/1400+o)*H*.03;const len=H*(.18+.12*Math.sin(px*.02+t/900+o));
+      const g=x.createLinearGradient(0,yy,0,yy+len);g.addColorStop(0,`rgba(${c},0)`);g.addColorStop(.25,`rgba(${c},${a*(.6+.4*Math.sin(px*.05+t/500))})`);g.addColorStop(1,`rgba(${c},0)`);x.fillStyle=g;x.fillRect(px,yy,3,len)}});
+    x.globalCompositeOperation='source-over';
+    for(let i=0;i<60;i++){x.fillStyle=`rgba(255,255,255,${.3+.3*Math.sin(t/700+i)})`;x.fillRect((i*137)%W,(i*71)%(H*.45),1.5,1.5)}
+    // hills + pines
+    x.fillStyle='#070b16';x.beginPath();x.moveTo(0,H);for(let px=0;px<=W;px+=20)x.lineTo(px,H*.62+Math.sin(px*.004)*H*.04);x.lineTo(W,H);x.fill();
+    trees.forEach(tr=>{const base=H*.64+Math.sin(tr.x*.004)*H*.04+tr.d*H*.08,sh=Math.round(8+tr.d*10);x.fillStyle=`rgb(${sh},${sh+4},${sh+14})`;x.beginPath();
+      for(let k=0;k<5;k++){const yy=base-tr.h*(k/5),ww=tr.w*(1-k/6);x.moveTo(tr.x-ww,yy);x.lineTo(tr.x,yy-tr.h*.32);x.lineTo(tr.x+ww,yy)}x.fill();x.fillRect(tr.x-2,base-6,4,10)});
+    const mg=x.createLinearGradient(0,H*.72,0,H);mg.addColorStop(0,'#0b1020');mg.addColorStop(1,'#140a1e');x.fillStyle=mg;x.fillRect(0,H*.74,W,H*.26);
+    // flowers
+    fl.forEach(f=>{f.g=Math.min(1,f.g+.012);const e=1-Math.pow(1-f.g,3),sway=Math.sin(t/900+f.sw)*6*e,top=f.y-f.h*e,tx=f.x+sway;
+      x.strokeStyle='#2f5a3a';x.lineWidth=2;x.beginPath();x.moveTo(f.x,f.y);x.quadraticCurveTo(f.x,f.y-f.h*.5*e,tx,top);x.stroke();
+      if(f.lup){for(let k=0;k<9;k++){const yy=top+k*7*e,rr=(5-k*.35)*e;if(rr<=0)continue;x.fillStyle=f.c[k%2];x.globalAlpha=.9;x.beginPath();x.arc(tx+(k%2?3:-3),yy,rr,0,7);x.fill()}x.globalAlpha=1;return}
+      const b=Math.max(0,(f.g-.35)/.65),R=(10+f.h*.08)*b;if(R<=0)return;x.save();x.translate(tx,top);x.shadowBlur=18;x.shadowColor=f.c[0];
+      for(let k=0;k<f.n;k++){x.rotate(Math.PI*2/f.n);const g=x.createLinearGradient(0,0,0,-R);g.addColorStop(0,f.c[0]);g.addColorStop(1,f.c[1]);x.fillStyle=g;x.beginPath();x.ellipse(0,-R*.55,R*.42,R*.6,0,0,7);x.fill()}
+      x.shadowBlur=0;x.fillStyle='#ffe28a';x.beginPath();x.arc(0,0,R*.22,0,7);x.fill();x.restore()});
+    // fireflies
+    ff.forEach(p=>{p.x+=Math.sin(t/1000+p.p)*.4;p.y+=Math.cos(t/1300+p.p)*.3;const a=.4+.6*Math.max(0,Math.sin(t/400+p.p*3));x.fillStyle=`rgba(255,240,150,${a})`;x.shadowBlur=10;x.shadowColor='#ffe68a';x.beginPath();x.arc(p.x,p.y,1.8,0,7);x.fill()});x.shadowBlur=0}
+  requestAnimationFrame(frame);
+  const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){$('#bottle').classList.add('in');toast('a meadow grows where you wander ✿')}},{threshold:.4});io.observe(sec);
 })();
 setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'})+' IST · bhopal',1000);
 </script>
