@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>N.O.V.A. · Navya Gupta</title>
+<meta name="description" content="Navya Gupta: bioengineer, coder and storyteller. A HUD portfolio run by N.O.V.A., Navya's Operational Virtual Assistant.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;700&family=Share+Tech+Mono&family=La+Belle+Aurore&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04060c; --bg2:#070b16; --ink:#e6edfb; --dim:#7d8aa8; --cyan:#3df5ff; --cyan2:#0fb8ff; --ember:#ff4a1c; --gold:#ffb347; --red:#ff2a2a; --blue:#2a5cff;
+  --hud:'Orbitron',sans-serif; --ui:'Rajdhani',system-ui,sans-serif; --mono:'Share Tech Mono',monospace; --hand:'La Belle Aurore',cursive;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:17px;overflow-x:hidden;cursor:none}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--cyan);color:#000}
+@media(hover:none){body{cursor:auto}#cur{display:none}}
+/* global film: scanlines + grain + vignette */
+body::before{content:"";position:fixed;inset:0;z-index:900;pointer-events:none;background:repeating-linear-gradient(0deg,#ffffff05 0 1px,transparent 1px 3px)}
+body::after{content:"";position:fixed;inset:0;z-index:901;pointer-events:none;opacity:.08;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ---------- HUD cursor ---------- */
+#cur{position:fixed;left:0;top:0;z-index:1000;pointer-events:none;width:46px;height:46px;transform:translate(-50%,-50%)}
+#cur svg{width:100%;height:100%;overflow:visible;animation:rot 6s linear infinite}
+#cur .xy{position:absolute;left:36px;top:30px;font:10px var(--mono);color:var(--cyan);white-space:nowrap;opacity:.8}
+#cur.hot svg{animation-duration:1.2s}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ---------- INTRO (hammer → city → WAKE UP) ---------- */
+#intro{position:fixed;inset:0;z-index:950;background:#000;transition:opacity 1.2s}
+#intro.out{opacity:0;pointer-events:none}
+#introGL{position:absolute;inset:0;width:100%;height:100%}
+#led{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#boot{position:absolute;left:5vw;bottom:9vh;font:clamp(.75rem,1.3vw,.95rem)/1.7 var(--mono);color:#8fd8ff;text-shadow:0 0 8px #0fb8ff;max-width:640px}
+#boot b{color:var(--ember);text-shadow:0 0 10px var(--ember);font-weight:400}
+#skip{position:absolute;right:4vw;top:4vh;font:12px var(--mono);letter-spacing:.2em;color:var(--dim);border:1px solid #ffffff22;padding:8px 14px;border-radius:2px;background:none;cursor:pointer}
+#skip:hover{color:var(--cyan);border-color:var(--cyan)}
+
+/* ---------- NAV ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:800;display:flex;justify-content:space-between;align-items:center;padding:16px 4vw;font:12px var(--mono);letter-spacing:.14em;text-transform:uppercase;background:linear-gradient(#04060ccc,transparent)}
+nav .logo{font-family:var(--hud);font-weight:900;letter-spacing:.3em;color:var(--cyan);text-shadow:0 0 12px var(--cyan)}
+nav .links{display:flex;gap:22px}
+nav .links a{color:var(--dim);transition:color .3s}nav .links a:hover{color:var(--cyan)}
+nav .stat{color:var(--ember)}nav .stat i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ember);box-shadow:0 0 10px var(--ember);margin-right:8px;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+@media(max-width:760px){nav .links{display:none}}
+
+section{position:relative;min-height:100svh}
+/* smooth dark blending between sections */
+.blend::before,.blend::after{content:"";position:absolute;left:0;right:0;height:22vh;z-index:3;pointer-events:none}
+.blend::before{top:0;background:linear-gradient(var(--bg),transparent)}
+.blend::after{bottom:0;background:linear-gradient(transparent,var(--bg))}
+.kick{font:12px var(--mono);letter-spacing:.3em;text-transform:uppercase;color:var(--cyan)}
+.h-hud{font-family:var(--hud);font-weight:900;text-transform:uppercase;letter-spacing:.04em;line-height:.95}
+.glow-c{text-shadow:0 0 18px #3df5ff88}.glow-e{text-shadow:0 0 22px #ff4a1caa}
+.panel{background:linear-gradient(160deg,#0b1428cc,#060a14cc);border:1px solid #3df5ff33;box-shadow:inset 0 0 30px #3df5ff0d,0 0 0 1px #00000088;backdrop-filter:blur(6px);position:relative}
+.panel::before,.panel::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--cyan)}
+.panel::before{left:-2px;top:-2px;border-right:0;border-bottom:0}.panel::after{right:-2px;bottom:-2px;border-left:0;border-top:0}
+.rv{opacity:0;transform:translateY(40px);filter:blur(6px);transition:opacity 1s,transform 1s cubic-bezier(.19,1,.22,1),filter 1s}
+.rv.in{opacity:1;transform:none;filter:none}
+#sweep{position:fixed;left:0;right:0;height:2px;top:-10px;z-index:850;pointer-events:none;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 30px 6px #3df5ff66;opacity:0}
+#sweep.go{animation:sweep 1s cubic-bezier(.65,0,.35,1)}
+@keyframes sweep{0%{top:-10px;opacity:1}100%{top:100vh;opacity:0}}
+
+/* ---------- HERO: student blueprint ---------- */
+#hero{height:100svh;overflow:hidden;background:#06103a}
+#heroCv{position:absolute;inset:0;width:100%;height:100%}
+.hero-ui{position:absolute;z-index:4;left:5vw;top:18vh;max-width:620px;pointer-events:none}
+.hero-ui h1{font-size:clamp(3rem,9vw,7.6rem);color:#eaf2ff}
+.hero-ui h1 span{display:block;font-size:.42em;letter-spacing:.32em;color:var(--cyan);margin-top:10px}
+.hero-ui p{margin-top:22px;font-size:1.15rem;color:#b9c6e8;max-width:440px;line-height:1.5}
+.hero-ui .greet{font:13px var(--mono);color:var(--ember);margin-top:18px;min-height:1.4em}
+.hero-scroll{position:absolute;z-index:4;bottom:5vh;left:50%;transform:translateX(-50%);font:11px var(--mono);letter-spacing:.3em;color:var(--dim);animation:blink 2s infinite}
+
+/* ---------- CORE: HUD hub ---------- */
+#core{display:grid;place-items:center;padding:120px 4vw;background:radial-gradient(60% 50% at 50% 50%,#0a1a34,var(--bg) 70%)}
+.core-wrap{position:relative;width:min(760px,94vw);aspect-ratio:1}
+#rings{position:absolute;inset:0;width:100%;height:100%}
+.core-mid{position:absolute;inset:0;display:grid;place-items:center;text-align:center;pointer-events:none}
+.core-mid h2{font-size:clamp(1.6rem,4vw,2.8rem);color:#fff}
+.core-mid p{font:13px var(--mono);color:var(--cyan);margin-top:8px;min-height:1.2em}
+.mod{position:absolute;width:150px;padding:16px 14px;text-align:center;cursor:pointer;transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .35s}
+.mod b{display:block;font-family:var(--hud);font-size:1.1rem;letter-spacing:.12em}
+.mod small{font:11px var(--mono);color:var(--dim)}
+.mod:hover{transform:scale(1.08);box-shadow:0 0 30px #3df5ff55}
+.mod.m1{left:50%;top:-2%;transform-origin:center;translate:-50% 0}.mod.m2{left:-4%;bottom:6%}.mod.m3{right:-4%;bottom:6%}
+.mod .ic{font-size:1.6rem;display:block;margin-bottom:6px;filter:drop-shadow(0 0 8px var(--cyan))}
+.readout{position:absolute;font:11px/1.6 var(--mono);color:var(--dim)}
+.readout b{color:var(--cyan);font-weight:400}
+.readout.r1{left:-2%;top:22%}.readout.r2{right:-2%;top:22%;text-align:right}
+#wave{position:absolute;left:50%;bottom:24%;translate:-50% 0;width:220px;height:40px}
+@media(max-width:700px){.mod{width:110px;padding:10px}.readout{display:none}}
+
+/* ---------- TECH: holo workshop ---------- */
+#tech{height:340vh;background:var(--bg)}
+.stick{position:sticky;top:0;height:100svh;overflow:hidden}
+#holoGL{position:absolute;inset:0;width:100%;height:100%}
+.sec-title{position:absolute;z-index:4;left:5vw;top:12vh}
+.sec-title h2{font-size:clamp(2.6rem,7vw,5.6rem)}
+.sec-title p{color:var(--dim);margin-top:8px;max-width:380px}
+.holo-info{position:absolute;z-index:4;right:5vw;top:16vh;width:min(360px,88vw);padding:20px}
+.holo-info .n{font:11px var(--mono);color:var(--ember)}
+.holo-info h3{font-family:var(--hud);font-size:1.4rem;margin:8px 0;color:var(--cyan)}
+.holo-info p{color:#b9c6e8;line-height:1.45}
+.holo-info .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.holo-info .tags span{font:11px var(--mono);border:1px solid #3df5ff44;padding:3px 8px;color:var(--cyan)}
+.term{position:absolute;z-index:5;left:5vw;bottom:6vh;width:min(560px,90vw);height:250px;padding:14px 16px;font:13px/1.55 var(--mono);color:#bfefff;display:flex;flex-direction:column}
+.term .out{flex:1;overflow:auto;white-space:pre-wrap}
+.term .out .u{color:var(--gold)}.term .out .e{color:var(--ember)}
+.term .in{display:flex;gap:8px;border-top:1px solid #3df5ff22;padding-top:8px}
+.term .in span{color:var(--ember)}
+.term input{flex:1;background:none;border:none;outline:none;color:#fff;font:inherit;cursor:text}
+.holo-hint{position:absolute;z-index:4;right:5vw;bottom:6vh;font:11px var(--mono);color:var(--dim);letter-spacing:.2em}
+@media(max-width:860px){.holo-info{top:auto;bottom:calc(6vh + 270px)}.holo-hint{display:none}}
+
+/* ---------- BIO: blueprint human ---------- */
+#bio{height:360vh;background:#120604}
+#bioCv{position:absolute;inset:0;width:100%;height:100%}
+.callout{position:absolute;z-index:4;max-width:230px;font:13px/1.35 var(--ui);color:#ffe9c9;opacity:0;transform:translateY(10px);transition:opacity .6s,transform .6s;pointer-events:none}
+.callout.on{opacity:1;transform:none}
+.callout b{display:block;font-family:var(--hud);font-size:.8rem;letter-spacing:.14em;color:var(--gold);margin-bottom:3px}
+.callout i{font-family:var(--hand);font-style:normal;font-size:1.05rem;color:#ffd7a0}
+.bio-title{position:absolute;z-index:4;left:5vw;top:12vh}
+.bio-title h2{font-size:clamp(2.6rem,7vw,5.6rem);color:#ffe2b8}
+.bio-title p{color:#d9b48a;margin-top:8px;max-width:340px}
+.bio-defn{position:absolute;z-index:4;right:5vw;bottom:8vh;width:min(340px,88vw);padding:18px;border:1px solid #ffb34755;background:#1a0a06cc;opacity:0;transition:opacity .8s}
+.bio-defn.on{opacity:1}
+.bio-defn b{font-family:var(--hud);color:var(--gold);letter-spacing:.1em}.bio-defn i{color:#d9b48a}.bio-defn p{margin-top:6px;color:#ffe9c9;line-height:1.4}
+
+/* ---------- MARKETING: mission control ---------- */
+#mkt{padding:120px 4vw;background:radial-gradient(70% 60% at 70% 40%,#1a0a14,var(--bg) 70%);overflow:hidden}
+.mk-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center;margin-top:40px}
+#globeGL{width:100%;aspect-ratio:1;display:block}
+.mk-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mk-card{padding:18px}
+.mk-card .v{font-family:var(--hud);font-size:2.2rem;color:var(--ember);text-shadow:0 0 16px #ff4a1c88}
+.mk-card .l{font:11px var(--mono);color:var(--dim);letter-spacing:.14em;text-transform:uppercase}
+.mk-card p{font-size:.95rem;color:#c9d3ee;margin-top:6px;line-height:1.35}
+.mk-card svg{width:100%;height:46px;margin-top:8px}
+.mk-card.wide{grid-column:1/-1}
+@media(max-width:900px){.mk-grid{grid-template-columns:1fr}}
+
+/* ---------- SERVICES: suit upgrades ---------- */
+#suits{padding:120px 4vw;background:var(--bg)}
+.suit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:40px}
+.suit{padding:22px;min-height:250px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .4s,box-shadow .4s;overflow:hidden}
+.suit:hover{transform:translateY(-8px);box-shadow:0 0 40px #3df5ff33}
+.suit .mk{font:11px var(--mono);color:var(--ember);letter-spacing:.2em}
+.suit h3{font-family:var(--hud);font-size:1.15rem;margin:10px 0;color:#fff;letter-spacing:.06em}
+.suit p{color:#b9c6e8;font-size:.95rem;line-height:1.4}
+.suit .pr{font:13px var(--mono);color:var(--cyan);margin-top:14px}
+.suit .bar{height:3px;background:#ffffff11;margin-top:10px;overflow:hidden}.suit .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--ember));transition:width 1.6s cubic-bezier(.19,1,.22,1)}
+.suit.in .bar i{width:var(--w)}
+
+/* ---------- CONTACT ---------- */
+#contact{display:grid;place-items:center;text-align:center;padding:120px 4vw;background:radial-gradient(60% 60% at 50% 60%,#2a0a04,var(--bg) 70%);overflow:hidden}
+#contact h2{font-size:clamp(2.8rem,9vw,7rem)}
+#contact p{color:#c9d3ee;margin:18px auto 0;max-width:520px}
+.proto{margin-top:36px;display:inline-flex;align-items:center;gap:14px;font-family:var(--hud);letter-spacing:.2em;font-size:1rem;padding:20px 34px;color:#000;background:var(--ember);box-shadow:0 0 40px #ff4a1c88;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);transition:transform .2s}
+.proto:hover{transform:scale(1.05)}
+.links2{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.links2 a{font:12px var(--mono);letter-spacing:.2em;color:var(--cyan);border:1px solid #3df5ff44;padding:10px 16px}
+.links2 a:hover{background:#3df5ff18}
+footer{padding:26px 4vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font:11px var(--mono);color:var(--dim);border-top:1px solid #ffffff10}
+.toast{position:fixed;left:50%;top:74px;transform:translate(-50%,-160px);z-index:960;font:13px var(--mono);color:#bfefff;padding:12px 18px;transition:transform .5s cubic-bezier(.34,1.56,.64,1);max-width:90vw}
+.toast.show{transform:translate(-50%,0)}
+.toast b{color:var(--ember);font-weight:400}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none;filter:none}}
+</style>
+</head>
+<body>
+<div id="cur"><svg viewBox="-24 -24 48 48"><circle r="16" fill="none" stroke="#3df5ff" stroke-width="1.2" stroke-dasharray="6 4"/><circle r="2" fill="#ff4a1c"/><path d="M-22 0h8M14 0h8M0-22v8M0 14v8" stroke="#3df5ff" stroke-width="1.2"/></svg><span class="xy" id="curXY"></span></div>
+<div id="sweep"></div>
+<div class="toast panel" id="toast"></div>
+
+<!-- INTRO -->
+<div id="intro"><canvas id="introGL"></canvas><canvas id="led"></canvas><div id="boot"></div><button id="skip">SKIP INTRO ▸</button></div>
+
+<nav><a href="#hero" class="logo">N.O.V.A.</a>
+  <div class="links"><a href="#core">hub</a><a href="#tech">tech</a><a href="#bio">bio</a><a href="#mkt">marketing</a><a href="#suits">services</a><a href="#contact">contact</a></div>
+  <span class="stat"><i></i>online · <span id="clk">--:--</span> IST</span></nav>
+
+<!-- HERO: the student, Da Vinci blueprint -->
+<section id="hero">
+  <canvas id="heroCv"></canvas>
+  <div class="hero-ui">
+    <p class="kick">// subject: navya gupta · b.tech bioengineering · VIT bhopal</p>
+    <h1 class="h-hud glow-c">Navya<br>Gupta<span>BIO · TECH · STORY</span></h1>
+    <p>A bioengineering student building AI for healthcare, writing code that ships and telling stories that sell. Running on chai and curiosity.</p>
+    <p class="greet" id="greet"></p>
+  </div>
+  <div class="hero-scroll">SCROLL TO ENTER THE LAB ↓</div>
+</section>
+
+<!-- CORE HUB -->
+<section id="core" class="blend">
+  <div class="core-wrap rv">
+    <svg id="rings" viewBox="-400 -400 800 800"></svg>
+    <div class="core-mid"><div><p class="kick">N.O.V.A. // core</p><h2 class="h-hud glow-c">choose<br>a module</h2><p id="coreSay"></p></div></div>
+    <canvas id="wave"></canvas>
+    <a class="mod panel m1" href="#tech"><span class="ic">⌬</span><b>TECH</b><small>python · AI · prompts</small></a>
+    <a class="mod panel m2" href="#bio"><span class="ic">🧬</span><b>BIO</b><small>bioinformatics · medtech</small></a>
+    <a class="mod panel m3" href="#mkt"><span class="ic">📡</span><b>MARKETING</b><small>growth · content · ops</small></a>
+    <div class="readout r1">CAFFEINE <b>87%</b><br>CHAI RESERVE <b>2 CUPS</b><br>SLEEP <b>NOT FOUND</b><br>MOOD <b>SHIPPING</b></div>
+    <div class="readout r2">PROJECTS <b>25+</b><br>DOMAINS <b>3</b><br>LOCATION <b>BHOPAL, IN</b><br>STATUS <b>OPEN FOR CLIENTS</b></div>
+  </div>
+</section>
+
+<!-- TECH: holographic workshop + terminal -->
+<section id="tech">
+  <div class="stick">
+    <canvas id="holoGL"></canvas>
+    <div class="sec-title"><p class="kick">module 01 // tech</p><h2 class="h-hud glow-c">The<br>Workshop</h2><p>Grab a hologram and spin it. Or talk to N.O.V.A. in the terminal.</p></div>
+    <div class="holo-info panel" id="holoInfo"></div>
+    <div class="term panel"><div class="out" id="tOut"></div><div class="in"><span>navya@nova:~$</span><input id="tIn" autocomplete="off" spellcheck="false" placeholder="type 'help'"></div></div>
+    <div class="holo-hint">DRAG TO ROTATE · SCROLL TO SWITCH</div>
+  </div>
+</section>
+
+<!-- BIO: glowing human blueprint -->
+<section id="bio">
+  <div class="stick">
+    <canvas id="bioCv"></canvas>
+    <div class="bio-title"><p class="kick" style="color:var(--gold)">module 02 // bio</p><h2 class="h-hud glow-e">The<br>Human<br>Machine</h2><p>Scroll to bring the blueprint to life. Every vein is a question I want to answer with data.</p></div>
+    <div class="callout" data-k="brain"><b>NEURAL NETWORKS</b>both kinds: the ones in your skull and the ones in my code. <i>brain → model → insight</i></div>
+    <div class="callout" data-k="heart"><b>MEDICAL IMAGING AI</b>CNNs that read scans and Grad-CAM heatmaps that show doctors <i>why</i>.</div>
+    <div class="callout" data-k="lungs"><b>BIOSIGNALS</b>ECG, EEG and breath: signal processing for the body's own data streams.</div>
+    <div class="callout" data-k="dna"><b>BIOINFORMATICS</b>gene expression pipelines and volcano plots from public GEO data. <i>ATGC → AI</i></div>
+    <div class="callout" data-k="hand"><b>BIONICS (THE DREAM)</b>prosthetics and wearables that make humans a little more super.</div>
+    <div class="bio-defn" id="bioDefn"><b>BIOENGINEER</b> <i>(noun)</i><p>a person who uses fancy gadgets and computers to fix humans and turn them into bionic superheroes… and still can't fix her own sleep schedule.</p></div>
+  </div>
+</section>
+
+<!-- MARKETING: mission control -->
+<section id="mkt" class="blend">
+  <p class="kick rv" style="color:var(--ember)">module 03 // marketing</p>
+  <h2 class="h-hud glow-e rv" style="font-size:clamp(2.6rem,7vw,5.6rem)">Mission<br>Control</h2>
+  <p class="rv" style="color:var(--dim);max-width:460px;margin-top:10px">Stories that travel. Content, growth and Excel ops: tracked like a launch, told like a film.</p>
+  <div class="mk-grid">
+    <canvas id="globeGL" class="rv"></canvas>
+    <div class="mk-cards">
+      <div class="mk-card panel rv"><div class="l">reach target</div><div class="v"><span class="cnt" data-to="300">0</span>%</div><p>content sprint for a brand IG</p><svg viewBox="0 0 200 46" class="spark"></svg></div>
+      <div class="mk-card panel rv"><div class="l">hook window</div><div class="v">1.5s</div><p>or the thumb wins. every time.</p><svg viewBox="0 0 200 46" class="spark"></svg></div>
+      <div class="mk-card panel rv"><div class="l">hours saved / week</div><div class="v"><span class="cnt" data-to="10">0</span>h</div><p>excel ops dashboards that build themselves</p><svg viewBox="0 0 200 46" class="spark"></svg></div>
+      <div class="mk-card panel rv"><div class="l">calendar</div><div class="v"><span class="cnt" data-to="30">0</span>d</div><p>hook-first reels + carousels, planned</p><svg viewBox="0 0 200 46" class="spark"></svg></div>
+      <div class="mk-card panel wide rv"><div class="l">N.O.V.A. hot take</div><p id="hotTake" style="font-size:1.1rem;color:#fff">your brand doesn't need more posts. it needs a better story.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES: suit upgrades -->
+<section id="suits" class="blend">
+  <p class="kick rv">armory // services</p>
+  <h2 class="h-hud glow-c rv" style="font-size:clamp(2.4rem,6vw,4.8rem)">Suit<br>Upgrades</h2>
+  <div class="suit-grid">
+    <div class="suit panel rv" style="--w:92%"><div><span class="mk">MK-01</span><h3>AI AUTOMATION &amp; PROMPT SYSTEMS</h3><p>Agents and prompt libraries with evals. Your team stops doing robot work.</p></div><div><div class="pr">FROM ₹15,000</div><div class="bar"><i></i></div></div></div>
+    <div class="suit panel rv" style="--w:86%"><div><span class="mk">MK-02</span><h3>PYTHON &amp; VIBE-CODED APPS</h3><p>Landing pages, dashboards and micro-SaaS: idea to live URL, fast.</p></div><div><div class="pr">FROM ₹20,000</div><div class="bar"><i></i></div></div></div>
+    <div class="suit panel rv" style="--w:80%"><div><span class="mk">MK-03</span><h3>BIOINFORMATICS &amp; ML</h3><p>Gene expression, medical imaging and literature pipelines.</p></div><div><div class="pr">PROJECT BASED</div><div class="bar"><i></i></div></div></div>
+    <div class="suit panel rv" style="--w:88%"><div><span class="mk">MK-04</span><h3>DIGITAL MARKETING &amp; CONTENT</h3><p>Hook-first reels, carousel storytelling and 30-day calendars.</p></div><div><div class="pr">FROM ₹12,000 / MO</div><div class="bar"><i></i></div></div></div>
+    <div class="suit panel rv" style="--w:84%"><div><span class="mk">MK-05</span><h3>EXCEL OPS &amp; EXECUTIVE SUPPORT</h3><p>MIS dashboards, XLOOKUP models, inbox and calendar handled.</p></div><div><div class="pr">FROM ₹10,000 / MO</div><div class="bar"><i></i></div></div></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="blend">
+  <div class="rv">
+    <p class="kick" style="color:var(--ember)">final protocol</p>
+    <h2 class="h-hud glow-e">Initiate<br>Collab</h2>
+    <p>Got a product to launch, a dataset to tame or a brand to grow? N.O.V.A. forwards everything to Navya. She replies within 24h (faster than your cousin on the family group).</p>
+    <a class="proto" href="mailto:hello@example.com">⚡ HIRE NAVYA</a>
+    <div class="links2"><a href="#" target="_blank">LINKEDIN</a><a href="#" target="_blank">GITHUB</a><a href="#" target="_blank">INSTAGRAM</a><a href="#" target="_blank">RESUME</a></div>
+  </div>
+</section>
+<footer><span>© 2026 navya gupta · N.O.V.A. v4.2</span><span>built with python brain, marketing heart &amp; too much chai</span></footer>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/three-extras.js"></script>
+<script src="js/nova.js"></script>
+</body>
+</html>

@@ -1,0 +1,378 @@
+/* N.O.V.A. — Navya's Operational Virtual Assistant. All scenes for the HUD portfolio. */
+(function () {
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, t) => a + (b - a) * t, ease = (t) => t * t * (3 - 2 * t);
+  const prog = (el) => { const r = el.getBoundingClientRect(); return clamp(-r.top / Math.max(1, r.height - innerHeight)); };
+  const vis = (el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
+  const R = Math.random, TAU = Math.PI * 2;
+  if (window.THREE && THREE.ColorManagement) { THREE.ColorManagement.legacyMode = false; THREE.ColorManagement.enabled = true; }
+
+  /* ===================== UI basics ===================== */
+  const toastEl = $('#toast'); let tT; const toast = (m) => { toastEl.innerHTML = '<b>N.O.V.A. ›</b> ' + m; toastEl.classList.add('show'); clearTimeout(tT); tT = setTimeout(() => toastEl.classList.remove('show'), 3200); };
+  window.toast = toast;
+  const cur = $('#cur'), cxy = $('#curXY'); let mx = innerWidth / 2, my = innerHeight / 2, cx = mx, cy = my;
+  addEventListener('pointermove', (e) => { mx = e.clientX; my = e.clientY; });
+  (function cl() { cx += (mx - cx) * 0.25; cy += (my - cy) * 0.25; cur.style.left = cx + 'px'; cur.style.top = cy + 'px'; cxy.textContent = `X:${Math.round(mx)} Y:${Math.round(my)}`; requestAnimationFrame(cl); })();
+  $$('a,button,input,.mod,.suit').forEach((el) => { el.addEventListener('pointerenter', () => cur.classList.add('hot')); el.addEventListener('pointerleave', () => cur.classList.remove('hot')); });
+  setInterval(() => { $('#clk').textContent = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }); }, 1000);
+  const typeInto = (el, txt, sp = 28) => new Promise((res) => { let i = 0; el.textContent = ''; (function t() { el.textContent = txt.slice(0, ++i); if (i < txt.length) setTimeout(t, sp); else res(); })(); });
+  // reveal + counters + suit bars
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (!e.isIntersecting) return; e.target.classList.add('in');
+    $$('.cnt', e.target).forEach((c) => { const to = +c.dataset.to; let s = null; const st = (t) => { s ??= t; const p = Math.min(1, (t - s) / 1500); c.textContent = Math.round(to * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(st); }; requestAnimationFrame(st); });
+    io.unobserve(e.target); }), { threshold: 0.2 });
+  $$('.rv').forEach((el) => io.observe(el));
+  // scan sweep on section change
+  let lastSec = null; const sweep = $('#sweep');
+  addEventListener('scroll', () => { const s = $$('section').find((el) => { const r = el.getBoundingClientRect(); return r.top <= innerHeight * 0.5 && r.bottom > innerHeight * 0.5; });
+    if (s && s !== lastSec) { lastSec = s; sweep.classList.remove('go'); void sweep.offsetWidth; sweep.classList.add('go'); } }, { passive: true });
+  // sparklines + hot takes
+  $$('.spark').forEach((sv, k) => { let d = 'M0,40'; let y = 36; for (let x = 0; x <= 200; x += 10) { y = clamp(y - (R() * 9 - 2.5 - k * 0.3), 4, 42); d += ` L${x},${y.toFixed(1)}`; }
+    sv.innerHTML = `<path d="${d}" fill="none" stroke="#ff4a1c" stroke-width="2" style="stroke-dasharray:600;stroke-dashoffset:600;animation:dash 2.4s ${k * 0.2}s forwards"/>`; });
+  const st = document.createElement('style'); st.textContent = '@keyframes dash{to{stroke-dashoffset:0}}'; document.head.appendChild(st);
+  const takes = ["your brand doesn't need more posts. it needs a better story.", 'hook in 1.5 seconds or the thumb wins. every time.', 'carousels win saves. reels win reach. use both.', 'nobody reads captions. everyone reads the first line.', 'consistency beats virality. virality is a bonus, like extra chutney.', 'your audience is not "everyone". even maggi has a target customer.'];
+  let tk = 0; setInterval(() => { const el = $('#hotTake'); if (!el || !vis(el)) return; el.style.opacity = 0; setTimeout(() => { el.textContent = takes[++tk % takes.length]; el.style.opacity = 1; }, 300); }, 4200);
+  $('#hotTake') && ($('#hotTake').style.transition = 'opacity .3s');
+  // tab title + idle humour
+  const T0 = document.title; addEventListener('visibilitychange', () => { document.title = document.hidden ? 'N.O.V.A. › come back, navya is waiting 👀' : T0; });
+
+  /* ===================== shared three helpers ===================== */
+  function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); draw(x, w, h); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t; }
+  function rbox(w, h, d, r, m) { const s = new THREE.Shape(), x = -w / 2, y = -h / 2; s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h); s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+    const g = new THREE.ExtrudeGeometry(s, { depth: Math.max(0.001, d - r), bevelEnabled: true, bevelThickness: r / 2, bevelSize: r / 2, bevelSegments: 5, curveSegments: 6 }); g.center(); const o = new THREE.Mesh(g, m); o.castShadow = o.receiveShadow = true; return o; }
+  const FBM = 'float h1(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h1(i),h1(i+vec2(1,0)),f.x),mix(h1(i+vec2(0,1)),h1(i+1.),f.x),f.y);}float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<6;i++){v+=a*n2(p);p=p*2.03+1.7;a*=.5;}return v;}';
+
+  /* ===================== INTRO: hammer → city → WAKE UP ===================== */
+  function intro(done) {
+    const el = $('#intro');
+    let seen = false; try { seen = sessionStorage.getItem('nova_seen') === '1'; } catch (e) {}
+    if (seen || !window.THREE) { el.remove(); done(); return; }
+    const cv = $('#introGL'), led = $('#led'), lx = led.getContext('2d'), boot = $('#boot');
+    const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.5)); r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.1;
+    const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(50, 1, 0.1, 900); sc.fog = new THREE.FogExp2('#05070d', 0.006);
+    if (window.RoomEnvironment) { const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; }
+    // sky: storm → nebula
+    const U = { uT: { value: 0 }, uFlash: { value: 0 }, uMix: { value: 0 } };
+    sc.add(new THREE.Mesh(new THREE.SphereGeometry(600, 48, 32), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false, uniforms: U,
+      vertexShader: 'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+      fragmentShader: 'uniform float uT,uFlash,uMix;varying vec3 vP;' + FBM + 'void main(){vec2 p=vec2(atan(vP.z,vP.x)*1.6,vP.y*3.);float f=fbm(p*1.5+vec2(uT*.05,0.));float g=fbm(p*3.+f*2.-uT*.03);' +
+        'vec3 storm=mix(vec3(.02,.025,.04),vec3(.18,.2,.26),smoothstep(.3,.8,f*g*1.6));' +
+        'float fil=pow(smoothstep(.45,.9,g),2.);vec3 neb=mix(vec3(.01,.015,.04),vec3(.08,.18,.42),smoothstep(.2,.8,f));neb+=vec3(.9,.25,.06)*fil*smoothstep(-.1,.5,vP.y);neb+=vec3(.6,.75,1.)*pow(max(0.,1.-abs(vP.y)*6.),6.)*.8;' +
+        'float st=pow(h1(floor(p*260.)),90.)*smoothstep(0.,.3,vP.y);vec3 c=mix(storm,neb,uMix)+st*uMix+uFlash*vec3(.55,.65,1.)*(.4+f);gl_FragColor=vec4(c,1.);}' })));
+    // ground + city
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshStandardMaterial({ color: '#07090d', roughness: 0.95 })); ground.rotation.x = -Math.PI / 2; sc.add(ground);
+    const crack = canvasTex(1024, 1024, (x, w, h) => { x.clearRect(0, 0, w, h); x.strokeStyle = '#ff6a1c'; x.shadowColor = '#ff4a1c'; x.shadowBlur = 18; x.lineCap = 'round';
+      const branch = (px, py, a, len, wdt, d) => { if (d > 4 || len < 8) return; let X = px, Y = py; x.lineWidth = wdt; x.beginPath(); x.moveTo(X, Y); for (let i = 0; i < 8; i++) { a += (R() - 0.5) * 0.7; X += Math.cos(a) * len / 8; Y += Math.sin(a) * len / 8; x.lineTo(X, Y); } x.stroke();
+        branch(X, Y, a + (R() - 0.5) * 1.2, len * 0.65, wdt * 0.7, d + 1); if (R() < 0.6) branch(X, Y, a + (R() - 0.5) * 1.6, len * 0.5, wdt * 0.6, d + 1); };
+      for (let i = 0; i < 14; i++) branch(512, 512, (i / 14) * TAU + R() * 0.3, 260 + R() * 120, 9, 0); x.fillStyle = '#ffb347'; x.beginPath(); x.arc(512, 512, 40, 0, TAU); x.fill(); });
+    const crackM = new THREE.MeshBasicMaterial({ map: crack, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+    const crackP = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), crackM); crackP.rotation.x = -Math.PI / 2; crackP.position.y = 0.02; sc.add(crackP);
+    const win = canvasTex(64, 128, (x) => { x.fillStyle = '#000'; x.fillRect(0, 0, 64, 128); for (let yy = 4; yy < 128; yy += 8) for (let xx = 4; xx < 64; xx += 8) if (R() < 0.35) { x.fillStyle = R() < 0.85 ? '#ffcf8a' : '#8fd8ff'; x.fillRect(xx, yy, 4, 4); } });
+    win.wrapS = win.wrapT = THREE.RepeatWrapping;
+    const bM = new THREE.MeshStandardMaterial({ color: '#0c1018', roughness: 0.7, metalness: 0.3, emissive: '#ffffff', emissiveMap: win, emissiveIntensity: 1.1 });
+    const N = 2600, city = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), bM, N), m4 = new THREE.Matrix4(), q = new THREE.Quaternion();
+    for (let i = 0; i < N; i++) { const a = R() * TAU, d = 14 + Math.pow(R(), 0.7) * 230, hgt = (2 + Math.pow(R(), 3) * 40) * (d < 70 ? 1.6 : 1) * (1 - d / 330), w = 2 + R() * 4;
+      m4.compose(new THREE.Vector3(Math.cos(a) * d, hgt / 2, Math.sin(a) * d - 20), q, new THREE.Vector3(w, hgt, w * (0.7 + R() * 0.6))); city.setMatrixAt(i, m4); }
+    sc.add(city);
+    // the hammer (original rune design)
+    const runes = canvasTex(512, 512, (x, w, h) => { const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#5b6270'); g.addColorStop(1, '#2a2e36'); x.fillStyle = g; x.fillRect(0, 0, w, h);
+      for (let i = 0; i < 2500; i++) { x.fillStyle = `rgba(255,255,255,${R() * 0.05})`; x.fillRect(R() * w, R() * h, 2, 1); } x.strokeStyle = '#1a1d22'; x.lineWidth = 10; x.strokeRect(24, 24, w - 48, h - 48); });
+    const glyph = canvasTex(512, 512, (x, w, h) => { x.fillStyle = '#000'; x.fillRect(0, 0, w, h); x.strokeStyle = '#fff'; x.lineWidth = 7; x.lineCap = 'round';
+      x.beginPath(); x.arc(256, 256, 150, 0, TAU); x.stroke(); x.beginPath(); x.arc(256, 256, 110, 0, TAU); x.stroke();
+      for (let i = 0; i < 3; i++) { x.save(); x.translate(256, 256); x.rotate(i * TAU / 3); x.beginPath(); x.moveTo(0, -110); x.bezierCurveTo(90, -60, 90, 60, 0, 110); x.stroke(); x.restore(); }
+      const rr = ['ᚾ', 'ᚨ', 'ᚢ', 'ᛃ', 'ᚨ']; x.font = '44px serif'; x.fillStyle = '#fff'; x.textAlign = 'center'; rr.forEach((c, i) => { const a = -Math.PI / 2 + (i - 2) * 0.42; x.fillText(c, 256 + Math.cos(a) * 205, 268 + Math.sin(a) * 205); });
+      [[60, 60], [452, 60], [60, 452], [452, 452]].forEach(([px, py]) => { x.beginPath(); x.moveTo(px - 20, py); x.lineTo(px, py - 20); x.lineTo(px + 20, py); x.lineTo(px, py + 20); x.closePath(); x.stroke(); }); });
+    const steel = new THREE.MeshStandardMaterial({ map: runes, metalness: 0.92, roughness: 0.32, emissive: '#3df5ff', emissiveMap: glyph, emissiveIntensity: 0 });
+    const hammer = new THREE.Group(), head = rbox(2.1, 1.25, 1.25, 0.16, steel); head.position.y = 0.62; hammer.add(head);
+    [-1, 1].forEach((s) => { const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.06, 48), steel); cap.rotation.z = Math.PI / 2; cap.position.set(s * 1.08, 0.62, 0); hammer.add(cap); });
+    const leather = canvasTex(64, 256, (x, w, h) => { x.fillStyle = '#3a2416'; x.fillRect(0, 0, w, h); for (let yy = -64; yy < h + 64; yy += 14) { x.strokeStyle = '#1c110a'; x.lineWidth = 3; x.beginPath(); x.moveTo(0, yy); x.lineTo(w, yy + 20); x.stroke(); x.strokeStyle = '#5a3a24'; x.lineWidth = 1; x.beginPath(); x.moveTo(0, yy + 4); x.lineTo(w, yy + 24); x.stroke(); } });
+    leather.wrapT = THREE.RepeatWrapping; leather.repeat.set(1, 3);
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 2.4, 32), new THREE.MeshStandardMaterial({ map: leather, roughness: 0.75 })); handle.position.y = 2.45; hammer.add(handle);
+    const pommel = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.17, 0.25, 32), steel); pommel.position.y = 3.7; hammer.add(pommel);
+    const strap = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.035, 12, 32), new THREE.MeshStandardMaterial({ color: '#2a1a10', roughness: 0.8 })); strap.position.set(0, 3.95, 0); strap.rotation.x = 0.3; hammer.add(strap);
+    hammer.position.y = 14; sc.add(hammer);
+    sc.add(new THREE.AmbientLight('#203050', 0.4)); const moon = new THREE.DirectionalLight('#9fb8ff', 0.9); moon.position.set(-5, 10, 6); sc.add(moon);
+    const fire = new THREE.PointLight('#ff6a1c', 0, 30); fire.position.set(0, 1.5, 1); sc.add(fire); const bolt = new THREE.PointLight('#9fd8ff', 0, 40); bolt.position.set(0, 8, 2); sc.add(bolt);
+    // sparks
+    const SN = 1800, sp = new Float32Array(SN * 3), sv = []; for (let i = 0; i < SN; i++) sv.push(new THREE.Vector3());
+    const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
+    const sm = new THREE.PointsMaterial({ size: 0.07, color: '#ffb347', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }); const sparks = new THREE.Points(sg, sm); sc.add(sparks);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 1, 96), new THREE.MeshBasicMaterial({ color: '#ffb347', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; sc.add(ring);
+    const size = () => { r.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); led.width = innerWidth; led.height = innerHeight; }; size(); addEventListener('resize', size);
+    // LED "WAKE UP" dots
+    const ledDots = (() => { const o = document.createElement('canvas'), W = 900, H = 200; o.width = W; o.height = H; const x = o.getContext('2d'); x.fillStyle = '#fff'; x.font = '900 150px Orbitron, sans-serif'; x.textBaseline = 'middle'; x.fillText('WAKE UP', 10, 105);
+      const d = x.getImageData(0, 0, W, H).data, pts = []; for (let yy = 0; yy < H; yy += 9) for (let xx = 0; xx < W; xx += 9) if (d[(yy * W + xx) * 4 + 3] > 120) pts.push([xx, yy, R()]); return pts; })();
+    const codeLines = Array.from({ length: 22 }, () => Array.from({ length: 6 + (R() * 8 | 0) }, () => ['navya', 'chai()', 'model.fit', 'grad_cam', 'ship', '0x7f', 'bio', 'hook=1.5s', 'deploy', 'atgc', 'vitb', 'nova.init'][R() * 12 | 0]).join(' '));
+    let t0 = performance.now(), impacted = false, ended = false, bolts = [], boltT = 0, typed = false;
+    const end = () => { if (ended) return; ended = true; try { sessionStorage.setItem('nova_seen', '1'); } catch (e) {} el.classList.add('out'); done(); setTimeout(() => { r.dispose(); r.forceContextLoss && r.forceContextLoss(); el.remove(); }, 1300); };
+    $('#skip').onclick = end; addEventListener('keydown', (e) => { if (e.key === 'Escape') end(); }, { once: true });
+    const project = (v) => { const p = v.clone().project(cam); return [(p.x * 0.5 + 0.5) * innerWidth, (-p.y * 0.5 + 0.5) * innerHeight]; };
+    function makeBolt(x1, y1, x2, y2, depth = 0) { const pts = [[x1, y1], [x2, y2]]; for (let k = 0; k < 6; k++) { for (let i = pts.length - 1; i > 0; i--) { const a = pts[i - 1], b = pts[i], off = (Math.hypot(b[0] - a[0], b[1] - a[1])) * 0.25;
+          pts.splice(i, 0, [(a[0] + b[0]) / 2 + (R() - 0.5) * off, (a[1] + b[1]) / 2 + (R() - 0.5) * off]); } } const out = [pts];
+      if (depth < 1) for (let i = 0; i < 3; i++) { const s = pts[(R() * pts.length * 0.7) | 0]; out.push(...makeBolt(s[0], s[1], s[0] + (R() - 0.5) * 300, s[1] + 80 + R() * 200, depth + 1)); } return out; }
+    (function frame(now) { if (ended && el.classList.contains('out') && !el.isConnected) return; requestAnimationFrame(frame); const t = (now - t0) / 1000; U.uT.value = t;
+      lx.clearRect(0, 0, led.width, led.height);
+      // camera path
+      const rise = ease(clamp((t - 3.1) / 2.4)); cam.position.set(Math.sin(t * 0.2) * 0.4 * (1 - rise), lerp(1.6, 62, rise), lerp(8.5, 44, rise)); cam.lookAt(0, lerp(1.2, 0, rise), lerp(0, -40, rise));
+      U.uMix.value = rise; sc.fog.density = lerp(0.03, 0.0045, rise);
+      // hammer fall
+      const k = clamp(t / 1.25); if (t < 1.25) { hammer.position.y = lerp(14, 0, k * k); hammer.rotation.set((1 - k) * TAU * 1.5, 0, (1 - k) * 0.6); } else { hammer.position.y = 0; hammer.rotation.set(0, Math.sin(t * 0.6) * 0.15, 0); }
+      if (t >= 1.25 && !impacted) { impacted = true; for (let i = 0; i < SN; i++) { const a = R() * TAU, up = 0.2 + R() * 1.2, s = 3 + R() * 9; sv[i].set(Math.cos(a) * s, up * s * 0.8, Math.sin(a) * s); sp[i * 3] = 0; sp[i * 3 + 1] = 0.2; sp[i * 3 + 2] = 0; } sm.opacity = 1; }
+      if (impacted) { const dt = 1 / 60; for (let i = 0; i < SN; i++) { sv[i].y -= 9.8 * dt; sv[i].multiplyScalar(0.985); sp[i * 3] += sv[i].x * dt; sp[i * 3 + 1] = Math.max(0.02, sp[i * 3 + 1] + sv[i].y * dt); sp[i * 3 + 2] += sv[i].z * dt; }
+        sg.attributes.position.needsUpdate = true; const it = t - 1.25; sm.opacity = clamp(1.4 - it * 0.5); ring.scale.setScalar(1 + it * 16); ring.material.opacity = clamp(1 - it * 1.2);
+        crackM.opacity = clamp(1 - Math.max(0, it - 1.5) * 0.3); fire.intensity = Math.max(0, 9 * Math.exp(-it * 1.8)) + 1.5; const shake = Math.exp(-it * 4) * 0.35; cam.position.x += (R() - 0.5) * shake; cam.position.y += (R() - 0.5) * shake;
+        steel.emissiveIntensity = clamp((t - 2.0) / 1.0) * 2.6 * (0.85 + Math.sin(t * 8) * 0.15); }
+      // lightning
+      U.uFlash.value *= 0.85; bolt.intensity *= 0.8;
+      if (t > 1.1 && t < 3.4) { boltT -= 1 / 60; if (boltT <= 0) { const [hx, hy] = project(new THREE.Vector3(0, 3.8, 0)); bolts = makeBolt(hx + (R() - 0.5) * 500, -20, hx, hy); boltT = 0.08 + R() * 0.18; U.uFlash.value = 1; bolt.intensity = 25; } }
+      else bolts = [];
+      if (bolts.length && boltT > 0.05) { lx.save(); lx.globalCompositeOperation = 'lighter'; bolts.forEach((b, i) => { lx.strokeStyle = i ? 'rgba(160,210,255,.6)' : '#e8f6ff'; lx.lineWidth = i ? 1.5 : 3; lx.shadowColor = '#7fc8ff'; lx.shadowBlur = 25; lx.beginPath(); b.forEach(([x, y], j) => j ? lx.lineTo(x, y) : lx.moveTo(x, y)); lx.stroke(); }); lx.restore(); }
+      // WAKE UP dot matrix
+      if (t > 4.6) { const a = clamp((t - 4.6) * 1.5) * (Math.random() < 0.04 ? 0.4 : 1), s = Math.min(innerWidth / 1100, 1.1); lx.save(); lx.translate(innerWidth * 0.1, innerHeight * 0.52); lx.transform(1, -0.08, -0.25, 0.9, 0, 0); lx.scale(s, s);
+        lx.shadowColor = '#ff2a1a'; lx.shadowBlur = 14; ledDots.forEach(([x, y, rr]) => { const fl = 0.6 + 0.4 * Math.sin(t * 9 + rr * 30); lx.fillStyle = `rgba(255,${50 + rr * 40 | 0},30,${a * fl})`; lx.beginPath(); lx.arc(x, y, 3.2, 0, TAU); lx.fill(); });
+        lx.shadowBlur = 6; lx.font = '18px "Share Tech Mono"'; lx.fillStyle = `rgba(255,70,40,${a * 0.9})`; ['navya.exe loaded. 3 domains detected.', 'bio // tech // marketing : online', 'chai reserves critical. proceed anyway.'].forEach((l, i) => lx.fillText(l, 10, 240 + i * 26));
+        lx.fillStyle = `rgba(120,200,255,${a * 0.6})`; lx.shadowColor = '#3db8ff'; codeLines.forEach((l, i) => lx.fillText(l, 40 + (i % 3) * 230, 340 + Math.floor(i / 3) * 26 - ((t - 4.6) * 20 % 26))); lx.restore(); }
+      if (t > 5.6 && !typed) { typed = true; (async () => { const L = ['N.O.V.A. v4.2 · Navya\'s Operational Virtual Assistant', '> initialising neural cores .............. OK', '> calibrating chai reserves ............. 87%', '> loading modules: TECH · BIO · MARKETING .. OK', '<b>> welcome back, Navya. the lab is yours.</b>'];
+        for (const l of L) { const d = document.createElement('div'); boot.appendChild(d); if (l.startsWith('<b>')) { d.innerHTML = l; await new Promise((r2) => setTimeout(r2, 300)); } else await typeInto(d, l, 14); } setTimeout(end, 1300); })(); }
+      if (t > 12) end();
+      r.render(sc, cam); })(t0);
+  }
+
+  /* ===================== HERO: the student, Da Vinci blueprint ===================== */
+  function hero() {
+    const cv = $('#heroCv'), x = cv.getContext('2d'), sec = $('#hero'); let W, H, D, bg, clouds, far, near, me, notes = [], sketches = [], spireX, spireY;
+    const notesTxt = ['hypothesis: chai improves code quality', 'ΔG = ΔH − TΔS', 'if (curiosity) { build(); }', 'CNN → Grad-CAM → why?', 'ATGC → AI', 'hook < 1.5s', 'model.fit(dreams)', 'p < 0.05 (please)', 'Σ attention = 1', 'ship it, beta', 'bioengineer · coder · storyteller', 'sleep: TODO', 'f(x) = learn(x) + chai', 'gene expression ↑', 'mummy said doctor. close enough.'];
+    function build() { D = Math.min(devicePixelRatio, 1.5); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * D; cv.height = H * D; x.setTransform(D, 0, 0, D, 0, 0);
+      const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w * D; c.height = h * D; const g = c.getContext('2d'); g.setTransform(D, 0, 0, D, 0, 0); return [c, g]; };
+      // background: ink-blue paper with cross hatching
+      let g; [bg, g] = mk(W, H); const gr = g.createRadialGradient(W * 0.6, H * 0.35, 0, W * 0.6, H * 0.4, W * 0.8); gr.addColorStop(0, '#2a4fb8'); gr.addColorStop(0.45, '#12266e'); gr.addColorStop(1, '#040a24'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      for (let i = 0; i < W * H / 90; i++) { const px = R() * W, py = R() * H, l = 6 + R() * 14; g.strokeStyle = `rgba(${R() < 0.5 ? '10,20,60' : '120,150,230'},${0.05 + R() * 0.12})`; g.lineWidth = 0.8; g.beginPath(); g.moveTo(px, py); g.lineTo(px + l, py - l * 0.8); g.stroke(); }
+      // clouds: swirling strokes (wider than screen for drift)
+      [clouds, g] = mk(W * 1.5, H * 0.7); for (let i = 0; i < 1400; i++) { const cx0 = R() * W * 1.5, cy0 = R() * H * 0.62, rr = 20 + R() * 120, a0 = R() * TAU; g.strokeStyle = `rgba(${150 + R() * 80 | 0},${170 + R() * 60 | 0},255,${0.04 + R() * 0.1})`; g.lineWidth = 0.7 + R() * 1.2; g.beginPath(); g.arc(cx0, cy0, rr, a0, a0 + 0.6 + R() * 1.6); g.stroke(); }
+      // city layers
+      const city = (yBase, col, edge, hMin, hMax, dens, spire) => { const [c, cg] = mk(W, H); cg.fillStyle = col; cg.strokeStyle = edge; cg.lineWidth = 1; let px = -20; while (px < W + 20) { const w = 14 + R() * 40, h = hMin + R() * (hMax - hMin);
+          cg.beginPath(); cg.moveTo(px, H); cg.lineTo(px, yBase - h); const t = R(); if (t < 0.35) { cg.lineTo(px + w / 2, yBase - h - w * 1.4); cg.lineTo(px + w, yBase - h); } else if (t < 0.6) { cg.lineTo(px + w * 0.3, yBase - h); cg.lineTo(px + w * 0.5, yBase - h - 40); cg.lineTo(px + w * 0.7, yBase - h); cg.lineTo(px + w, yBase - h); } else cg.lineTo(px + w, yBase - h);
+          cg.lineTo(px + w, H); cg.closePath(); cg.fill(); cg.stroke(); for (let k = 0; k < 6; k++) { cg.strokeStyle = edge; cg.beginPath(); const lx2 = px + R() * w; cg.moveTo(lx2, yBase - h * R()); cg.lineTo(lx2, H); cg.stroke(); } px += w * dens; }
+        if (spire) { spireX = W * 0.68; spireY = yBase - hMax * 1.7; cg.fillStyle = col; cg.beginPath(); cg.moveTo(spireX - 30, H); cg.lineTo(spireX - 30, yBase - hMax * 1.1); cg.lineTo(spireX - 12, yBase - hMax * 1.25); cg.lineTo(spireX, spireY); cg.lineTo(spireX + 12, yBase - hMax * 1.25); cg.lineTo(spireX + 30, yBase - hMax * 1.1); cg.lineTo(spireX + 30, H); cg.fill(); cg.stroke(); } return c; };
+      far = city(H * 0.68, '#14286a', 'rgba(140,170,255,.35)', 40, H * 0.22, 0.9, false); near = city(H * 0.8, '#0a1640', 'rgba(150,180,255,.3)', 30, H * 0.26, 0.95, true);
+      // the student on a rock (from behind): bun, headphones, hoodie, backpack, laptop glow
+      [me, g] = mk(W, H); const s = H / 900, bx = W * 0.62, by = H * 0.8;
+      g.fillStyle = '#050a1e'; g.strokeStyle = 'rgba(160,190,255,.45)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(bx - 260 * s, H); g.lineTo(bx - 220 * s, by + 20 * s); g.lineTo(bx - 120 * s, by - 6 * s); g.lineTo(bx - 20 * s, by - 14 * s); g.lineTo(bx + 120 * s, by - 4 * s); g.lineTo(bx + 230 * s, by + 30 * s); g.lineTo(bx + 300 * s, H); g.closePath(); g.fill(); g.stroke();
+      for (let i = 0; i < 220; i++) { const px = bx + (R() - 0.5) * 500 * s, py = by + R() * 160 * s; g.strokeStyle = `rgba(140,170,255,${R() * 0.18})`; g.beginPath(); g.moveTo(px, py); g.lineTo(px + 10 * s, py - 6 * s); g.stroke(); }
+      const P = (px, py) => [bx + px * s, by + py * s];
+      const body = new Path2D(); const pt = (a, b) => P(a, b);
+      body.moveTo(...pt(-62, -8)); body.bezierCurveTo(...pt(-70, -60), ...pt(-82, -100), ...pt(-66, -118)); body.bezierCurveTo(...pt(-50, -136), ...pt(-26, -140), ...pt(-16, -146)); body.lineTo(...pt(-12, -158));
+      body.bezierCurveTo(...pt(-34, -170), ...pt(-30, -214), ...pt(0, -216)); body.bezierCurveTo(...pt(30, -214), ...pt(34, -170), ...pt(12, -158)); body.lineTo(...pt(16, -146)); body.bezierCurveTo(...pt(26, -140), ...pt(50, -136), ...pt(66, -118)); body.bezierCurveTo(...pt(82, -100), ...pt(70, -60), ...pt(62, -8)); body.closePath();
+      body.moveTo(...pt(14, -228)); body.arc(...pt(4, -232), 17 * s, 0, TAU); // bun
+      g.save(); g.shadowColor = '#3df5ff'; g.shadowBlur = 40 * s; g.fillStyle = '#03061a'; g.fill(body); g.restore(); g.fillStyle = '#03061a'; g.fill(body);
+      g.save(); g.clip(body); for (let i = 0; i < 400; i++) { const px = bx + (R() - 0.5) * 170 * s, py = by - R() * 240 * s; g.strokeStyle = `rgba(110,140,230,${R() * 0.22})`; g.lineWidth = 0.8; g.beginPath(); g.moveTo(px, py); g.lineTo(px + 9 * s, py - 7 * s); g.stroke(); } g.restore();
+      g.strokeStyle = 'rgba(170,200,255,.6)'; g.lineWidth = 1.3; g.stroke(body);
+      g.strokeStyle = '#0a1230'; g.lineWidth = 7 * s; g.beginPath(); g.arc(...P(0, -186), 34 * s, Math.PI * 1.05, Math.PI * 1.95); g.stroke(); g.strokeStyle = 'rgba(170,200,255,.6)'; g.lineWidth = 1; g.stroke();
+      [-1, 1].forEach((q2) => { g.fillStyle = '#0a1230'; g.beginPath(); g.ellipse(...P(q2 * 32, -184), 9 * s, 14 * s, 0, 0, TAU); g.fill(); g.stroke(); });
+      g.strokeStyle = 'rgba(170,200,255,.45)'; g.beginPath(); g.moveTo(...P(-18, -150)); g.quadraticCurveTo(...P(0, -132), ...P(18, -150)); g.stroke(); // hood
+      g.fillStyle = '#060c26'; g.beginPath(); g.roundRect(...P(96, -78), 58 * s, 72 * s, 12 * s); g.fill(); g.strokeStyle = 'rgba(170,200,255,.5)'; g.stroke(); g.beginPath(); g.roundRect(...P(104, -52), 42 * s, 26 * s, 6 * s); g.stroke(); // backpack
+      g.beginPath(); g.moveTo(...P(-6, -232)); g.quadraticCurveTo(...P(-14, -218), ...P(-8, -210)); g.stroke(); // loose strand
+      // notes + sketches
+      notes = notesTxt.map((n, i) => ({ n, x: R() * W * 0.95, y: 30 + R() * H * 0.6, s: 13 + R() * 14, ph: R() * TAU, sp: 0.15 + R() * 0.25, rot: (R() - 0.5) * 0.25 }));
+      sketches = Array.from({ length: 6 }, (_, i) => ({ x: W * (0.1 + R() * 0.85), y: H * (0.08 + R() * 0.55), r: 30 + R() * 50, k: i % 3, sp: (R() - 0.5) * 0.3 }));
+    }
+    build(); addEventListener('resize', build);
+    let bolt = null, boltT = 2, flash = 0, pmx = 0, pmy = 0;
+    sec.addEventListener('pointermove', (e) => { pmx = e.clientX / W - 0.5; pmy = e.clientY / H - 0.5; });
+    function makeBolt(x1, y1, x2, y2, d = 0) { const pts = [[x1, y1], [x2, y2]]; for (let k = 0; k < 6; k++) for (let i = pts.length - 1; i > 0; i--) { const a = pts[i - 1], b = pts[i], o = Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.22; pts.splice(i, 0, [(a[0] + b[0]) / 2 + (R() - 0.5) * o, (a[1] + b[1]) / 2 + (R() - 0.5) * o * 0.3]); }
+      const out = [pts]; if (d < 1) for (let i = 0; i < 4; i++) { const s = pts[(R() * pts.length * 0.8) | 0]; out.push(...makeBolt(s[0], s[1], s[0] + (R() - 0.5) * 220, s[1] + 60 + R() * 140, d + 1)); } return out; }
+    let lt = performance.now();
+    (function f(now) { requestAnimationFrame(f); if (!vis(sec)) return; const t = now / 1000, dt = Math.min(0.05, (now - lt) / 1000); lt = now;
+      x.clearRect(0, 0, W, H); x.drawImage(bg, -pmx * 10, -pmy * 6, W, H);
+      x.globalAlpha = 0.9; x.drawImage(clouds, -((t * 6) % (W * 0.5)) - pmx * 30, -pmy * 14, W * 1.5, H * 0.7); x.globalAlpha = 1;
+      // sketches (rotating schematics)
+      x.save(); x.strokeStyle = 'rgba(210,225,255,.35)'; x.lineWidth = 1; sketches.forEach((k) => { x.save(); x.translate(k.x - pmx * 20, k.y - pmy * 10); x.rotate(t * k.sp); x.beginPath(); x.arc(0, 0, k.r, 0, TAU); x.stroke();
+        if (k.k === 0) { x.beginPath(); for (let i = 0; i < 3; i++) { const a = i * TAU / 3 - Math.PI / 2; i ? x.lineTo(Math.cos(a) * k.r, Math.sin(a) * k.r) : x.moveTo(Math.cos(a) * k.r, Math.sin(a) * k.r); } x.closePath(); x.stroke(); }
+        else if (k.k === 1) { for (let i = 0; i < 12; i++) { const a = i * TAU / 12; x.beginPath(); x.moveTo(Math.cos(a) * k.r, Math.sin(a) * k.r); x.lineTo(Math.cos(a) * k.r * 1.15, Math.sin(a) * k.r * 1.15); x.stroke(); } x.beginPath(); x.arc(0, 0, k.r * 0.4, 0, TAU); x.stroke(); }
+        else { for (let i = -6; i <= 6; i++) { const yy = i * k.r / 6, w = Math.sin(i * 0.8 + t) * k.r * 0.5; x.beginPath(); x.moveTo(-w, yy); x.lineTo(w, yy); x.stroke(); } } x.restore(); }); x.restore();
+      // handwritten notes
+      x.save(); notes.forEach((n) => { const a = 0.25 + 0.3 * Math.sin(t * n.sp + n.ph); x.save(); x.translate(n.x - pmx * 25, n.y - pmy * 12); x.rotate(n.rot); x.font = `${n.s}px "La Belle Aurore", cursive`; x.fillStyle = `rgba(225,232,255,${a})`; x.fillText(n.n, 0, 0); x.restore(); }); x.restore();
+      x.drawImage(far, -pmx * 18, -pmy * 6, W, H);
+      // lightning strikes the spire
+      boltT -= dt; if (boltT <= 0) { bolt = makeBolt(spireX + (R() - 0.5) * 300, -10, spireX - pmx * 40, spireY); boltT = 2.5 + R() * 3; flash = 1; setTimeout(() => (bolt = null), 180); }
+      if (bolt) { x.save(); x.globalCompositeOperation = 'lighter'; bolt.forEach((b, i) => { x.strokeStyle = i ? 'rgba(170,215,255,.55)' : '#f2f9ff'; x.lineWidth = i ? 1.2 : 2.6; x.shadowColor = '#8fd0ff'; x.shadowBlur = 24; x.beginPath(); b.forEach(([px, py], j) => (j ? x.lineTo(px, py) : x.moveTo(px, py))); x.stroke(); }); x.restore(); }
+      if (flash > 0.01) { x.fillStyle = `rgba(150,190,255,${flash * 0.25})`; x.fillRect(0, 0, W, H); flash *= 0.88; }
+      x.drawImage(near, -pmx * 34, -pmy * 10, W, H);
+      // laptop glow pulse in front of her
+      const gx = W * 0.62 - pmx * 50, gy = H * 0.8 - 40 * H / 900; const gl = x.createRadialGradient(gx, gy, 0, gx, gy, 140 * H / 900); gl.addColorStop(0, `rgba(61,245,255,${0.35 + 0.1 * Math.sin(t * 2)})`); gl.addColorStop(1, 'rgba(61,245,255,0)');
+      x.save(); x.globalCompositeOperation = 'lighter'; x.fillStyle = gl; x.fillRect(gx - 200, gy - 200, 400, 400); x.restore();
+      x.drawImage(me, -pmx * 50, -pmy * 14, W, H);
+      const v = x.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.95); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(2,4,12,.85)'); x.fillStyle = v; x.fillRect(0, 0, W, H);
+    })(lt);
+  }
+
+  /* ===================== CORE HUB ===================== */
+  function core() {
+    const sv = $('#rings'); if (!sv) return; let h = '';
+    const arc = (r, a0, a1) => { const p = (a) => [Math.cos(a) * r, Math.sin(a) * r]; const [x0, y0] = p(a0), [x1, y1] = p(a1); return `M${x0},${y0} A${r},${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1},${y1}`; };
+    h += '<defs><path id="tp" d="M0,-300 A300,300 0 1 1 -0.1,-300"/><radialGradient id="rg"><stop offset="0" stop-color="#3df5ff" stop-opacity=".35"/><stop offset="1" stop-color="#3df5ff" stop-opacity="0"/></radialGradient><linearGradient id="sw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3df5ff" stop-opacity="0"/><stop offset="1" stop-color="#3df5ff" stop-opacity=".45"/></linearGradient></defs>';
+    h += '<circle r="180" fill="url(#rg)"/>';
+    h += '<g class="r0"><circle r="360" fill="none" stroke="#3df5ff22" stroke-width="1"/>'; for (let i = 0; i < 120; i++) { const a = i / 120 * TAU, l = i % 10 ? 8 : 18; h += `<line x1="${Math.cos(a) * 350}" y1="${Math.sin(a) * 350}" x2="${Math.cos(a) * (350 - l)}" y2="${Math.sin(a) * (350 - l)}" stroke="#3df5ff" stroke-opacity="${i % 10 ? 0.35 : 0.8}"/>`; } h += '</g>';
+    h += `<g class="r1"><text fill="#3df5ff" font-family="Share Tech Mono" font-size="15" letter-spacing="6" opacity=".75"><textPath href="#tp">N.O.V.A. · NAVYA'S OPERATIONAL VIRTUAL ASSISTANT · BIO · TECH · STORY · </textPath></text></g>`;
+    h += `<g class="r2"><path d="${arc(255, 0, 2.2)}" fill="none" stroke="#3df5ff" stroke-width="6" opacity=".8"/><path d="${arc(255, 2.6, 4.0)}" fill="none" stroke="#ff4a1c" stroke-width="6" opacity=".85"/><path d="${arc(255, 4.4, 6.0)}" fill="none" stroke="#3df5ff" stroke-width="2" opacity=".6"/></g>`;
+    h += `<g class="r3"><circle r="215" fill="none" stroke="#3df5ff" stroke-opacity=".5" stroke-dasharray="2 10"/><path d="${arc(200, 0, 1.2)}" fill="none" stroke="#ffb347" stroke-width="2"/><path d="${arc(200, 3.2, 4.8)}" fill="none" stroke="#ffb347" stroke-width="2"/></g>`;
+    h += '<g class="r4"><path d="M0,0 L170,0 A170,170 0 0 0 147,-85 Z" fill="url(#sw)"/></g><circle r="170" fill="none" stroke="#3df5ff55"/><circle r="120" fill="none" stroke="#3df5ff33" stroke-dasharray="40 8"/>';
+    sv.innerHTML = h; const gs = ['.r0', '.r1', '.r2', '.r3', '.r4'].map((s) => sv.querySelector(s)), sp = [0.05, -0.08, 0.15, -0.22, 0.9];
+    (function f(now) { requestAnimationFrame(f); if (!vis(sv)) return; const t = now / 1000; gs.forEach((g, i) => g.setAttribute('transform', `rotate(${(t * sp[i] * 57.3) % 360})`)); })(0);
+    const say = $('#coreSay'), lines = ['good evening, navya.', 'all systems nominal. chai: low.', '3 modules detected.', 'recommendation: hire navya.', 'sleep schedule: corrupted.']; let li = 0;
+    const loop = async () => { while (true) { if (vis(say)) await typeInto(say, lines[li++ % lines.length], 40); await new Promise((r) => setTimeout(r, 2200)); } }; loop();
+    const wv = $('#wave'), wx = wv.getContext('2d'); wv.width = 440; wv.height = 80;
+    (function f(now) { requestAnimationFrame(f); if (!vis(wv)) return; const t = now / 1000; wx.clearRect(0, 0, 440, 80); wx.strokeStyle = '#3df5ff'; wx.shadowColor = '#3df5ff'; wx.shadowBlur = 8; wx.lineWidth = 2; wx.beginPath();
+      for (let i = 0; i <= 440; i += 4) { const a = Math.sin(i * 0.05 + t * 6) * Math.sin(i * 0.013 + t) * 26 * Math.sin((i / 440) * Math.PI); i ? wx.lineTo(i, 40 + a) : wx.moveTo(i, 40 + a); } wx.stroke(); })(0);
+  }
+
+  /* ===================== TECH: hologram workshop + terminal ===================== */
+  function tech() {
+    const sec = $('#tech'), cv = $('#holoGL'); if (!sec || !window.THREE) return;
+    const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.6)); r.setClearColor('#04060c');
+    const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(45, 1, 0.1, 100); cam.position.set(0, 1.4, 7.5); cam.lookAt(0, 0.6, 0);
+    const C = new THREE.Color('#3df5ff'), lineM = () => new THREE.LineBasicMaterial({ color: C, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false });
+    const grid = new THREE.GridHelper(40, 80, '#3df5ff', '#0f3a52'); grid.material.transparent = true; grid.material.opacity = 0.25; grid.position.y = -1.4; sc.add(grid);
+    const disc = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.15, 64), new THREE.MeshBasicMaterial({ color: '#3df5ff', transparent: true, opacity: 0.7, side: THREE.DoubleSide, blending: THREE.AdditiveBlending })); disc.rotation.x = -Math.PI / 2; disc.position.y = -1.38; sc.add(disc);
+    const beam = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.05, 3.4, 48, 1, true), new THREE.ShaderMaterial({ transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: 'varying float vY;void main(){vY=uv.y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}', fragmentShader: 'varying float vY;void main(){gl_FragColor=vec4(.24,.96,1.,(1.-vY)*.13);}' })); beam.position.y = 0.3; sc.add(beam);
+    const wire = (geo) => { const g = new THREE.Group(); g.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 1), lineM())); const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: '#bffaff', size: 0.04, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); g.add(pts); return g; };
+    const objs = [];
+    { const g = new THREE.Group(); g.add(wire(new THREE.IcosahedronGeometry(1.3, 1))); const inner = wire(new THREE.IcosahedronGeometry(0.6, 0)); g.add(inner); g.userData.spin = (t) => { inner.rotation.set(-t, t * 1.3, 0); }; objs.push(g); }
+    { const g = new THREE.Group(), layers = [4, 7, 7, 3], nodes = []; layers.forEach((n, l) => { const col = []; for (let i = 0; i < n; i++) col.push(new THREE.Vector3((l - 1.5) * 1.0, (i - (n - 1) / 2) * 0.36, 0)); nodes.push(col); });
+      const pos = []; nodes.forEach((col, l) => { if (l < nodes.length - 1) col.forEach((a) => nodes[l + 1].forEach((b) => pos.push(a.x, a.y, a.z, b.x, b.y, b.z))); });
+      const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); const lm = lineM(); lm.opacity = 0.35; g.add(new THREE.LineSegments(lg, lm));
+      nodes.flat().forEach((v) => { const s = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 8), new THREE.MeshBasicMaterial({ color: '#bffaff' })); s.position.copy(v); g.add(s); }); g.userData.spin = (t) => { g.children.forEach((c, i) => { if (c.isMesh) c.scale.setScalar(1 + 0.4 * Math.max(0, Math.sin(t * 4 - c.position.x * 2 + i))); }); }; objs.push(g); }
+    { const g = new THREE.Group(); g.add(wire(new THREE.TorusKnotGeometry(0.9, 0.28, 90, 10, 2, 3))); const sc2 = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.02), new THREE.MeshBasicMaterial({ color: '#ff4a1c', transparent: true, blending: THREE.AdditiveBlending })); g.add(sc2); g.userData.spin = (t) => { sc2.position.y = Math.sin(t * 1.5) * 1.1; }; objs.push(g); }
+    { const g = new THREE.Group(), pos = []; let prev = null; for (let i = 0; i <= 80; i++) { const t = i / 80 * TAU * 2.2, y = (i / 80 - 0.5) * 3, a = new THREE.Vector3(Math.cos(t) * 0.7, y, Math.sin(t) * 0.7), b = a.clone().multiply(new THREE.Vector3(-1, 1, -1));
+        if (prev) pos.push(prev[0].x, prev[0].y, prev[0].z, a.x, a.y, a.z, prev[1].x, prev[1].y, prev[1].z, b.x, b.y, b.z); if (i % 4 === 0) pos.push(a.x, a.y, a.z, b.x, b.y, b.z); prev = [a, b]; }
+      const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.add(new THREE.LineSegments(lg, lineM())); g.rotation.z = 0.4; objs.push(g); }
+    { const g = new THREE.Group(); g.add(wire(new THREE.BoxGeometry(2, 0.18, 2))); g.add(wire(new THREE.BoxGeometry(1, 0.3, 1))); const pos = []; for (let i = 0; i < 8; i++) { const o = -0.85 + i * 0.243; [[o, 1, o, 1.35], [o, -1, o, -1.35]].forEach(([x1, z1, x2, z2]) => pos.push(x1, 0, z1, x2, -0.25, z2)); [[1, o, 1.35, o], [-1, o, -1.35, o]].forEach(([x1, z1, x2, z2]) => pos.push(x1, 0, z1, x2, -0.25, z2)); }
+      const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.add(new THREE.LineSegments(lg, lineM())); g.rotation.x = 0.5; objs.push(g); }
+    const info = [['01', 'PROMPTOPS LIBRARY', 'Structured prompt systems for sales copy, research summaries and data extraction, scored with evals before and after.', ['claude', 'gpt', 'evals', 'json schemas']],
+      ['02', 'INBOX-TO-SHEET AGENT', 'A Python agent that reads lead emails, tags intent and logs everything to a CRM sheet. No more copy-paste Mondays.', ['python', 'apis', 'pandas']],
+      ['03', 'EXPLAINABLE SCAN CLASSIFIER', 'A CNN that flags abnormalities in medical scans, with Grad-CAM heatmaps so clinicians can see why it decided.', ['pytorch', 'cnn', 'grad-cam']],
+      ['04', 'GENE EXPRESSION EXPLORER', 'Differential expression analysis with interactive volcano plots, built from public GEO datasets.', ['biopython', 'scanpy', 'plotly']],
+      ['05', '48-HOUR WEB APPS', 'Landing pages, dashboards and micro-SaaS built AI-first: idea to live URL in a weekend.', ['next.js', 'cursor', 'vercel']]];
+    const holder = new THREE.Group(); holder.position.y = 0.55; sc.add(holder); let cur = -1, glitch = 0; const infoEl = $('#holoInfo');
+    const show = (i) => { if (i === cur) return; cur = i; holder.clear(); holder.add(objs[i]); glitch = 1; const [n, h, p, tags] = info[i];
+      infoEl.innerHTML = `<div class="n">PROJECT ${n} / 05</div><h3></h3><p>${p}</p><div class="tags">${tags.map((t) => `<span>${t}</span>`).join('')}</div>`; typeInto(infoEl.querySelector('h3'), h, 30); };
+    show(0);
+    let drag = false, lx = 0, vy = 0.3, rx = 0; cv.style.pointerEvents = 'auto';
+    cv.addEventListener('pointerdown', (e) => { drag = true; lx = e.clientX; cv.setPointerCapture(e.pointerId); }); cv.addEventListener('pointerup', () => (drag = false));
+    cv.addEventListener('pointermove', (e) => { if (!drag) return; vy = (e.clientX - lx) * 0.01; rx += (e.movementY || 0) * 0.005; lx = e.clientX; });
+    const size = () => { const w = cv.clientWidth, h = cv.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); holder.position.x = w > 900 ? 0.4 : 0; }; size(); addEventListener('resize', size);
+    (function f(now) { requestAnimationFrame(f); if (!vis(sec)) return; const t = now / 1000, p = prog(sec); show(Math.min(4, Math.floor(p * 5)));
+      if (!drag) vy += (0.3 - vy) * 0.02; holder.rotation.y += vy * 0.02; holder.rotation.x = rx + Math.sin(t * 0.5) * 0.08; objs[cur].userData.spin && objs[cur].userData.spin(t);
+      glitch *= 0.9; holder.scale.set(1 + glitch * 0.3, 1 - glitch * 0.5, 1); holder.position.x += (R() - 0.5) * glitch * 0.2;
+      holder.traverse((o) => { if (o.material && o.material.opacity !== undefined && o.material.blending === THREE.AdditiveBlending) o.material.opacity = (0.7 + 0.25 * Math.sin(t * 30 + o.id)) * (R() < glitch ? 0.2 : 1); });
+      disc.rotation.z = t; r.render(sc, cam); })(0);
+    // terminal
+    const out = $('#tOut'), inp = $('#tIn'), hist = []; let hi = 0;
+    const print = (s, cls = '') => { const d = document.createElement('div'); if (cls) d.className = cls; d.textContent = s; out.appendChild(d); out.scrollTop = out.scrollHeight; };
+    const jokes = ['why did the bioengineer break up with the biologist? no chemistry in the code.', 'my code works and i have no idea why. my code fails and i have no idea why. balance.', 'i told my model a joke. it overfit and now only laughs at that one.', 'there are 10 kinds of people: those who get binary and those who drink chai.'];
+    const cmds = { help: () => 'commands: whoami · skills · projects · domains · chai · joke · hire · clear',
+      whoami: () => 'Navya Gupta. 3rd-year B.Tech Bioengineering @ VIT Bhopal.\nbioengineer · coder · storyteller. AI × medtech is the dream.',
+      skills: () => 'python · pandas · pytorch · prompt engineering · bioinformatics\nexcel ops · digital marketing · storytelling · negotiation (ask the sabzi-wala)',
+      projects: () => info.map((i) => `[${i[0]}] ${i[1].toLowerCase()}`).join('\n'), domains: () => 'tech  → #tech\nbio   → #bio\nmarketing → #mkt\n(type the name to jump)',
+      tech: () => (location.hash = 'tech', 'jumping to module 01…'), bio: () => (setTimeout(() => $('#bio').scrollIntoView({ behavior: 'smooth' }), 200), 'jumping to module 02…'), marketing: () => (setTimeout(() => $('#mkt').scrollIntoView({ behavior: 'smooth' }), 200), 'jumping to module 03…'),
+      chai: () => '☕ brewing cutting chai… extra adrak… done.\nproductivity +40%. typos −12%.', joke: () => jokes[(R() * jokes.length) | 0],
+      hire: () => (setTimeout(() => $('#contact').scrollIntoView({ behavior: 'smooth' }), 400), 'initiating hire protocol… excellent choice.'),
+      hello: () => 'hello, human. navya is probably debugging. how can i help? (try help)', hi: () => cmds.hello(), sudo: () => 'nice try. N.O.V.A. only makes chai.', clear: () => { out.innerHTML = ''; return null; } };
+    print('N.O.V.A. terminal v4.2 · type "help" to begin'); print('tip: try "chai" or "hire"', 'u');
+    inp.addEventListener('keydown', (e) => { if (e.key === 'ArrowUp') { inp.value = hist[Math.max(0, --hi)] || ''; return; } if (e.key !== 'Enter') return; const v = inp.value.trim(); inp.value = ''; if (!v) return; hist.push(v); hi = hist.length;
+      print('navya@nova:~$ ' + v, 'u'); const c = cmds[v.toLowerCase().split(' ')[0]]; const res = c ? c() : `command not found: ${v}. even N.O.V.A. needs chai sometimes. try "help".`; if (res) print(res, c ? '' : 'e'); });
+    inp.addEventListener('focus', () => cur.classList && 0);
+  }
+
+  /* ===================== BIO: glowing human blueprint ===================== */
+  function bio() {
+    const sec = $('#bio'), cv = $('#bioCv'), x = cv.getContext('2d'); if (!sec) return;
+    let W, H, D, S, CX, CY, paper, sketch, veinL, vx, segs = [], maxO = 1, drawn = 0;
+    const KP = { brain: [0, -218], heart: [-10, -128], lungs: [26, -112], dna: [205, -40], hand: [148, 80] };
+    const bodyMask = (g) => { const cap = (a, b, c, d, w) => { g.lineWidth = w; g.lineCap = 'round'; g.beginPath(); g.moveTo(a, b); g.lineTo(c, d); g.stroke(); };
+      g.beginPath(); g.ellipse(0, -215, 26, 32, 0, 0, TAU); g.fill(); g.fillRect(-11, -188, 22, 22);
+      g.beginPath(); g.moveTo(-58, -170); g.quadraticCurveTo(-68, -120, -48, -60); g.lineTo(-42, -10); g.quadraticCurveTo(-48, 12, -46, 22); g.lineTo(46, 22); g.quadraticCurveTo(48, 12, 42, -10); g.lineTo(48, -60); g.quadraticCurveTo(68, -120, 58, -170); g.quadraticCurveTo(0, -186, -58, -170); g.fill();
+      [-1, 1].forEach((s) => { cap(s * 60, -160, s * 108, -42, 24); cap(s * 108, -42, s * 140, 58, 19); g.beginPath(); g.ellipse(s * 147, 80, 11, 18, s * -0.2, 0, TAU); g.fill(); cap(s * 26, 14, s * 34, 130, 38); cap(s * 34, 130, s * 40, 236, 26); g.beginPath(); g.ellipse(s * 46, 246, 17, 8, 0, 0, TAU); g.fill(); }); };
+    function build() { D = Math.min(devicePixelRatio, 1.5); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * D; cv.height = H * D; x.setTransform(D, 0, 0, D, 0, 0);
+      S = Math.min(H / 600, W / 700) * 0.95; CX = W > 900 ? W * 0.6 : W * 0.5; CY = H * 0.53;
+      const mk = () => { const c = document.createElement('canvas'); c.width = W * D; c.height = H * D; const g = c.getContext('2d'); g.setTransform(D, 0, 0, D, 0, 0); return [c, g]; };
+      let g; [paper, g] = mk(); const gr = g.createRadialGradient(CX, CY, 0, CX, CY, W * 0.75); gr.addColorStop(0, '#6a2a12'); gr.addColorStop(0.5, '#3a160a'); gr.addColorStop(1, '#120604'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      for (let i = 0; i < 70; i++) { const px = R() * W, py = R() * H, rr = 40 + R() * 180, gg = g.createRadialGradient(px, py, 0, px, py, rr); gg.addColorStop(0, `rgba(${R() < 0.5 ? '20,6,2' : '140,70,30'},${R() * 0.18})`); gg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gg; g.fillRect(px - rr, py - rr, rr * 2, rr * 2); }
+      g.fillStyle = 'rgba(255,225,180,.22)'; const words = 'the heart pumps five litres a minute and the brain runs on twenty watts and every cell holds a copy of the code we are machines that dream and learn and heal and i want to build tools that help them heal faster'.split(' ');
+      for (let i = 0; i < 46; i++) { g.font = `${12 + R() * 8}px "La Belle Aurore", cursive`; let l = ''; for (let k = 0; k < 6 + R() * 6; k++) l += words[(R() * words.length) | 0] + ' '; const px = R() < 0.5 ? R() * W * 0.32 : W * 0.7 + R() * W * 0.3; g.fillText(l, px, R() * H); }
+      g.strokeStyle = 'rgba(255,220,170,.18)'; g.lineWidth = 1; for (let i = 0; i < 8; i++) { const px = R() * W, py = R() * H, rr = 30 + R() * 70; g.beginPath(); g.arc(px, py, rr, 0, TAU); g.stroke(); g.beginPath(); g.moveTo(px - rr, py); g.lineTo(px + rr, py); g.moveTo(px, py - rr); g.lineTo(px, py + rr); g.stroke(); }
+      // skeleton + outline sketch
+      [sketch, g] = mk(); g.save(); g.translate(CX, CY); g.scale(S, S); g.strokeStyle = 'rgba(255,230,190,.42)'; g.lineWidth = 1.2 / S;
+      const outline = document.createElement('canvas'); outline.width = 400; outline.height = 560; const og = outline.getContext('2d'); og.translate(200, 280); og.fillStyle = '#fff'; og.strokeStyle = '#fff'; bodyMask(og);
+      vx = og.getImageData(0, 0, 400, 560).data; const inside = (px, py) => { const ix = Math.round(px + 200), iy = Math.round(py + 280); if (ix < 0 || iy < 0 || ix >= 400 || iy >= 560) return false; return vx[(iy * 400 + ix) * 4 + 3] > 100; };
+      for (let a = 0; a < TAU; a += 0.01) { } // (edge sketch done below)
+      g.beginPath(); g.moveTo(0, -182); g.lineTo(0, 10); g.stroke(); for (let i = 0; i < 11; i++) { const yy = -160 + i * 11, w = 40 - Math.abs(i - 4) * 2.5; g.beginPath(); g.ellipse(0, yy, w, 6, 0, Math.PI * 0.05, Math.PI * 0.95); g.stroke(); }
+      g.beginPath(); g.ellipse(0, -215, 24, 30, 0, 0, TAU); g.stroke(); g.beginPath(); g.ellipse(0, 18, 34, 14, 0, 0, Math.PI); g.stroke(); [-1, 1].forEach((s) => { g.beginPath(); g.moveTo(s * 22, 22); g.lineTo(s * 33, 128); g.lineTo(s * 39, 232); g.stroke(); g.beginPath(); g.moveTo(s * 60, -160); g.lineTo(s * 106, -44); g.lineTo(s * 138, 56); g.stroke(); });
+      // body edge (marching the mask)
+      g.fillStyle = 'rgba(255,230,190,.5)'; for (let iy = 2; iy < 558; iy += 2) for (let ix = 2; ix < 398; ix += 2) { const a = vx[(iy * 400 + ix) * 4 + 3] > 100; if (a && (!(vx[(iy * 400 + ix - 2) * 4 + 3] > 100) || !(vx[(iy * 400 + ix + 2) * 4 + 3] > 100) || !(vx[((iy - 2) * 400 + ix) * 4 + 3] > 100) || !(vx[((iy + 2) * 400 + ix) * 4 + 3] > 100))) g.fillRect(ix - 200, iy - 280, 1.4, 1.4); }
+      // DNA strand sketch
+      g.strokeStyle = 'rgba(255,200,120,.55)'; for (let i = 0; i < 60; i++) { const yy = -140 + i * 4.5, a = i * 0.32; g.beginPath(); g.arc(205 + Math.cos(a) * 16, yy, 1.4, 0, TAU); g.arc(205 - Math.cos(a) * 16, yy, 1.4, 0, TAU); g.stroke(); if (i % 3 === 0) { g.beginPath(); g.moveTo(205 + Math.cos(a) * 16, yy); g.lineTo(205 - Math.cos(a) * 16, yy); g.stroke(); } }
+      g.restore();
+      // grow the vascular tree inside the mask
+      segs = []; const H0 = KP.heart, targets = [[0, -228], [-148, 84], [148, 84], [-46, 248], [46, 248], [0, 15], [-30, -110], [30, -110]];
+      const grow = (px, py, ang, steps, w, order, depth, target) => { for (let i = 0; i < steps && segs.length < 9000; i++) { if (target) { const ta = Math.atan2(target[1] - py, target[0] - px); let d = ta - ang; d = Math.atan2(Math.sin(d), Math.cos(d)); ang += d * 0.25; }
+          ang += (R() - 0.5) * 0.5; let nx = px + Math.cos(ang) * 3, ny = py + Math.sin(ang) * 3; let tries = 0; while (!inside(nx, ny) && tries++ < 6) { ang += (R() < 0.5 ? 1 : -1) * 0.8; nx = px + Math.cos(ang) * 3; ny = py + Math.sin(ang) * 3; } if (!inside(nx, ny)) return;
+          segs.push([px, py, nx, ny, w, order]); px = nx; py = ny; order += 3; if (target && Math.hypot(target[0] - px, target[1] - py) < 6) target = null;
+          if (depth < 4 && R() < (target ? 0.14 : 0.07)) grow(px, py, ang + (R() < 0.5 ? 1 : -1) * (0.5 + R() * 0.8), 10 + R() * 40, w * 0.62, order, depth + 1, null); } };
+      targets.forEach((tg) => grow(H0[0], H0[1], Math.atan2(tg[1] - H0[1], tg[0] - H0[0]), 400, 2.6, 0, 0, tg));
+      segs.sort((a, b) => a[5] - b[5]); maxO = segs.length ? segs[segs.length - 1][5] : 1; [veinL] = mk(); drawn = 0; }
+    build(); addEventListener('resize', build);
+    const callouts = $$('.callout', sec), thr = { brain: 0.2, heart: 0.34, lungs: 0.48, dna: 0.62, hand: 0.76 };
+    const place = () => callouts.forEach((c) => { const [kx, ky] = KP[c.dataset.k]; const px = CX + kx * S, py = CY + ky * S, right = kx >= 0; c.style.left = (right ? px + 60 : px - 290) + 'px'; c.style.top = (py - 30) + 'px'; c.style.textAlign = right ? 'left' : 'right'; });
+    place(); addEventListener('resize', place);
+    (function f(now) { requestAnimationFrame(f); if (!vis(sec)) return; const t = now / 1000, p = prog(sec);
+      x.clearRect(0, 0, W, H); x.drawImage(paper, 0, 0, W, H); x.globalAlpha = clamp(0.4 + p * 2); x.drawImage(sketch, 0, 0, W, H); x.globalAlpha = 1;
+      // reveal veins incrementally
+      const target = Math.floor(segs.length * clamp(p * 1.25)); const vg = veinL.getContext('2d');
+      if (target < drawn) { vg.setTransform(1, 0, 0, 1, 0, 0); vg.clearRect(0, 0, veinL.width, veinL.height); drawn = 0; }
+      if (target > drawn) { vg.setTransform(D * S, 0, 0, D * S, CX * D, CY * D); vg.lineCap = 'round'; vg.globalCompositeOperation = 'lighter';
+        for (let i = drawn; i < target; i++) { const [a, b, c2, d, w] = segs[i]; vg.strokeStyle = 'rgba(255,40,20,.18)'; vg.lineWidth = w * 3.2; vg.beginPath(); vg.moveTo(a, b); vg.lineTo(c2, d); vg.stroke(); vg.strokeStyle = 'rgba(255,90,50,.9)'; vg.lineWidth = w; vg.stroke(); } drawn = target; }
+      x.save(); x.shadowColor = '#ff2a1a'; x.shadowBlur = 18; x.drawImage(veinL, 0, 0, W, H); x.restore();
+      // growth-front sparks + heart core + head rays
+      x.save(); x.globalCompositeOperation = 'lighter'; x.translate(CX, CY); x.scale(S, S);
+      for (let i = 0; i < 26 && drawn > 0; i++) { const sgm = segs[Math.max(0, drawn - 1 - ((R() * 400) | 0))]; if (!sgm) continue; x.fillStyle = `rgba(255,${180 + R() * 70 | 0},90,${0.5 + R() * 0.5})`; x.beginPath(); x.arc(sgm[2], sgm[3], 1 + R() * 1.6, 0, TAU); x.fill(); }
+      const beat = Math.pow(Math.max(0, Math.sin(t * 5.2)), 8) + Math.pow(Math.max(0, Math.sin(t * 5.2 - 0.6)), 10) * 0.6; const hp = KP.heart, hr = 16 + beat * 8;
+      const hg = x.createRadialGradient(hp[0], hp[1], 0, hp[0], hp[1], hr * 3); hg.addColorStop(0, 'rgba(255,250,220,1)'); hg.addColorStop(0.25, 'rgba(255,190,90,.9)'); hg.addColorStop(1, 'rgba(255,80,20,0)'); x.fillStyle = hg; x.beginPath(); x.arc(hp[0], hp[1], hr * 3, 0, TAU); x.fill();
+      const rays = 30 + p * 60; for (let i = 0; i < rays; i++) { const a = R() * TAU, l = 20 + R() * (80 + p * 160), o = [0, -218]; x.strokeStyle = `rgba(255,${170 + R() * 80 | 0},90,${R() * 0.35 * clamp(p * 2)})`; x.lineWidth = 0.6 + R(); x.beginPath(); x.moveTo(o[0] + Math.cos(a) * 30, o[1] + Math.sin(a) * 36); x.lineTo(o[0] + Math.cos(a) * l, o[1] + Math.sin(a) * l); x.stroke(); }
+      x.restore();
+      // leader lines + callouts
+      callouts.forEach((c) => { const on = p >= thr[c.dataset.k]; c.classList.toggle('on', on); if (!on) return; const [kx, ky] = KP[c.dataset.k], px = CX + kx * S, py = CY + ky * S, right = kx >= 0;
+        x.strokeStyle = 'rgba(255,190,110,.7)'; x.lineWidth = 1; x.beginPath(); x.arc(px, py, 5, 0, TAU); x.moveTo(px + (right ? 5 : -5), py); x.lineTo(px + (right ? 55 : -55), py - 20); x.stroke(); });
+      $('#bioDefn').classList.toggle('on', p > 0.88);
+    })(0);
+  }
+
+  /* ===================== MARKETING: reach globe ===================== */
+  function globe() {
+    const cv = $('#globeGL'); if (!cv || !window.THREE) return; const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+    const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(40, 1, 0.1, 100); cam.position.set(0, 0.6, 6.4); cam.lookAt(0, 0, 0); const G = new THREE.Group(); sc.add(G);
+    const N = 3200, pos = new Float32Array(N * 3); for (let i = 0; i < N; i++) { const y = 1 - (i / (N - 1)) * 2, rr = Math.sqrt(1 - y * y), th = i * 2.399963; pos.set([Math.cos(th) * rr * 1.6, y * 1.6, Math.sin(th) * rr * 1.6], i * 3); }
+    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); G.add(new THREE.Points(pg, new THREE.PointsMaterial({ color: '#3d8fff', size: 0.022, transparent: true, opacity: 0.75 })));
+    G.add(new THREE.Mesh(new THREE.SphereGeometry(1.58, 48, 32), new THREE.MeshBasicMaterial({ color: '#030814' })));
+    const atm = new THREE.Mesh(new THREE.SphereGeometry(1.75, 48, 32), new THREE.ShaderMaterial({ transparent: true, side: THREE.BackSide, blending: THREE.AdditiveBlending, depthWrite: false,
+      vertexShader: 'varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}', fragmentShader: 'varying vec3 vN;void main(){float f=pow(.75-dot(vN,vec3(0,0,1.)),3.);gl_FragColor=vec4(mix(vec3(.24,.96,1.),vec3(1.,.29,.11),.35)*f,f);}' })); sc.add(atm);
+    const ll = (la, lo, rad = 1.6) => { const p = (90 - la) * Math.PI / 180, t = (lo + 180) * Math.PI / 180; return new THREE.Vector3(-rad * Math.sin(p) * Math.cos(t), rad * Math.cos(p), rad * Math.sin(p) * Math.sin(t)); };
+    const home = ll(23.26, 77.41), cities = [[19.07, 72.88], [28.61, 77.21], [12.97, 77.59], [25.2, 55.27], [51.5, -0.12], [40.71, -74], [1.35, 103.8], [35.68, 139.69], [-33.87, 151.2], [52.52, 13.4], [37.77, -122.4]];
+    const hm = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 12), new THREE.MeshBasicMaterial({ color: '#ff4a1c' })); hm.position.copy(home); G.add(hm);
+    const arcs = cities.map(([la, lo], i) => { const to = ll(la, lo), mid = home.clone().add(to).multiplyScalar(0.5); mid.setLength(1.6 + home.distanceTo(to) * 0.45); const curve = new THREE.QuadraticBezierCurve3(home, mid, to), pts = curve.getPoints(64);
+      const g = new THREE.BufferGeometry().setFromPoints(pts), m = new THREE.Line(g, new THREE.LineBasicMaterial({ color: i % 2 ? '#3df5ff' : '#ff4a1c', transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending })); G.add(m);
+      const dot = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), new THREE.MeshBasicMaterial({ color: '#fff' })); G.add(dot); const cm = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), new THREE.MeshBasicMaterial({ color: '#ffb347' })); cm.position.copy(to); G.add(cm);
+      return { g, curve, dot, off: i * 0.37 }; });
+    G.rotation.y = -1.9; G.rotation.x = 0.25; let drag = false, lx = 0, vy = 0.002;
+    cv.addEventListener('pointerdown', (e) => { drag = true; lx = e.clientX; }); addEventListener('pointerup', () => (drag = false)); cv.addEventListener('pointermove', (e) => { if (drag) { G.rotation.y += (e.clientX - lx) * 0.008; lx = e.clientX; } });
+    const size = () => { const w = cv.clientWidth; r.setSize(w, w, false); }; size(); addEventListener('resize', size);
+    (function f(now) { requestAnimationFrame(f); if (!vis(cv)) return; const t = now / 1000; if (!drag) G.rotation.y += vy;
+      arcs.forEach((a) => { const k = ((t * 0.35 + a.off) % 1.4); a.g.setDrawRange(0, Math.floor(Math.min(1, k) * 65)); a.dot.position.copy(a.curve.getPoint(Math.min(1, k))); a.dot.visible = k < 1; });
+      hm.scale.setScalar(1 + Math.sin(t * 4) * 0.4); r.render(sc, cam); })(0);
+  }
+
+  /* ===================== boot order ===================== */
+  const afterIntro = () => { setTimeout(() => typeInto($('#greet'), 'N.O.V.A. › wake up, navya. the world needs your code.', 30), 600); };
+  const start = () => { [hero, core, tech, bio, globe].forEach((fn) => { try { fn(); } catch (e) { console.error('nova init failed:', fn.name, e); } }); try { intro(afterIntro); } catch (e) { console.error(e); const i = $('#intro'); i && i.remove(); afterIntro(); } };
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
+})();
