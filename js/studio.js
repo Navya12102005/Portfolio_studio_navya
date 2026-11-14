@@ -115,13 +115,14 @@
     function set(i, instant) { if (i === curI) return; curI = i; const it = items[i]; target.c1.set(it.bg[0]); target.c2.set(it.bg[1]); target.glow.set(it.glow || it.bg[0]); target.rim.set(it.rim || '#ffffff');
       const next = build(i); if (instant || !cur) { if (cur) holder.remove(cur); cur = next; holder.add(cur); cur.scale.setScalar(instant ? 1 : 0.001); swap = instant ? null : { t: 0, out: null };
         if (instant) { U.c1.value.copy(target.c1); U.c2.value.copy(target.c2); U.glow.value.copy(target.glow); rim.color.copy(target.rim); } return; }
+      if (swap && swap.out) holder.remove(swap.out); holder.children.slice().forEach((w) => { if (w !== cur) holder.remove(w); });
       swap = { t: 0, out: cur }; cur = next; cur.scale.setScalar(0.001); holder.add(cur); }
     function resize() { const w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
       const ox = typeof opts.offsetX === 'function' ? opts.offsetX(w, h) : (opts.offsetX || 0); holder.position.x = ox; const s = Math.min(1, cam.aspect / 1.1); holder.scale.setScalar(Math.max(0.62, s)); }
     resize(); addEventListener('resize', resize);
     let visible = true; if (!opts.preserve) new IntersectionObserver((es) => { visible = es[0].isIntersecting; }, { threshold: 0 }).observe(canvas);
     const clock = new THREE.Clock();
-    function render(dtOverride) { const t = opts.timeFn ? opts.timeFn() : clock.getElapsedTime(), dt = dtOverride ?? 0.016;
+    function render(dtOverride) { const t = opts.timeFn ? opts.timeFn() : clock.getElapsedTime(), now = performance.now(), dt = dtOverride ?? Math.min(0.12, (now - (render.last || now)) / 1000 || 0.016); render.last = now;
       U.c1.value.lerp(target.c1, 0.06); U.c2.value.lerp(target.c2, 0.06); U.glow.value.lerp(target.glow, 0.06); rim.color.lerp(target.rim, 0.06);
       if (swap) { swap.t += dt; if (swap.out) { const k = Math.min(1, swap.t / 0.45); swap.out.scale.setScalar(Math.max(0.001, 1 - k * k)); swap.out.rotation.y += 0.15; if (k >= 1) { holder.remove(swap.out); swap.out = null; swap.t = 0; } }
         else { const k = Math.min(1, swap.t / 0.9), e = 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2); cur.scale.setScalar(Math.max(0.001, k >= 1 ? 1 : e)); if (k >= 1) swap = null; } }
