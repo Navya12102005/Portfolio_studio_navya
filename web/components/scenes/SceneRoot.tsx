@@ -10,6 +10,7 @@ import SchematicLayer from "./SchematicLayer";
 import BootHorizon from "./BootHorizon";
 import { BioEngineeringScene } from "./BioEngineeringScene";
 import { OperationsArenaScene } from "./OperationsArenaScene";
+import CameraRig from "./CameraRig";
 
 /**
  * The single persistent R3F canvas behind the whole page. Scene 0 (boot
@@ -47,6 +48,7 @@ export default function SceneRoot({
         <fog attach="fog" args={["#030508", 10, 60]} />
         <ambientLight intensity={0.25} />
         <directionalLight position={[4, 8, 6]} intensity={0.6} color="#9fd8ff" />
+        <CameraRig />
 
         <Suspense fallback={null}>
           <SchematicLayer />

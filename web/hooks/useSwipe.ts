@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 type SwipeHandlers = {
   onSwipeLeft?: () => void;
@@ -25,7 +25,9 @@ const MAX_OFF_AXIS_RATIO = 0.6; // keeps a mostly-horizontal swipe from also fir
 export function useSwipe<T extends HTMLElement>(handlers: SwipeHandlers) {
   const start = useRef<{ x: number; y: number } | null>(null);
   const handlersRef = useRef(handlers);
-  handlersRef.current = handlers;
+  useEffect(() => {
+    handlersRef.current = handlers;
+  }, [handlers]);
 
   // React 19 callback refs may return a cleanup function, called on unmount —
   // exactly the native-listener teardown this needs.

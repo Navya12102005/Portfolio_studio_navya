@@ -5,19 +5,27 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/lib/useLenis";
 import { useDevicePerformance } from "@/hooks/useDevicePerformance";
+import { useSecondBrainStore } from "@/lib/secondBrainStore";
 import Cursor from "./hud/Cursor";
 import PerimeterHUD from "./hud/PerimeterHUD";
 import SceneRoot from "./scenes/SceneRoot";
 import LightweightFallback from "./scenes/LightweightFallback";
 import WakeUpText from "./scenes/WakeUpText";
 import JarvisAssistant from "./JarvisAssistant";
+import JarvisBootSequence from "./JarvisBootSequence";
 import ProjectModal from "./ProjectModal";
+import SecondBrainView from "./SecondBrainView";
+import BioTelemetryWidget from "./BioTelemetryWidget";
+import DossierModal from "./DossierModal";
+import EasterEggOverlay from "./EasterEggOverlay";
+import LiveTicker from "./LiveTicker";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
 export default function AppShell() {
   const { velocity } = useLenis();
   const perf = useDevicePerformance();
+  const secondBrainOpen = useSecondBrainStore((s) => s.open);
   const pitch = useRef(0);
   const bootRef = useRef<HTMLDivElement>(null);
   const wakeRef = useRef<HTMLDivElement>(null);
@@ -64,9 +72,13 @@ export default function AppShell() {
           `determined` stays false until the client-side GPU/width check
           has actually run, so the full scene is never even briefly
           mounted on a low-power device while that check is pending. */}
-      {perf.determined && (perf.tier === "low" ? <LightweightFallback /> : <SceneRoot scrollVelocity={velocity} pitch={pitch} />)}
+      {perf.determined && !secondBrainOpen && (perf.tier === "low" ? <LightweightFallback /> : <SceneRoot scrollVelocity={velocity} pitch={pitch} />)}
       <Cursor />
       <PerimeterHUD />
+      <BioTelemetryWidget />
+      <DossierModal />
+      <EasterEggOverlay />
+      <LiveTicker />
 
       {/* pointer-events-none: lets clicks reach the 3D canvas (domain nodes)
           beneath. Nothing inside <main> is currently interactive; if that
@@ -83,7 +95,7 @@ export default function AppShell() {
         <section className="relative min-h-screen flex items-center justify-center px-8 md:px-16 text-center">
           <div className="sn-glass rounded-2xl px-10 py-12 max-w-xl">
             <p className="sn-hud-text text-xs text-[var(--sn-cyan)]/70 mb-3">
-              // SCENE 0 COMPLETE — COMMAND CENTER ONLINE
+              {"// SCENE 0 COMPLETE — COMMAND CENTER ONLINE"}
             </p>
             <h2 className="sn-title text-2xl md:text-3xl font-bold text-[#e6edfb]">
               Tech · Bioengineering · Operations
@@ -98,6 +110,8 @@ export default function AppShell() {
 
       <JarvisAssistant />
       <ProjectModal />
+      <SecondBrainView />
+      <JarvisBootSequence />
     </>
   );
 }

@@ -19,10 +19,11 @@ const TERMINAL_LINES = [
 export default function PerimeterHUD() {
   const [xy, setXy] = useState({ x: 0, y: 0 });
   const [deg, setDeg] = useState(0);
-  const dialStart = useRef(performance.now());
+  const dialStart = useRef<number>(0);
   const [line, setLine] = useState(0);
 
   useEffect(() => {
+    dialStart.current = performance.now();
     startPointerTracking();
     let raf = 0;
     function tick() {
@@ -63,13 +64,14 @@ export default function PerimeterHUD() {
         ))}
       </div>
 
-      {/* bottom-left: live XYZ */}
-      <div className="absolute bottom-6 left-6">
+      {/* bottom-left: live XYZ — bottom-12, not bottom-6: LiveTicker now
+          occupies the bottom-0 edge strip, so this sits clear above it */}
+      <div className="absolute bottom-12 left-6">
         <div>X:{xy.x.toString().padStart(4, "0")} Y:{xy.y.toString().padStart(4, "0")} Z:0.00</div>
       </div>
 
-      {/* bottom-right: scrolling terminal */}
-      <div className="hidden md:block absolute bottom-6 right-6 w-64 text-right opacity-80">
+      {/* bottom-right: scrolling terminal — same bottom-12 adjustment */}
+      <div className="hidden md:block absolute bottom-12 right-6 w-64 text-right opacity-80">
         <div key={line} className="animate-[fadeIn_0.4s_ease]">
           {TERMINAL_LINES[line]}
         </div>

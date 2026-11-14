@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const MIN_SCALE = 1;
 const MAX_SCALE = 2.2;
@@ -24,7 +24,9 @@ function distance(a: Touch, b: Touch) {
 export function usePinchZoom<T extends HTMLElement>() {
   const [scale, setScale] = useState(1);
   const scaleRef = useRef(scale);
-  scaleRef.current = scale;
+  useEffect(() => {
+    scaleRef.current = scale;
+  }, [scale]);
   const startDist = useRef<number | null>(null);
   const startScale = useRef(1);
 

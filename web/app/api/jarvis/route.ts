@@ -74,10 +74,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ response: "Say something, and I'll route it." });
   }
 
+  // detected regardless of engine, so the client can bridge a domain-shaped
+  // query straight to the Second Brain graph (isolate/zoom the right cluster)
+  const bridgeDomain = detectDomain(prompt);
+
   if (isGeminiConfigured()) {
     try {
       const response = await runJarvisTurn(prompt);
-      return NextResponse.json({ response, engine: "gemini" });
+      return NextResponse.json({ response, engine: "gemini", domain: bridgeDomain });
     } catch (e) {
       // fall through to the local router below; log server-side for debugging
       console.error("Gemini turn failed, falling back to local router:", e instanceof GeminiError ? e.message : e);
@@ -85,7 +89,7 @@ export async function POST(req: Request) {
   }
 
   const action = detectAction(prompt);
-  const domain = detectDomain(prompt);
+  const domain = bridgeDomain;
 
   let response: string;
   if (action) {
@@ -100,5 +104,5 @@ export async function POST(req: Request) {
       "I didn't catch a domain in that — try mentioning tech/AI, bioengineering, or operations/marketing, or just say 'hire' to start a project scope. (Routing here is local keyword-matching right now, not a live LLM — Gemini isn't connected yet.)";
   }
 
-  return NextResponse.json({ response, engine: "local" });
+  return NextResponse.json({ response, engine: "local", domain });
 }

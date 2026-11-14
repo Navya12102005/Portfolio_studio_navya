@@ -4,6 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import JarvisWaveform from "./JarvisWaveform";
 import { isSpeechRecognitionSupported, listenOnce, speak, stopSpeaking } from "@/lib/speech";
+import { useSecondBrainStore } from "@/lib/secondBrainStore";
+import type { GraphCluster } from "@/data/knowledgeGraph";
+import { soundFX } from "@/utils/soundManager";
 
 type Message = { role: "system" | "user"; text: string };
 
@@ -12,7 +15,12 @@ const QUICK_ACTIONS: { label: string; prompt: string }[] = [
   { label: "Check Tech Stack", prompt: "what's your tech stack" },
   { label: "Book Discovery Call", prompt: "book a discovery call" },
   { label: "Download Resume/Dossier", prompt: "send me the resume and dossier" },
+  { label: "Open Second Brain", prompt: "open the knowledge graph" },
 ];
+
+function isGraphCluster(d: unknown): d is GraphCluster {
+  return d === "tech" || d === "bio" || d === "ops";
+}
 
 export default function JarvisAssistant() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,11 +31,14 @@ export default function JarvisAssistant() {
   const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
   const [voiceOut, setVoiceOut] = useState(true);
-  const micSupported = useRef(false);
+  const [micSupported, setMicSupported] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // browser-feature check — must run post-mount: SpeechRecognition only
+  // exists client-side, so a lazy useState initializer (which runs during
+  // the hydration render itself) would mismatch the server's render.
   useEffect(() => {
-    micSupported.current = isSpeechRecognitionSupported();
+    setMicSupported(isSpeechRecognitionSupported()); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
 
   useEffect(() => {
@@ -40,10 +51,19 @@ export default function JarvisAssistant() {
     return () => stopSpeaking();
   }, [isOpen]);
 
+  const openGraph = useSecondBrainStore((s) => s.openGraph);
+  const focusCluster = useSecondBrainStore((s) => s.focusCluster);
+
   const send = async (text: string) => {
     if (!text.trim()) return;
     setMessages((prev) => [...prev, { role: "user", text }]);
     setInput("");
+
+    // explicit "open the graph" intent — handled client-side since it names
+    // no domain keyword the API's local router would otherwise detect
+    if (/second brain|knowledge graph/i.test(text)) {
+      openGraph();
+    }
 
     let replyText = "Telemetry connection interrupted. Try again.";
     try {
@@ -54,6 +74,10 @@ export default function JarvisAssistant() {
       });
       const data = await res.json();
       replyText = data.response ?? replyText;
+      // command bridge: a domain-shaped query (e.g. "show me her
+      // bioengineering projects") isolates/zooms the matching Second Brain
+      // cluster, independent of whether Gemini or the local router answered
+      if (isGraphCluster(data.domain)) focusCluster(data.domain);
     } catch {
       // keep fallback message
     }
@@ -75,18 +99,24 @@ export default function JarvisAssistant() {
   };
 
   const handleMic = async () => {
-    if (!micSupported.current || listening) return;
+    if (!micSupported || listening) return;
     setListening(true);
     const transcript = await listenOnce();
     setListening(false);
     if (transcript) await send(transcript);
   };
 
+  // bottom-14, not bottom-6: LiveTicker now occupies the bottom-0 edge
+  // strip, so the orb trigger sits clear above it
   return (
-    <div className="fixed bottom-6 right-6 z-50 font-mono">
+    <div className="fixed bottom-14 right-6 z-50 font-mono">
       {/* Arc Reactor Trigger Orb */}
       <motion.button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          soundFX.playClickLock();
+          setIsOpen(!isOpen);
+        }}
+        onMouseEnter={() => soundFX.playHoverTick()}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         className="w-16 h-16 rounded-full bg-gradient-to-br from-[#00F0FF] to-[#0044FF] p-[2px] shadow-[0_0_30px_rgba(0,240,255,0.5)] flex items-center justify-center relative cursor-pointer"
@@ -124,7 +154,7 @@ export default function JarvisAssistant() {
                   >
                     {voiceOut ? "🔊" : "🔇"}
                   </button>
-                  <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white text-sm cursor-pointer">✕</button>
+                  <button onClick={() => { soundFX.playClickLock(); setIsOpen(false); }} className="text-gray-400 hover:text-white text-sm cursor-pointer">✕</button>
                 </div>
               </div>
               {/* audio-reactive waveform */}
@@ -157,6 +187,7 @@ export default function JarvisAssistant() {
                 <button
                   key={a.label}
                   onClick={() => send(a.prompt)}
+                  onMouseEnter={() => soundFX.playHoverTick()}
                   className="text-[9px] px-2.5 py-1.5 rounded-full border border-[#00F0FF]/25 text-[#00F0FF]/80 hover:bg-[#00F0FF]/10 hover:border-[#00F0FF]/50 cursor-pointer whitespace-nowrap"
                 >
                   {a.label}
@@ -166,7 +197,7 @@ export default function JarvisAssistant() {
 
             {/* Input Bar */}
             <form onSubmit={handleSend} className="p-3 border-t border-[#00F0FF]/20 bg-black/50 flex items-center space-x-2">
-              {micSupported.current && (
+              {micSupported && (
                 <button
                   type="button"
                   onClick={handleMic}
