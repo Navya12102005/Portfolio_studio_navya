@@ -396,6 +396,71 @@
       r.render(sc, cam); })(0);
   }
 
+
+  /* ===================== LIQUID GLASS CURSOR ===================== */
+  function blobCursor() {
+    const cv = $('#blob'); if (!cv || matchMedia('(hover:none)').matches) return; const gl = cv.getContext('webgl', { premultipliedAlpha: false, alpha: true }); if (!gl) return;
+    const vs = 'attribute vec2 p;varying vec2 uv;void main(){uv=p;gl_Position=vec4(p,0.,1.);}';
+    const fs = `precision highp float;varying vec2 uv;uniform float t;uniform vec2 v;uniform float hot;
+      vec3 hue(float h){return clamp(abs(mod(h*6.+vec3(0.,4.,2.),6.)-3.)-1.,0.,1.);}
+      void main(){vec2 q=uv*1.25;float sp=length(v);vec2 dir=sp>0.0001?v/sp:vec2(1.,0.);float st=min(sp*6.,.55);
+        vec2 qa=vec2(dot(q,dir),dot(q,vec2(-dir.y,dir.x)));qa.x/=1.+st;qa.y*=1.+st*.5;
+        float a=atan(qa.y,qa.x);float r0=.55+hot*.12+.06*sin(a*3.+t*2.3)+.045*sin(a*5.-t*3.1)+.03*sin(a*2.+t*1.7)+st*.05*sin(a*7.+t*6.);
+        float d=length(qa)-r0;float edge=smoothstep(.02,-.02,d);if(edge<=0.){gl_FragColor=vec4(0.);return;}
+        float rim=smoothstep(-.22,0.,d);vec3 c=hue(fract(a/6.2832+t*.08+length(qa)*.6))*1.1;
+        float spec=pow(max(0.,1.-length(qa-vec2(-.18,.2)*r0*1.6)*3.2),6.);
+        vec3 col=c*rim*1.4+vec3(1.)*spec*.9+vec3(.05,.02,.08);float alpha=edge*(.18+rim*.85+spec);
+        gl_FragColor=vec4(col,alpha);}`;
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+    const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr); gl.useProgram(pr);
+    const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const uT = gl.getUniformLocation(pr, 't'), uV = gl.getUniformLocation(pr, 'v'), uH = gl.getUniformLocation(pr, 'hot'); gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    let x = innerWidth / 2, y = innerHeight / 2, tx = x, ty = y, vx = 0, vy = 0, hot = 0, th = 0; addEventListener('pointermove', (e) => { tx = e.clientX; ty = e.clientY; });
+    document.addEventListener('pointerover', (e) => { th = e.target.closest('a,button,input,.kcap,.mod,.suit,canvas') ? 1 : 0; });
+    addEventListener('pointerdown', () => { hot = 1.6; });
+    (function f(now) { requestAnimationFrame(f); const nx = x + (tx - x) * 0.18, ny = y + (ty - y) * 0.18; vx += ((nx - x) - vx) * 0.3; vy += ((ny - y) - vy) * 0.3; x = nx; y = ny; hot += (th - hot) * 0.12;
+      cv.style.left = x + 'px'; cv.style.top = y + 'px'; gl.viewport(0, 0, 220, 220); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform1f(uT, now / 1000); gl.uniform2f(uV, vx * 0.01, -vy * 0.01); gl.uniform1f(uH, hot); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); })(0);
+  }
+
+  /* ===================== SOCIAL KEYBOARD ===================== */
+  function socialKeys() {
+    const ks = $$('.kcap'); if (!ks.length) return; const msgs = ['posted! the algorithm is pleased ✨', 'reel scheduled for 7:30 pm (peak chai hour)', 'hook rewritten. now it slaps.', 'carousel slide 10: the CTA. always the CTA.', 'going LIVE… brand teardown in 3, 2, 1', 'analytics: your audience loves stories, not ads'];
+    ks.forEach((k, i) => k.addEventListener('click', () => { k.classList.add('dn'); setTimeout(() => k.classList.remove('dn'), 160); toast(msgs[i % msgs.length]); }));
+  }
+
+  /* ===================== THE FEED: tunnel of social screens ===================== */
+  function feed() {
+    const sec = $('#feed'), cv = $('#feedGL'); if (!sec || !window.THREE) return;
+    const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.6)); r.outputEncoding = THREE.sRGBEncoding;
+    const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(55, 1, 0.1, 200); sc.fog = new THREE.Fog('#0a0414', 10, 40);
+    const hooks = ['STOP SCROLLING', 'POV: your brand finally has a story', '3 HOOKS THAT ACTUALLY WORK', 'LIVE: brand teardown', 'chai & strategy · ep 12', 'CAROUSEL: 10 slides, 1 big idea', 'why nobody reads your caption', 'REEL: 0 to 100k', 'storytelling > selling', 'excel ops but make it aesthetic', 'BTS: how i plan 30 days', 'medtech, but explained simply'];
+    const pals = [['#7b2cff', '#ff4fb8'], ['#ff7a3d', '#ffd23f'], ['#2a5cff', '#3df5ff'], ['#e0242f', '#ff8a3d'], ['#1f8a5a', '#d4ff3a'], ['#3a0f6a', '#c9a2ff']];
+    const card = (i) => { const c = document.createElement('canvas'); c.width = 512; c.height = 320; const x = c.getContext('2d'), p = pals[i % pals.length], g = x.createLinearGradient(0, 0, 512, 320); g.addColorStop(0, p[0]); g.addColorStop(1, p[1]); x.fillStyle = g; x.fillRect(0, 0, 512, 320);
+      for (let k = 0; k < 40; k++) { x.fillStyle = `rgba(255,255,255,${R() * 0.08})`; x.beginPath(); x.arc(R() * 512, R() * 320, R() * 60, 0, TAU); x.fill(); }
+      x.fillStyle = '#0008'; x.fillRect(0, 0, 512, 46); x.fillStyle = '#fff'; x.beginPath(); x.arc(26, 23, 14, 0, TAU); x.fill(); x.font = '600 20px Rajdhani, sans-serif'; x.fillText('@navya.creates', 50, 30);
+      if (i % 3 === 0) { x.fillStyle = '#e0242f'; x.fillRect(420, 10, 74, 26); x.fillStyle = '#fff'; x.font = '700 16px Rajdhani'; x.fillText('● LIVE', 430, 29); }
+      x.fillStyle = '#fff'; x.font = '900 40px Orbitron, sans-serif'; const words = hooks[i % hooks.length].split(' '); let line = '', y = 120; words.forEach((w) => { const tt = line ? line + ' ' + w : w; if (x.measureText(tt).width > 460) { x.fillText(line, 24, y); y += 46; line = w; } else line = tt; }); x.fillText(line, 24, y);
+      x.font = '20px Rajdhani'; x.fillText(`♥ ${(R() * 90 + 5).toFixed(1)}k   💬 ${(R() * 900 | 0) + 40}   ↗ ${(R() * 20).toFixed(1)}k`, 24, 296);
+      const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.wrapS = THREE.RepeatWrapping; t.repeat.x = -1; return t; };
+    const rings = []; [[2.4, 6, 0], [4.2, 9, 1.6], [6.3, 12, 3.4], [8.8, 15, 5.4]].forEach(([rad, n, y], ri) => { const g = new THREE.Group(); g.position.y = y; const gap = 0.12, th = TAU / n - gap;
+      for (let k = 0; k < n; k++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad, rad * 0.55, 16, 1, true, k * TAU / n, th), new THREE.MeshBasicMaterial({ map: card(ri * 20 + k), side: THREE.BackSide, toneMapped: false })); g.add(m);
+        const edge = new THREE.Mesh(new THREE.CylinderGeometry(rad * 1.002, rad * 1.002, rad * 0.55 + 0.06, 16, 1, true, k * TAU / n - 0.01, th + 0.02), new THREE.MeshBasicMaterial({ color: '#8a5cff', side: THREE.BackSide, transparent: true, opacity: 0.6 })); edge.scale.set(1.01, 1, 1.01); g.add(edge); }
+      g.userData.sp = (ri % 2 ? -1 : 1) * (0.08 + ri * 0.02); sc.add(g); rings.push(g); });
+    const floor = new THREE.Mesh(new THREE.CircleGeometry(2.3, 64), new THREE.ShaderMaterial({ transparent: true, vertexShader: 'varying vec2 vU;void main(){vU=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}', fragmentShader: 'varying vec2 vU;void main(){float d=length(vU-.5)*2.;gl_FragColor=vec4(mix(vec3(.7,.35,1.),vec3(.25,.05,.5),d),1.-d*.6);}' })); floor.rotation.x = -Math.PI / 2; floor.position.y = -0.8; sc.add(floor);
+    const me = new THREE.Group(), mm = new THREE.MeshStandardMaterial({ color: '#141018', roughness: 0.6 }); const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.16, 0.5, 8, 16), mm); body.position.y = -0.2; me.add(body);
+    const headM = new THREE.Mesh(new THREE.SphereGeometry(0.13, 24, 16), mm); headM.position.y = 0.28; me.add(headM); const bun = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), mm); bun.position.set(0, 0.42, -0.04); me.add(bun);
+    const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.42, 6, 12), mm); arm.position.set(0.16, 0.25, 0.06); arm.rotation.z = -0.5; arm.rotation.x = -0.4; me.add(arm); me.position.y = -0.45; sc.add(me);
+    sc.add(new THREE.AmbientLight('#8a5cff', 0.6)); const pl = new THREE.PointLight('#c9a2ff', 3, 6); pl.position.set(0, 0.5, 0); sc.add(pl);
+    const size = () => { const w = cv.clientWidth, h = cv.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }; size(); addEventListener('resize', size);
+    let mx3 = 0, my3 = 0; sec.addEventListener('pointermove', (e) => { mx3 = e.clientX / innerWidth - 0.5; my3 = e.clientY / innerHeight - 0.5; }); const nEl = $('#feedN');
+    (function f(now) { requestAnimationFrame(f); if (!vis(sec)) return; const t = now / 1000, p = prog(sec), e = ease(p);
+      cam.position.set(Math.sin(t * 0.1) * 0.3 + mx3 * 1.2, lerp(17, 2.4, e), lerp(2.2, 0.01, e) + my3 * 1.2); cam.lookAt(0, -0.6, 0); cam.rotation.z += t * 0.02;
+      rings.forEach((g) => (g.rotation.y += g.userData.sp * 0.01)); me.rotation.y = Math.sin(t * 0.5) * 0.4; arm.rotation.z = -0.5 + Math.sin(t * 2) * 0.15;
+      nEl.textContent = `● LIVE · ${(1200 + Math.round(p * 98000 + Math.sin(t) * 40)).toLocaleString('en-IN')} viewers`; r.render(sc, cam); })(0);
+  }
+
   /* ===================== MARKETING: reach globe ===================== */
   function globe() {
     const cv = $('#globeGL'); if (!cv || !window.THREE) return; const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.6));
@@ -422,6 +487,6 @@
 
   /* ===================== boot order ===================== */
   const afterIntro = () => { setTimeout(() => typeInto($('#greet'), 'N.O.V.A. › wake up, navya. the world needs your code.', 30), 600); };
-  const start = () => { [hero, core, tech, bio, brain, globe].forEach((fn) => { try { fn(); } catch (e) { console.error('nova init failed:', fn.name, e); } }); try { intro(afterIntro); } catch (e) { console.error(e); const i = $('#intro'); i && i.remove(); afterIntro(); } };
+  const start = () => { [hero, core, tech, bio, brain, globe, blobCursor, socialKeys, feed].forEach((fn) => { try { fn(); } catch (e) { console.error('nova init failed:', fn.name, e); } }); try { intro(afterIntro); } catch (e) { console.error(e); const i = $('#intro'); i && i.remove(); afterIntro(); } };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
 })();

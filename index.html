@@ -24,7 +24,9 @@ body::before{content:"";position:fixed;inset:0;z-index:900;pointer-events:none;b
 body::after{content:"";position:fixed;inset:0;z-index:901;pointer-events:none;opacity:.08;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
 /* ---------- HUD cursor ---------- */
-#cur{position:fixed;left:0;top:0;z-index:1000;pointer-events:none;width:46px;height:46px;transform:translate(-50%,-50%)}
+#cur{position:fixed;left:0;top:0;z-index:1000;pointer-events:none;width:46px;height:46px;transform:translate(-50%,-50%);opacity:.55}
+#blob{position:fixed;left:0;top:0;z-index:999;pointer-events:none;width:110px;height:110px;transform:translate(-50%,-50%);mix-blend-mode:screen}
+@media(hover:none){#blob{display:none}}
 #cur svg{width:100%;height:100%;overflow:visible;animation:rot 6s linear infinite}
 #cur .xy{position:absolute;left:36px;top:30px;font:10px var(--mono);color:var(--cyan);white-space:nowrap;opacity:.8}
 #cur.hot svg{animation-duration:1.2s}
@@ -158,6 +160,25 @@ section{position:relative;min-height:100svh}
 .mk-card.wide{grid-column:1/-1}
 @media(max-width:900px){.mk-grid{grid-template-columns:1fr}}
 
+/* ---------- SOCIAL KEYBOARD ---------- */
+.kb3d-wrap{margin-top:70px;perspective:1400px}
+.kb3d{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;width:min(820px,96vw);margin:26px auto 0;transform:rotateX(52deg) rotateZ(-28deg);transform-style:preserve-3d}
+.kcap{--h:calc(var(--i)*22deg);position:relative;aspect-ratio:1.5;border:none;border-radius:18px;cursor:pointer;color:#fff;font-family:var(--ui);text-align:left;padding:14px 16px;display:flex;flex-direction:column;justify-content:flex-end;
+  background:linear-gradient(150deg,hsl(calc(70 - var(--i)*18) 100% 62%),hsl(calc(40 - var(--i)*18) 100% 50%) 60%,hsl(calc(20 - var(--i)*18) 95% 38%));
+  box-shadow:inset 0 2px 0 #fff8,inset 0 -10px 18px #0005,0 2px 0 hsl(calc(20 - var(--i)*18) 90% 30%),0 4px 0 hsl(calc(20 - var(--i)*18) 90% 26%),0 6px 0 hsl(calc(20 - var(--i)*18) 90% 22%),0 8px 0 hsl(calc(20 - var(--i)*18) 90% 18%),0 24px 40px #0009,0 0 40px hsl(calc(40 - var(--i)*18) 100% 50% / .45);
+  transform:translateZ(0);transition:transform .15s,box-shadow .15s;animation:typewave 4.8s calc(var(--i)*.18s) infinite}
+.kcap::before{content:"";position:absolute;inset:6px 8px 50% 8px;border-radius:12px 12px 40% 40%;background:linear-gradient(#ffffff66,#ffffff00);pointer-events:none}
+.kcap .ke{position:absolute;top:10px;right:14px;font-size:1.8rem;filter:drop-shadow(0 4px 6px #0006)}
+.kcap b{font-family:var(--hud);font-size:.95rem;letter-spacing:.06em;text-shadow:0 2px 6px #0007}
+.kcap small{font:12px var(--mono);opacity:.9;text-shadow:0 1px 4px #0008}
+.kcap:hover,.kcap.dn{transform:translateZ(-8px);box-shadow:inset 0 2px 0 #fff8,inset 0 -6px 12px #0005,0 1px 0 hsl(calc(20 - var(--i)*18) 90% 30%),0 10px 20px #0009,0 0 60px hsl(calc(40 - var(--i)*18) 100% 55% / .8)}
+@keyframes typewave{0%,8%,100%{translate:0 0 0}4%{translate:0 0 -7px}}
+@media(max-width:700px){.kb3d{grid-template-columns:repeat(3,1fr);transform:rotateX(40deg) rotateZ(-18deg)}}
+/* ---------- FEED TUNNEL ---------- */
+#feed{height:340vh;background:radial-gradient(50% 50% at 50% 55%,#2a0f4a,var(--bg) 70%)}
+#feedGL{position:absolute;inset:0;width:100%;height:100%}
+.feed-t{position:absolute;z-index:4;left:5vw;top:14vh;max-width:380px}.feed-t h2{font-size:clamp(2.8rem,7vw,5.6rem)}.feed-t p{color:#c9bde8;margin-top:10px}
+.feed-n{position:absolute;z-index:4;right:5vw;top:14vh;font:12px var(--mono);color:#fff;background:#e0242f;padding:6px 12px;border-radius:4px;box-shadow:0 0 20px #e0242f88}
 /* ---------- SERVICES: suit upgrades ---------- */
 #suits{padding:120px 4vw;background:var(--bg)}
 .suit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:40px}
@@ -187,6 +208,7 @@ footer{padding:26px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 </style>
 </head>
 <body>
+<canvas id="blob" width="220" height="220"></canvas>
 <div id="cur"><svg viewBox="-24 -24 48 48"><circle r="16" fill="none" stroke="#3df5ff" stroke-width="1.2" stroke-dasharray="6 4"/><circle r="2" fill="#ff4a1c"/><path d="M-22 0h8M14 0h8M0-22v8M0 14v8" stroke="#3df5ff" stroke-width="1.2"/></svg><span class="xy" id="curXY"></span></div>
 <div id="sweep"></div>
 <div class="toast panel" id="toast"></div>
@@ -195,7 +217,7 @@ footer{padding:26px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 <div id="intro"><canvas id="introGL"></canvas><canvas id="led"></canvas><div id="boot"></div><button id="skip">SKIP INTRO ▸</button></div>
 
 <nav><a href="#hero" class="logo">N.O.V.A.</a>
-  <div class="links"><a href="#core">hub</a><a href="#tech">tech</a><a href="#bio">bio</a><a href="#brain">neuro</a><a href="#mkt">marketing</a><a href="#suits">services</a><a href="#contact">contact</a></div>
+  <div class="links"><a href="#core">hub</a><a href="#tech">tech</a><a href="#bio">bio</a><a href="#brain">neuro</a><a href="#mkt">marketing</a><a href="#feed">feed</a><a href="#suits">services</a><a href="#contact">contact</a></div>
   <span class="stat"><i></i>online · <span id="clk">--:--</span> IST</span></nav>
 
 <!-- HERO: the student, Da Vinci blueprint -->
@@ -273,6 +295,16 @@ footer{padding:26px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
       <div class="mk-card panel rv"><div class="l">calendar</div><div class="v"><span class="cnt" data-to="30">0</span>d</div><p>hook-first reels + carousels, planned</p><svg viewBox="0 0 200 46" class="spark"></svg></div>
       <div class="mk-card panel wide rv"><div class="l">N.O.V.A. hot take</div><p id="hotTake" style="font-size:1.1rem;color:#fff">your brand doesn't need more posts. it needs a better story.</p></div>
     </div>
+  </div>
+  <div class="kb3d-wrap rv"><p class="kick" style="color:var(--ember)">social keyboard // hover to post</p><div class="kb3d" id="kb3d"><button class="kcap" style="--i:0"><span class="ke">📸</span><b>reel</b><small>2.1M views</small></button><button class="kcap" style="--i:1"><span class="ke">❤️</span><b>likes</b><small>48.2k</small></button><button class="kcap" style="--i:2"><span class="ke">#</span><b>brandstory</b><small>trending</small></button><button class="kcap" style="--i:3"><span class="ke">🎬</span><b>hook</b><small>1.5s</small></button><button class="kcap" style="--i:4"><span class="ke">📈</span><b>reach</b><small>+300%</small></button><button class="kcap" style="--i:5"><span class="ke">💬</span><b>comments</b><small>1,204</small></button><button class="kcap" style="--i:6"><span class="ke">🔁</span><b>shares</b><small>9.8k</small></button><button class="kcap" style="--i:7"><span class="ke">📅</span><b>calendar</b><small>30 days</small></button><button class="kcap" style="--i:8"><span class="ke">🧠</span><b>strategy</b><small>on point</small></button><button class="kcap" style="--i:9"><span class="ke">✨</span><b>carousel</b><small>10/10</small></button><button class="kcap" style="--i:10"><span class="ke">🎯</span><b>ctr</b><small>6.4%</small></button><button class="kcap" style="--i:11"><span class="ke">📊</span><b>excel ops</b><small>automated</small></button><button class="kcap" style="--i:12"><span class="ke">🔴</span><b>LIVE</b><small>brand teardown</small></button><button class="kcap" style="--i:13"><span class="ke">🎤</span><b>podcast</b><small>ep. 12</small></button><button class="kcap" style="--i:14"><span class="ke">☕</span><b>chai &</b><small>strategy</small></button><button class="kcap" style="--i:15"><span class="ke">🚀</span><b>launch</b><small>day 1</small></button></div></div>
+</section>
+
+<!-- SOCIAL: the feed tunnel -->
+<section id="feed">
+  <div class="stick">
+    <canvas id="feedGL"></canvas>
+    <div class="feed-t"><p class="kick" style="color:#c9a2ff">module 03.5 // social</p><h2 class="h-hud" style="color:#fff;text-shadow:0 0 24px #9b5cff">The<br>Feed</h2><p>Scroll down into my content universe: reels, lives, carousels and stories, all orbiting one idea. <i>Make them stop scrolling.</i></p></div>
+    <div class="feed-n" id="feedN">LIVE · 0 viewers</div>
   </div>
 </section>
 
