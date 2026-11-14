@@ -1,0 +1,55 @@
+"use client";
+
+import { Canvas } from "@react-three/fiber";
+import { EffectComposer, Bloom, ChromaticAberration, Vignette } from "@react-three/postprocessing";
+import { BlendFunction } from "postprocessing";
+import { Suspense } from "react";
+import * as THREE from "three";
+import DustField from "./DustField";
+import SchematicLayer from "./SchematicLayer";
+import BootHorizon from "./BootHorizon";
+
+/**
+ * The single persistent R3F canvas behind the whole page. Scene 0 (boot
+ * horizon) lives here now; Scenes 1-3 mount into the same canvas as the
+ * user scrolls past the boot sequence (next milestone).
+ *
+ * NOTE: `preserveDrawingBuffer: true` is kept on intentionally — this sandbox's
+ * headless/software-GL screenshot pipeline needs it to capture the canvas
+ * reliably for automated visual testing (see AGENTS.md / build notes). It
+ * has a negligible cost on a real GPU and is safe to leave in.
+ */
+export default function SceneRoot({
+  scrollVelocity,
+  pitch,
+}: {
+  scrollVelocity: React.MutableRefObject<number>;
+  pitch: React.MutableRefObject<number>;
+}) {
+  return (
+    <div className="fixed inset-0 -z-10">
+      <Canvas
+        dpr={[1, 2]}
+        gl={{ antialias: true, powerPreference: "high-performance", preserveDrawingBuffer: true }}
+        camera={{ position: [0, 1.4, 9], fov: 50, near: 0.1, far: 200 }}
+      >
+        <color attach="background" args={["#030508"]} />
+        <fog attach="fog" args={["#030508", 10, 60]} />
+        <ambientLight intensity={0.25} />
+        <directionalLight position={[4, 8, 6]} intensity={0.6} color="#9fd8ff" />
+
+        <Suspense fallback={null}>
+          <SchematicLayer />
+          <BootHorizon pitch={pitch} />
+          <DustField velocity={scrollVelocity} />
+        </Suspense>
+
+        <EffectComposer>
+          <Bloom intensity={1.1} luminanceThreshold={0.08} luminanceSmoothing={0.4} mipmapBlur />
+          <ChromaticAberration offset={new THREE.Vector2(0.0008, 0.0008)} blendFunction={BlendFunction.NORMAL} />
+          <Vignette eskil={false} offset={0.25} darkness={0.65} />
+        </EffectComposer>
+      </Canvas>
+    </div>
+  );
+}
