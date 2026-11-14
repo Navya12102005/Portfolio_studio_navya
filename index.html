@@ -340,6 +340,67 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
 .bottle .hint{font-family:var(--mono);font-size:.62rem;opacity:.5;margin-top:16px}
 .hl{color:#000}
 @media(max-width:800px){.about{justify-content:center}}
+/* ===== V6: VIBE BOARD ===== */
+#vibe{position:relative;z-index:2;min-height:120svh;padding:110px 4vw 80px;background:var(--blue);color:#fff;overflow:hidden;
+  background-image:radial-gradient(#ffffff2a 1.2px,transparent 1.2px);background-size:26px 26px}
+.vb-head{text-align:center;position:relative;z-index:3}
+.vb-kick{font-family:var(--pixel);font-size:.75rem;letter-spacing:.06em;background:var(--lime);color:#000;display:inline-block;padding:6px 12px;border-radius:999px;transform:rotate(-3deg)}
+.vb-title{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:clamp(2.6rem,8vw,7rem);line-height:.92;margin:18px 0 10px}
+.vb-count{font-family:var(--pixel);font-size:.8rem;display:inline-flex;align-items:center;gap:10px}
+.vb-bar{width:140px;height:10px;border:2px solid #fff;border-radius:999px;overflow:hidden;display:inline-block}
+.vb-bar i{display:block;height:100%;width:0;background:var(--pink);transition:width .5s cubic-bezier(.34,1.56,.64,1)}
+.vb-stage{position:relative;margin-top:40px;display:grid;place-items:center;perspective:1200px;min-height:420px}
+.vb-board{position:relative;z-index:2;background:#151517;border-radius:28px;padding:16px 18px 22px;transform:rotateX(24deg) rotateZ(-3deg);transform-style:preserve-3d;
+  box-shadow:0 2px 0 #2a2a2e inset,0 18px 0 #0b0b0c,0 50px 80px #0008;width:min(760px,94vw);transition:transform .6s cubic-bezier(.34,1.56,.64,1)}
+.vb-board:hover{transform:rotateX(18deg) rotateZ(-2deg) translateY(-6px)}
+.vb-strip{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.62rem;color:#777;padding:0 6px 12px}
+.vb-strip .led{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px var(--lime);animation:blink 1.4s infinite}
+.vb-keys{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.kc{position:relative;aspect-ratio:1/.92;border:none;border-radius:16px;cursor:pointer;background:var(--kc);color:#111;
+  box-shadow:inset 0 -9px 0 #0003,inset 0 2px 0 #fff6,0 9px 0 var(--kd),0 16px 22px #0007;transition:transform .09s,box-shadow .09s;font-family:var(--pixel);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.kc::before{content:"";position:absolute;inset:7px 8px 14px;border-radius:11px;background:linear-gradient(160deg,#ffffff55,transparent 55%);pointer-events:none}
+.kc b{font-size:clamp(1.2rem,3.4vw,2.1rem);line-height:1}
+.kc small{font-size:clamp(.45rem,1.1vw,.62rem);opacity:.75;letter-spacing:.04em}
+.kc.down{transform:translateY(8px);box-shadow:inset 0 -3px 0 #0003,inset 0 2px 0 #fff6,0 1px 0 var(--kd),0 4px 8px #0006}
+.kc.done::after{content:"✓";position:absolute;top:6px;right:9px;font-size:.7rem}
+.kc.wide{grid-column:span 3;aspect-ratio:auto}
+.kc.wide b{font-size:clamp(.9rem,2.4vw,1.4rem)}
+.vb-card{position:absolute;z-index:4;left:50%;top:50%;width:min(230px,56vw);background:#fff;color:#000;border:3px solid #000;border-radius:18px;padding:14px 16px 16px;
+  box-shadow:7px 7px 0 #000;cursor:grab;touch-action:none;user-select:none}
+.vb-card:active{cursor:grabbing}
+.vb-card .top{display:flex;justify-content:space-between;align-items:center}
+.vb-card .em{font-size:2.4rem;line-height:1}
+.vb-card .tg{font-family:var(--pixel);font-size:.55rem;background:var(--cc);padding:4px 8px;border-radius:999px;border:2px solid #000}
+.vb-card h4{font-family:'Honk',system-ui;font-weight:400;font-size:1.9rem;line-height:1;margin:10px 0 6px;font-variation-settings:'MORF' 10}
+.vb-card p{font-size:.8rem;line-height:1.4}
+.vb-card .ch{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.vb-card .ch span{font-family:var(--mono);font-size:.6rem;border:1.5px solid #000;border-radius:999px;padding:2px 7px}
+.vb-hint{text-align:center;font-family:var(--mono);font-size:.72rem;margin-top:40px;opacity:.85;position:relative;z-index:3}
+.vb-hint b{display:inline-block;background:#fff;color:#000;border-radius:5px;padding:1px 6px;box-shadow:0 2px 0 #0006;font-weight:600}
+.vb-spark{position:absolute;z-index:5;pointer-events:none;font-size:1.3rem}
+@media(max-width:700px){.vb-keys{grid-template-columns:repeat(3,1fr)}.kc.wide{grid-column:span 3}.vb-board{transform:rotateX(14deg)}}
+/* ===== V6: TRAFFIC LIGHT ===== */
+.contact{grid-template-columns:1.1fr auto 1fr!important}
+.tl{position:relative;display:flex;flex-direction:column;align-items:center;transform-origin:50% 100%;animation:sway 4s ease-in-out infinite}
+@keyframes sway{0%,100%{rotate:-2deg}50%{rotate:2deg}}
+.tl .bulb{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff7b0,#f5c03a 60%,#a07800);box-shadow:0 0 18px #f5c03a;margin-bottom:-4px;z-index:2}
+.tl .cap{width:70px;height:16px;background:#1e7a52;border-radius:12px 12px 4px 4px;box-shadow:inset 0 -4px 0 #0003}
+.tl .box{position:relative;background:linear-gradient(90deg,#1a6b47,#2fa572 45%,#1a6b47);border-radius:26px;padding:16px 18px;display:flex;flex-direction:column;gap:14px;box-shadow:inset 0 0 0 3px #145a3b,0 20px 40px #0007}
+.tl .fl{position:absolute;width:30px;height:46px;background:#24905f;top:var(--t);box-shadow:inset 0 -4px 0 #0003}
+.tl .fl.l{left:-26px;border-radius:14px 0 0 30px}.tl .fl.r{right:-26px;border-radius:0 14px 30px 0}
+.lamp{position:relative;width:74px;height:74px;border-radius:50%;background:#0b0b0b;border:4px solid #145a3b;display:grid;place-items:center;cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.lamp::before{content:"";position:absolute;left:-8px;right:-8px;top:-10px;height:30px;background:#16613f;border-radius:40px 40px 6px 6px;z-index:1}
+.lamp i{position:absolute;inset:6px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--lc2),var(--lc) 55%,#000 120%);opacity:.18;transition:opacity .25s,box-shadow .25s}
+.lamp.on i,.lamp:hover i{opacity:1;box-shadow:0 0 30px 6px var(--lc),inset 0 0 12px #fff8}
+.lamp span{position:relative;z-index:2;font-family:var(--pixel);font-size:.72rem;color:#fff;opacity:.45;transition:opacity .25s}
+.lamp.on span,.lamp:hover span{opacity:1}
+.lamp:hover{transform:scale(1.1)}
+.tl .pole{width:26px;height:110px;background:linear-gradient(90deg,#c9c9c9,#fff 40%,#9a9a9a);position:relative}
+.tl .pole::after{content:"";position:absolute;left:0;right:0;top:30px;height:22px;background:repeating-linear-gradient(45deg,#e33 0 8px,#fff 8px 16px)}
+.tl .base{width:80px;height:14px;border-radius:8px;background:#444}
+.tl .sign{margin-top:14px;font-family:var(--pixel);font-size:.7rem;background:var(--lime);color:#000;padding:6px 12px;border-radius:999px;transform:rotate(-3deg);white-space:nowrap}
+@media(max-width:860px){.contact{grid-template-columns:1fr!important;justify-items:center}}
 /* label cursor */
 .lc{position:fixed;left:0;top:0;z-index:2500;pointer-events:none;width:14px;height:14px;border-radius:50%;background:#fff;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:width .35s cubic-bezier(.34,1.56,.64,1),height .35s cubic-bezier(.34,1.56,.64,1);display:grid;place-items:center}
 .lc span{font-family:var(--pixel);font-size:.65rem;color:#000;opacity:0;transition:opacity .2s}
@@ -383,22 +444,17 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
   <span>✦ python</span><span>✦ vibe coding</span><span>✦ prompt engineering</span><span>✦ bioinformatics</span><span>✦ ai × medtech</span><span>✦ digital marketing</span><span>✦ excel ops</span><span>✦ executive assistant</span>
 </div></div>
 
-<!-- ===== V4: PARALLAX DESCENT ===== -->
-<section id="descent">
-  <div class="stick">
-    <div class="px-l px-sky" data-s="0"></div>
-    <canvas class="px-l px-stars" id="pxStars" data-s="-10"></canvas>
-    <div class="px-l px-sun" data-s="30"></div>
-    <div class="px-l px-m" data-s="12"><svg viewBox="0 0 1000 400" preserveAspectRatio="none" id="m1"></svg></div>
-    <div class="px-l px-m" data-s="26"><svg viewBox="0 0 1000 400" preserveAspectRatio="none" id="m2"></svg></div>
-    <div class="px-l px-girl" data-s="40"><svg viewBox="0 0 40 110"><path fill="#140a14" d="M20 4a7 7 0 1 1 0 14a7 7 0 1 1 0-14zM13 20h14l6 34h-5l-2-14-1 22 9 46H6l9-46-1-22-2 14H7z"/><path d="M14 10c-6 4-10 30-12 40" stroke="#140a14" stroke-width="3" fill="none"/></svg></div>
-    <div class="px-l px-m" data-s="48"><svg viewBox="0 0 1000 400" preserveAspectRatio="none" id="m3"></svg></div>
-    <div class="px-l px-fog" data-s="0"></div>
-    <div class="px-l px-fall" id="pxFall"></div>
-    <div class="px-l px-cave" id="pxCave"><svg viewBox="0 0 1000 1000" preserveAspectRatio="none" id="cave"></svg></div>
-    <div class="px-t" id="pxT1"><div><p>a portfolio in motion</p><h2>building worlds,<br>crafting <em>dreams.</em></h2></div></div>
-    <div class="px-t" id="pxT2" style="opacity:0"><div><p>scroll deeper</p><h2>my story,<br>your adventure.</h2><a class="btn2" href="#work">skip to the work →</a></div></div>
+<!-- ===== V6: VIBE BOARD (keyboard) ===== -->
+<section id="vibe">
+  <div class="vb-head">
+    <p class="vb-kick">✦ interactive · press any key</p>
+    <h2 class="stack vb-title">meet me,<br>one key at a time</h2>
+    <p class="vb-count"><span id="vbN">0</span>/9 unlocked <span class="vb-bar"><i id="vbBar"></i></span></p>
   </div>
+  <div class="vb-stage" id="vbStage">
+    <div class="vb-board" id="vbBoard"><div class="vb-strip"><span>NAVYA-KB · MK II</span><span class="led"></span></div><div class="vb-keys" id="vbKeys"></div></div>
+  </div>
+  <p class="vb-hint">tip: type <b>P</b> <b>A</b> <b>B</b> <b>M</b> <b>X</b> <b>G</b> <b>V</b> <b>K</b> or hit <b>space</b> · drag the stickers around</p>
 </section>
 
 <!-- ===== STORY ===== -->
@@ -552,6 +608,16 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
     <p class="label">(05) let's build</p>
     <h2 class="glitch stack" data-t="say hi" style="font-family:'Anton',sans-serif;font-weight:400">say hi</h2>
     <p>Got a product to launch, a dataset to tame or a brand to grow? Press a key. I reply within 24 hours.</p>
+  </div>
+  <div class="tl" id="tl">
+    <div class="bulb"></div><div class="cap"></div>
+    <div class="box"><div class="fl l" style="--t:22px"></div><div class="fl r" style="--t:22px"></div><div class="fl l" style="--t:110px"></div><div class="fl r" style="--t:110px"></div><div class="fl l" style="--t:198px"></div><div class="fl r" style="--t:198px"></div>
+      <a class="lamp" href="#" target="_blank" title="Instagram" style="--lc:#ff3b5c;--lc2:#ffb3c0"><i></i><span>IG</span></a>
+      <a class="lamp" href="mailto:hello@example.com" title="Email" style="--lc:#ffc21a;--lc2:#fff1a8"><i></i><span>@</span></a>
+      <a class="lamp" href="#" target="_blank" title="LinkedIn" style="--lc:#2bff88;--lc2:#c8ffe0"><i></i><span>IN</span></a>
+    </div>
+    <div class="pole"></div><div class="base"></div>
+    <div class="sign" id="tlSign">● open for clients</div>
   </div>
   <div class="board" id="board">
     <div class="bar"><span>NAVYA-KB v2.6</span><span>● online</span></div>
@@ -1043,6 +1109,49 @@ const io2=new IntersectionObserver(es=>{if(es[0].isIntersecting){show(k);io2.dis
     ff.forEach(p=>{p.x+=Math.sin(t/1000+p.p)*.4;p.y+=Math.cos(t/1300+p.p)*.3;const a=.4+.6*Math.max(0,Math.sin(t/400+p.p*3));x.fillStyle=`rgba(255,240,150,${a})`;x.shadowBlur=10;x.shadowColor='#ffe68a';x.beginPath();x.arc(p.x,p.y,1.8,0,7);x.fill()});x.shadowBlur=0}
   requestAnimationFrame(frame);
   const io=new IntersectionObserver(es=>{if(es[0].isIntersecting){$('#bottle').classList.add('in');toast('a meadow grows where you wander ✿')}},{threshold:.4});io.observe(sec);
+})();
+
+/* =================== V6: VIBE BOARD =================== */
+(()=>{const host=$('#vbKeys');if(!host)return;
+  const K=[
+    {k:'P',lab:'python',kc:'#d4ff3a',kd:'#7a9a00',em:'🐍',t:'python',tg:'tech',p:'Automations, data pipelines and bots that do the boring stuff.',ch:['pandas','apis','scripts']},
+    {k:'A',lab:'ai / ml',kc:'#ff6ec7',kd:'#a3226f',em:'🤖',t:'AI / ML',tg:'tech × bio',p:'Models that read medical scans and explain why they decided.',ch:['pytorch','cnn','grad-cam']},
+    {k:'B',lab:'bio',kc:'#3df5c6',kd:'#0a8a6a',em:'🧬',t:'bioinformatics',tg:'bio',p:'Gene expression, protein data and biology questions answered with code.',ch:['biopython','scanpy','GEO']},
+    {k:'K',lab:'prompts',kc:'#bda9ff',kd:'#6a4fd0',em:'🧠',t:'prompt eng.',tg:'tech',p:'Prompt systems with evals, so AI gives the same great answer every time.',ch:['claude','gpt','evals']},
+    {k:'V',lab:'vibe code',kc:'#ffd84a',kd:'#b38f00',em:'⚡',t:'vibe coding',tg:'tech',p:'Idea to live website in a weekend, built AI-first.',ch:['cursor','next.js','vercel']},
+    {k:'M',lab:'marketing',kc:'#ff8a3d',kd:'#b04a00',em:'📱',t:'marketing',tg:'growth',p:'Hook-first reels, carousels and content calendars people actually stop for.',ch:['meta ads','canva','copy']},
+    {k:'G',lab:'growth',kc:'#7fd8ff',kd:'#1f7fb0',em:'📈',t:'growth & stories',tg:'growth',p:'Turning complex ideas into stories that sell, for brands and for me.',ch:['seo','storytelling']},
+    {k:'X',lab:'excel ops',kc:'#9fe870',kd:'#4f9a1f',em:'📊',t:'excel ops',tg:'ops',p:'Messy data to clean dashboards and weekly reports that build themselves.',ch:['xlookup','pivots','power query']},
+    {k:'E',lab:'exec asst',kc:'#f2f0ea',kd:'#9a968c',em:'🗂️',t:'executive asst.',tg:'ops',p:'Inbox, calendar, research and decks, run like a system for busy founders.',ch:['notion','workspace']},
+    {k:' ',lab:'space',kc:'#ffffff',kd:'#9a9a9a',em:'💌',t:'hire navya',tg:'cta',p:'You\'ve met all of me. Let\'s build something together.',ch:['reply in 24h'],wide:1,big:'HIRE NAVYA ↵'}];
+  host.innerHTML=K.map((o,i)=>`<button class="kc${o.wide?' wide':''}" data-i="${i}" style="--kc:${o.kc};--kd:${o.kd}"><b>${o.big||o.k}</b><small>${o.lab}</small></button>`).join('');
+  const keys=[...host.children],stage=$('#vbStage'),found=new Set();let z=10;
+  function spark(x,y){for(let i=0;i<8;i++){const s=document.createElement('div');s.className='vb-spark';s.textContent=['✦','✸','★','✿'][i%4];s.style.left=x+'px';s.style.top=y+'px';s.style.color=['#d4ff3a','#ff6ec7','#3df5c6','#fff'][i%4];stage.appendChild(s);
+    const a=i/8*Math.PI*2;s.animate([{transform:'translate(-50%,-50%) scale(.5)',opacity:1},{transform:`translate(calc(-50% + ${Math.cos(a)*70}px),calc(-50% + ${Math.sin(a)*70}px)) scale(1.3) rotate(90deg)`,opacity:0}],{duration:700,easing:'cubic-bezier(.19,1,.22,1)'}).onfinish=()=>s.remove()}}
+  function drag(c){let sx,sy,ox,oy,on=false;c.addEventListener('pointerdown',e=>{on=true;c.setPointerCapture(e.pointerId);sx=e.clientX;sy=e.clientY;ox=c.offsetLeft;oy=c.offsetTop;c.style.zIndex=++z});
+    c.addEventListener('pointermove',e=>{if(on){c.style.left=ox+e.clientX-sx+'px';c.style.top=oy+e.clientY-sy+'px'}});c.addEventListener('pointerup',()=>on=false)}
+  function press(i){const o=K[i],key=keys[i];key.classList.add('down');setTimeout(()=>key.classList.remove('down'),140);
+    const sr=stage.getBoundingClientRect(),kr=key.getBoundingClientRect(),kx=kr.left-sr.left+kr.width/2,ky=kr.top-sr.top+kr.height/2;spark(kx,ky);
+    if(o.k===' '&&found.size<9){toast(`unlock all 9 first · ${found.size}/9 ✦`);return}
+    if(o.k===' '){toast('say less → contact');setTimeout(()=>$('#contact').scrollIntoView({behavior:'smooth'}),500)}
+    const c=document.createElement('div');c.className='vb-card';c.style.setProperty('--cc',o.kc);
+    c.innerHTML=`<div class="top"><span class="em">${o.em}</span><span class="tg">${o.tg}</span></div><h4>${o.t}</h4><p>${o.p}</p><div class="ch">${o.ch.map(x=>`<span>${x}</span>`).join('')}</div>`;
+    stage.appendChild(c);c.style.zIndex=++z;const W=sr.width,H=sr.height,cw=c.offsetWidth,ch=c.offsetHeight;
+    const side=found.size%2?1:-1,tx=W/2+side*(W*.18+Math.random()*W*.25)-cw/2,ty=Math.random()*(H-ch*.6)-ch*.2;
+    const fx=Math.min(Math.max(tx,0),W-cw),fy=ty,rot=(Math.random()-.5)*24;c.style.left=fx+'px';c.style.top=fy+'px';c.style.rotate=rot+'deg';
+    c.animate([{transform:`translate(${kx-fx-cw/2}px,${ky-fy-ch/2}px) scale(.2) rotate(${-rot*3}deg)`,opacity:0},{transform:'translate(0,0) scale(1.08)',opacity:1,offset:.7},{transform:'none',opacity:1}],{duration:650,easing:'cubic-bezier(.34,1.56,.64,1)'});
+    drag(c);
+    if(o.k!==' '&&!found.has(i)){found.add(i);key.classList.add('done');$('#vbN').textContent=found.size;$('#vbBar').style.width=found.size/9*100+'%';
+      if(found.size===9){confetti();toast('🏆 you unlocked the full navya! hit space ↵')}else if(found.size===1)toast('nice! 8 more to go ✦')}}
+  keys.forEach((k,i)=>k.addEventListener('click',()=>press(i)));
+  const sec=$('#vibe');addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey)return;const r=sec.getBoundingClientRect();if(r.top>innerHeight*.6||r.bottom<innerHeight*.4)return;
+    const i=K.findIndex(o=>o.k===e.key.toUpperCase()||(o.k===' '&&e.key===' '));if(i>-1){e.preventDefault();press(i)}});
+})();
+/* =================== V6: TRAFFIC LIGHT =================== */
+(()=>{const L=[...$$('#tl .lamp')];if(!L.length)return;const msg=['● stop scrolling','● get ready…','● open for clients'];let i=0,paused=false;
+  const set=n=>{L.forEach((l,j)=>l.classList.toggle('on',j===n));$('#tlSign').textContent=msg[n]};
+  L.forEach(l=>{l.addEventListener('pointerenter',()=>paused=true);l.addEventListener('pointerleave',()=>paused=false)});
+  set(0);setInterval(()=>{if(paused)return;i=(i+1)%3;set(i);if(i===2){paused=true;setTimeout(()=>paused=false,4000)}},1400);
 })();
 setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'})+' IST · bhopal',1000);
 </script>
