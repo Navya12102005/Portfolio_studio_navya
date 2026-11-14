@@ -8,6 +8,7 @@ import Cursor from "./hud/Cursor";
 import PerimeterHUD from "./hud/PerimeterHUD";
 import SceneRoot from "./scenes/SceneRoot";
 import WakeUpText from "./scenes/WakeUpText";
+import JarvisAssistant from "./JarvisAssistant";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
@@ -77,13 +78,14 @@ export default function AppShell() {
               Tech · Bioengineering · Operations
             </h2>
             <p className="mt-4 text-sm text-[#b9c6e8]">
-              Scenes 1–3 (mechanical hand, thermal DNA shader, ops arena) and
-              the J.A.R.V.I.S. agent are the next build milestones — not yet
-              wired into this page.
+              Scenes 1–3 centerpieces are mounted; full scroll-triggered
+              choreography/domain switching between them is still ahead.
             </p>
           </div>
         </section>
       </main>
+
+      <JarvisAssistant />
     </>
   );
 }
