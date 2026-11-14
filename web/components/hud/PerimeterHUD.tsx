@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { pointer, startPointerTracking } from "@/lib/pointer";
+import { soundFX } from "@/utils/soundManager";
 
 const RULER_MARKS = Array.from({ length: 21 }, (_, i) => (i - 10) * 5); // -50..50
 const TERMINAL_LINES = [
@@ -21,6 +22,7 @@ export default function PerimeterHUD() {
   const [deg, setDeg] = useState(0);
   const dialStart = useRef<number>(0);
   const [line, setLine] = useState(0);
+  const [muted, setMuted] = useState(false);
 
   useEffect(() => {
     dialStart.current = performance.now();
@@ -51,10 +53,20 @@ export default function PerimeterHUD() {
         ))}
       </div>
 
-      {/* top-left: rotation dial + system id */}
+      {/* top-left: rotation dial + system id + master SFX mute */}
       <div className="hidden md:block absolute top-6 left-6">
         <div>STUDIO.NAVYA // OS v4.0</div>
         <div className="mt-1 opacity-70">ROTATION {deg.toString().padStart(3, "0")}°</div>
+        <button
+          onClick={() => {
+            const next = !muted;
+            setMuted(next);
+            soundFX.setMuted(next);
+          }}
+          className="pointer-events-auto mt-1 opacity-70 hover:opacity-100 cursor-pointer underline-offset-2 hover:underline"
+        >
+          SFX: {muted ? "MUTED" : "ON"}
+        </button>
       </div>
 
       {/* top-right: hex status grid */}

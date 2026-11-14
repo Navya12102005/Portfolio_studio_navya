@@ -7,6 +7,7 @@ import { isSpeechRecognitionSupported, listenOnce, speak, stopSpeaking } from "@
 import { useSecondBrainStore } from "@/lib/secondBrainStore";
 import type { GraphCluster } from "@/data/knowledgeGraph";
 import { soundFX } from "@/utils/soundManager";
+import { CORE_CLICK_EVENT } from "@/hooks/useEasterEgg";
 
 type Message = { role: "system" | "user"; text: string };
 
@@ -114,6 +115,7 @@ export default function JarvisAssistant() {
       <motion.button
         onClick={() => {
           soundFX.playClickLock();
+          window.dispatchEvent(new Event(CORE_CLICK_EVENT));
           setIsOpen(!isOpen);
         }}
         onMouseEnter={() => soundFX.playHoverTick()}

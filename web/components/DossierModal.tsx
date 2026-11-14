@@ -2,12 +2,37 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { jsPDF } from "jspdf";
 import { soundFX } from "@/utils/soundManager";
 
+const TITLES: Record<"tech" | "bio" | "ops", string> = {
+  tech: "NAVYA GUPTA // TECH & AI SYSTEMS",
+  bio: "NAVYA GUPTA // BIOENGINEERING R&D",
+  ops: "NAVYA GUPTA // OPERATIONS & GROWTH",
+};
+
+const LINES: Record<"tech" | "bio" | "ops", string[]> = {
+  tech: [
+    "Stack: Next.js, React Three Fiber, TypeScript, Python, AWS Cloud.",
+    "Roles: Operational Lead (AWS Student Builder Group), Startup Club President.",
+    "Key Projects: NoviCord Health Platform, Agentic AI Workflows.",
+  ],
+  bio: [
+    "Institution: B.Tech Bioengineering, VIT Bhopal (CGPA: 8.68).",
+    "Research: Liquid Crystal Biosensors, Computational Docking on",
+    "Pseudomonas aeruginosa (PDB: 5O7), Biomedical Optics (IIITDM Kancheepuram).",
+  ],
+  ops: [
+    "Marketing: Mailchimp Email Automation, Campaign Analytics.",
+    "Operations: Automated Excel Financial & KPI Modeling, Executive",
+    "Assistant Triage, Large-Scale Event Management (Rang & Ruckus / Advitya).",
+  ],
+};
+
 const CONTENT: Record<"tech" | "bio" | "ops", string> = {
-  tech: "NAVYA GUPTA // TECH & AI SYSTEMS\n- Stack: Next.js, React Three Fiber, TypeScript, Python, AWS Cloud.\n- Roles: Operational Lead (AWS Student Builder Group), Startup Club President.\n- Key Projects: NoviCord Health Platform, Agentic AI Workflows.",
-  bio: "NAVYA GUPTA // BIOENGINEERING R&D\n- Institution: B.Tech Bioengineering, VIT Bhopal (CGPA: 8.68).\n- Research: Liquid Crystal Biosensors, Computational Docking on Pseudomonas aeruginosa (PDB: 5O7), Biomedical Optics (IIITDM Kancheepuram).",
-  ops: "NAVYA GUPTA // OPERATIONS & GROWTH\n- Marketing: Mailchimp Email Automation, Campaign Analytics.\n- Operations: Automated Excel Financial & KPI Modeling, Executive Assistant Triage, Large-Scale Event Management (Rang & Ruckus / Advitya).",
+  tech: [TITLES.tech, ...LINES.tech.map((l) => `- ${l}`)].join("\n"),
+  bio: [TITLES.bio, ...LINES.bio.map((l) => `- ${l}`)].join("\n"),
+  ops: [TITLES.ops, ...LINES.ops.map((l) => `- ${l}`)].join("\n"),
 };
 
 /**
@@ -18,21 +43,36 @@ export default function DossierModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"tech" | "bio" | "ops">("tech");
 
-  // A real download instead of a fake alert — this site is built to be
-  // honest about what's actually wired up (see JarvisAssistant's ACTION_STUB
-  // messages for the same principle). No PDF library is installed, so this
-  // generates a genuine downloadable .txt summary rather than faking a PDF.
+  // A real PDF, generated client-side with jsPDF — not a fake alert() and
+  // not a .txt wearing a PDF's name. This site is built to be honest about
+  // what's actually wired up (see JarvisAssistant's ACTION_STUB messages
+  // for the same principle), so this only claims "PDF" once it is one.
   const downloadDossier = () => {
     soundFX.playClickLock();
-    const blob = new Blob([CONTENT[activeTab]], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Navya_Gupta_${activeTab}_Dossier.txt`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const marginX = 56;
+    let y = 72;
+
+    doc.setFont("courier", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(0, 200, 220);
+    doc.text("CLASSIFIED OPERATOR DOSSIER // STUDIO NAVYA OS v4.0", marginX, y);
+    y += 28;
+
+    doc.setFontSize(13);
+    doc.setTextColor(10, 10, 10);
+    doc.text(TITLES[activeTab], marginX, y);
+    y += 22;
+
+    doc.setFont("courier", "normal");
+    doc.setFontSize(10);
+    for (const line of LINES[activeTab]) {
+      const wrapped = doc.splitTextToSize(`- ${line}`, 480);
+      doc.text(wrapped, marginX, y);
+      y += 16 * wrapped.length;
+    }
+
+    doc.save(`Navya_Gupta_${activeTab}_Dossier.pdf`);
   };
 
   return (
@@ -83,7 +123,7 @@ export default function DossierModal() {
                   onClick={downloadDossier}
                   className="px-5 py-2 bg-[#00F0FF] text-black font-bold text-xs rounded-xl hover:bg-cyan-300 transition-colors cursor-pointer"
                 >
-                  DOWNLOAD DOSSIER (.TXT)
+                  DOWNLOAD SECURE PDF
                 </button>
               </div>
             </div>

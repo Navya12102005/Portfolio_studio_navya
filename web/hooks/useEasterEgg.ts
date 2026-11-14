@@ -1,41 +1,62 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const TARGET_KEY = "navya";
+const CLICK_TARGET_COUNT = 5;
+const CLICK_WINDOW_MS = 1500;
+export const CORE_CLICK_EVENT = "studio-navya:core-click";
+
+function unlock(setUnlocked: (v: boolean) => void) {
+  setUnlocked(true);
+  console.log(
+    "%c[PROTOCOL 42 UNLOCKED] Startup Club President & AWS Lead Accolades Verified.",
+    "color: #00F0FF; font-size: 14px; font-weight: bold;"
+  );
+}
 
 /**
- * Listens for the typed sequence "n-a-v-y-a" anywhere on the page and
- * flips `unlocked` once it's matched.
- *
- * The buffer is a ref, not a plain `let` in the hook body: a bare `let`
- * would still happen to work here (the effect's `[]` deps mean it only
- * closes over it once), but that's incidental — a ref makes the intent
- * (persistent state across keydowns, not render-visible) explicit and
- * survives even if this hook's body ever gets called more than once per
- * commit (e.g. React Strict Mode double-invocation).
+ * Listens for the typed sequence "n-a-v-y-a", or 5 clicks on the Arc
+ * Reactor core within CLICK_WINDOW_MS, and flips `unlocked` once either
+ * fires. The click trigger is a window CustomEvent (CORE_CLICK_EVENT)
+ * rather than a callback this hook returns: the orb button lives in
+ * JarvisAssistant, a different component from this hook's sole consumer
+ * (EasterEggOverlay) — a returned callback would only ever reach whichever
+ * component calls this hook, not a second independent instance of it
+ * elsewhere. Dispatching a window event (the same pattern lib/pointer.ts
+ * uses) lets any component trigger this one shared detector.
  */
 export function useEasterEgg() {
   const [unlocked, setUnlocked] = useState(false);
-  const buffer = useRef("");
 
   useEffect(() => {
+    let buffer = "";
     const handleKeyDown = (e: KeyboardEvent) => {
-      buffer.current += e.key.toLowerCase();
-      if (buffer.current.length > TARGET_KEY.length) {
-        buffer.current = buffer.current.slice(-TARGET_KEY.length);
+      buffer += e.key.toLowerCase();
+      if (buffer.length > TARGET_KEY.length) {
+        buffer = buffer.slice(-TARGET_KEY.length);
       }
-      if (buffer.current === TARGET_KEY) {
-        setUnlocked(true);
-        console.log(
-          "%c[PROTOCOL 42 UNLOCKED] Startup Club President & AWS Lead Accolades Verified.",
-          "color: #00F0FF; font-size: 14px; font-weight: bold;"
-        );
+      if (buffer === TARGET_KEY) {
+        unlock(setUnlocked);
+      }
+    };
+
+    let clickTimes: number[] = [];
+    const handleCoreClick = () => {
+      const now = Date.now();
+      clickTimes = [...clickTimes, now].filter((t) => now - t <= CLICK_WINDOW_MS);
+      if (clickTimes.length >= CLICK_TARGET_COUNT) {
+        clickTimes = [];
+        unlock(setUnlocked);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener(CORE_CLICK_EVENT, handleCoreClick);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(CORE_CLICK_EVENT, handleCoreClick);
+    };
   }, []);
 
   return unlocked;
