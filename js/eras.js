@@ -134,7 +134,7 @@ navya.build("something people need")
     const ctrl = box(0.18, 0.04, 0.1, std('#ffd23f')); ctrl.position.set(-1.75, 0.66, 0.1); ctrl.rotation.y = 0.5; sc.add(ctrl);
     const pz = box(0.5, 0.05, 0.5, std('#c98a4a', { roughness: 0.9 })); pz.position.set(1.3, 0.03, 0.5); pz.rotation.y = 0.3; sc.add(pz);
     const lid = box(0.5, 0.02, 0.5, std('#d99a5a', { roughness: 0.9 })); lid.position.set(1.42, 0.25, 0.22); lid.rotation.set(-1.0, 0.3, 0); sc.add(lid);
-    const chair = new THREE.Group(); chair.add(Object.assign(box(0.5, 0.08, 0.5, std('#18181f')), { position: new THREE.Vector3(0, 0.52, 0) })); const bk = box(0.5, 0.6, 0.06, std('#18181f')); bk.position.set(0, 0.85, 0.24); chair.add(bk);
+    const chair = new THREE.Group(); const seat = box(0.5, 0.08, 0.5, std('#18181f')); seat.position.set(0, 0.52, 0); chair.add(seat); const bk = box(0.5, 0.6, 0.06, std('#18181f')); bk.position.set(0, 0.85, 0.24); chair.add(bk);
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.45, 12), std('#888', { metalness: 1, roughness: 0.3 })); pole.position.y = 0.25; chair.add(pole); chair.position.set(0.05, 0, -1.35); sc.add(chair);
     // desk lamp
     const lamp = new THREE.SpotLight('#ffcf8a', 2.2, 4, 0.7, 0.6); lamp.position.set(-1.0, 1.9, -2.0); lamp.target.position.set(-0.4, 0.8, -2.3); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); sc.add(lamp, lamp.target);
@@ -192,7 +192,7 @@ navya.build("something people need")
     const gcL = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.7, 32), liqM('#2a7bff')); gcL.position.set(2.55, 1.3, 0.0); sc.add(gcL);
     // microscope
     const mic = new THREE.Group(), dark = std('#1b2230', { roughness: 0.35, metalness: 0.4 }), chrome = std('#ffffff', { metalness: 1, roughness: 0.08 });
-    mic.add(Object.assign(box(0.5, 0.06, 0.4, dark), { position: new THREE.Vector3(0, 0.03, 0) })); const ar = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.05, 16, 32, Math.PI * 0.8), dark); ar.position.set(-0.1, 0.35, 0); ar.rotation.z = -0.3; mic.add(ar);
+    const mb = box(0.5, 0.06, 0.4, dark); mb.position.y = 0.03; mic.add(mb); const ar = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.05, 16, 32, Math.PI * 0.8), dark); ar.position.set(-0.1, 0.35, 0); ar.rotation.z = -0.3; mic.add(ar);
     const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.45, 24), chrome); tube.position.set(0.1, 0.55, 0); tube.rotation.z = 0.35; mic.add(tube); const eye = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.15, 16), dark); eye.position.set(0.02, 0.8, 0); eye.rotation.z = 0.35; mic.add(eye);
     const stage = box(0.28, 0.03, 0.28, dark); stage.position.set(0.18, 0.28, 0); mic.add(stage); const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.02, 0.1, 16), chrome); lens.position.set(0.19, 0.34, 0); mic.add(lens);
     mic.position.set(-1.9, 0.95, 0.05); mic.scale.setScalar(1.3); mic.traverse((o) => { if (o.isMesh) o.castShadow = true; }); sc.add(mic);
@@ -280,6 +280,6 @@ navya.build("something people need")
   function picker() { $$('.era-card').forEach((c) => { c.addEventListener('pointermove', (e) => { const b = c.getBoundingClientRect(); c.style.transform = `perspective(800px) rotateY(${((e.clientX - b.left) / b.width - 0.5) * 14}deg) rotateX(${-((e.clientY - b.top) / b.height - 0.5) * 10}deg) translateY(-6px)`; });
     c.addEventListener('pointerleave', () => { c.style.transform = ''; }); }); }
 
-  const start = () => { techRoom(); bioLab(); transitions(); marketing(); picker(); };
+  const start = () => { [techRoom, bioLab, transitions, marketing, picker].forEach((fn) => { try { fn(); } catch (e) { console.error('era init failed:', fn.name, e); } }); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
