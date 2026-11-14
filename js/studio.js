@@ -85,8 +85,8 @@
         const p = mesh(pg, pm); p.scale.setScalar(1 - l * 0.22); p.userData.open = 1.25 - l * 0.38; piv.add(p); g.add(piv); petals.push(p); }
       const centre = mesh(new THREE.SphereGeometry(0.3, 48, 32), M.gold()); centre.scale.y = 0.6; g.add(centre);
       for (let i = 0; i < 40; i++) { const r = Math.sqrt(i) * 0.045, a = i * 2.399, s = mesh(new THREE.SphereGeometry(0.03, 8, 6), M.chrome()); s.position.set(Math.cos(a) * r, 0.17, Math.sin(a) * r); g.add(s); }
-      const stem = mesh(new THREE.CylinderGeometry(0.05, 0.07, 2.6, 16), M.glass('#5fd17a', 0.6)); stem.position.y = -1.32; g.add(stem);
-      const lg = new THREE.SphereGeometry(1, 32, 16); lg.scale(0.22, 0.6, 0.05); lg.translate(0, 0.6, 0); const leaf = mesh(lg, M.glass('#5fd17a', 0.6)); leaf.position.set(0.03, -1.9, 0); leaf.rotation.set(0, 0, -0.9); g.add(leaf);
+      const stem = mesh(new THREE.CylinderGeometry(0.05, 0.07, 2.6, 16), M.glass('#d98a4a', 0.6)); stem.position.y = -1.32; g.add(stem);
+      const lg = new THREE.SphereGeometry(1, 32, 16); lg.scale(0.22, 0.6, 0.05); lg.translate(0, 0.6, 0); const leaf = mesh(lg, M.glass('#d98a4a', 0.6)); leaf.position.set(0.03, -1.9, 0); leaf.rotation.set(0, 0, -0.9); g.add(leaf);
       g.position.y = 0.55; g.scale.setScalar(0.95); g.userData.t0 = null;
       g.userData.update = (t) => { if (g.userData.t0 === null) g.userData.t0 = t; const e = Math.min(1, (t - g.userData.t0) / 1.8), k = 1 - Math.pow(1 - e, 3) + Math.sin(Math.min(e, 1) * Math.PI) * 0.06;
         petals.forEach((p) => { p.rotation.x = 0.12 + (p.userData.open - 0.12) * k; }); g.rotation.y = t * 0.25; g.rotation.x = 0.35; }; return g;
