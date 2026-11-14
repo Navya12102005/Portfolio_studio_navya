@@ -7,7 +7,7 @@
 <meta name="description" content="Navya Gupta — AI/ML & prompt engineer, bioengineer, and growth marketer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800;900&family=Instrument+Serif:ital@0;1&family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Anton&family=Rozha+One&family=Honk:MORF@0..45&family=Nabla&family=Climate+Crisis:YEAR@1979..2048&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;800;900&family=Instrument+Serif:ital@0;1&family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;600&family=Anton&family=Rozha+One&family=Caveat:wght@600&family=Permanent+Marker&family=Honk:MORF@0..45&family=Nabla&family=Climate+Crisis:YEAR@1979..2048&display=swap" rel="stylesheet">
 <style>
 :root{
   --blue:#e8542a; --ink:#141210; --paper:#f3ede2; --lime:#ff7a3d; --pink:#ffc7a3; --aqua:#c43d12; --orange:#ff5a1f; --cream2:#ebe2d3; --sindoor:#d7261e; --marigold:#ffa400; --deva:'Rozha One',serif;
@@ -462,7 +462,6 @@ body{background:var(--paper);color:var(--ink)}
 .fn-win h3{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(2rem,5vw,3.6rem);text-transform:uppercase;line-height:.95}
 .fn-win a{display:inline-block;margin-top:16px;background:var(--ink);color:var(--paper);padding:14px 22px;border-radius:999px;font-weight:700}
 /* ===== V10: DESI ===== */
-.hero{background-color:var(--sindoor)!important;background-image:repeating-linear-gradient(45deg,#0000 0 3px,#00000012 3px 4px),repeating-linear-gradient(-45deg,#0000 0 3px,#ffffff0d 3px 4px)!important}
 #rangoli{position:absolute;left:50%;top:46%;width:min(92vh,92vw);height:min(92vh,92vw);transform:translate(-50%,-50%);z-index:0;opacity:.28;animation:spin 90s linear infinite;pointer-events:none}
 @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 .deva-name{position:absolute;left:0;right:0;top:66%;text-align:center;z-index:2;font-family:var(--deva);font-size:clamp(2rem,6vw,4.6rem);color:#ffc9bd;pointer-events:none;text-shadow:0 4px 30px #0003}
@@ -472,7 +471,6 @@ body{background:var(--paper);color:var(--ink)}
 .pre .w{color:#ffc9bd}
 .ticker{background-image:linear-gradient(var(--ink),var(--ink)),repeating-linear-gradient(90deg,var(--marigold) 0 10px,var(--sindoor) 10px 20px,#2fa572 20px 30px,#fff 30px 40px)!important;background-clip:padding-box,border-box!important;border-block:5px solid transparent!important}
 #prologue{background:var(--ink)!important}#prologue .pro{color:var(--paper)}
-#finale{background-color:var(--sindoor)!important;background-image:repeating-linear-gradient(45deg,#0000 0 3px,#00000012 3px 4px)!important}
 .fn-sub{font-family:var(--mono);font-size:.75rem;margin-top:10px;opacity:.85;text-transform:none}
 /* signposts */
 #signs{position:relative;z-index:2;background:var(--paper);padding:110px 4vw 90px;overflow:hidden;text-align:center;
@@ -492,6 +490,90 @@ body{background:var(--paper);color:var(--ink)}
 @keyframes swing{0%{opacity:0;transform:rotate(-35deg) translateY(-40px)}40%{opacity:1;transform:rotate(12deg)}65%{transform:rotate(-6deg)}85%{transform:rotate(3deg)}100%{opacity:1;transform:none}}
 .sg-b:hover{transform:rotate(-3deg) scale(1.04)!important}
 .sg-foot{font-family:var(--mono);font-size:.7rem;opacity:.6}
+/* ===== V11: ERAS ===== */
+.story-hidden,#hud{display:none!important}
+#eras{position:relative;z-index:2;background:var(--paper);padding:120px 4vw;text-align:center}
+.er-h{color:var(--ink)!important;font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:clamp(3rem,10vw,8rem);line-height:.88}
+.er-sub{font-family:var(--mono);font-size:.8rem;margin-top:14px;opacity:.7}
+.era-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:50px}
+.era-card{position:relative;aspect-ratio:3/4;border-radius:22px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;text-align:left;color:#fff;overflow:hidden;transition:transform .3s;box-shadow:0 20px 50px #0003}
+.era-card .en{position:absolute;top:18px;left:22px;font-family:var(--pixel);font-size:.75rem}
+.era-card .em{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:6rem;filter:drop-shadow(0 10px 20px #0006);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.era-card:hover .em{transform:translate(-50%,-66%) scale(1.15) rotate(-6deg)}
+.era-card b{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:.95}
+.era-card small{font-family:var(--mono);font-size:.7rem;opacity:.85;margin-top:6px}
+.era-card.c1{background:radial-gradient(circle at 70% 20%,#ff4fb8 0,transparent 45%),radial-gradient(circle at 20% 80%,#3df5ff 0,transparent 45%),#1a1030}
+.era-card.c2{background:radial-gradient(circle at 50% 40%,#2a7bff 0,transparent 55%),repeating-linear-gradient(0deg,#ffffff08 0 2px,transparent 2px 6px),#071226}
+.era-card.c3{background:repeating-linear-gradient(45deg,#0000 0 3px,#00000014 3px 4px),radial-gradient(circle at 30% 30%,#ffb000 0,transparent 40%),#d7261e}
+@media(max-width:800px){.era-grid{grid-template-columns:1fr}.era-card{aspect-ratio:16/10}}
+.era-scene{position:relative;z-index:2;height:420vh;padding:0;background:#140c24}
+#labroom{height:380vh;background:#071226}
+.es-stick{position:sticky;top:0;height:100svh;overflow:hidden}
+.es-stick canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.es-title,.es-cap,.defn,.tx-cap{position:absolute;z-index:3;opacity:0;transform:translateY(20px);transition:opacity .5s,transform .6s cubic-bezier(.19,1,.22,1);pointer-events:none}
+.es-title.on,.es-cap.on,.defn.on,.tx-cap.on{opacity:1;transform:none}
+.es-title{left:4vw;bottom:10vh;color:#fff}
+.es-title span{font-family:var(--pixel);font-size:.8rem;background:#ff4fb8;color:#000;padding:5px 10px;border-radius:999px}
+.es-title.lab span{background:#6ad0ff}
+.es-title h2{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(3.4rem,12vw,10rem);line-height:.85;margin:14px 0 8px;text-shadow:0 0 40px #ff4fb888}
+.es-title.lab h2{text-shadow:0 0 40px #6ad0ff88}
+.es-title p{font-family:var(--mono);font-size:.85rem;opacity:.85}
+.es-cap{left:50%;bottom:8vh;transform:translate(-50%,20px);max-width:min(560px,90vw);text-align:center;background:#000000aa;color:#fff;border:1px solid #ffffff33;backdrop-filter:blur(8px);padding:12px 18px;border-radius:14px;font-size:.95rem}
+.es-cap.on{transform:translate(-50%,0)}
+.defn{right:4vw;bottom:8vh;width:min(380px,90vw);background:#000;color:#fff;padding:22px;border:2px solid #fff}
+.defn b{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:2.4rem;line-height:.95}
+.defn i{font-family:'Instrument Serif',serif;font-size:1.4rem}.defn p{font-size:1rem;line-height:1.35;margin-top:8px}
+/* transitions */
+.tx{position:relative;z-index:1;height:260vh;padding:0;background:transparent}
+.tx-stick{position:sticky;top:0;height:100svh;overflow:hidden}
+#txGL{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;opacity:0;pointer-events:none;display:block}
+#txGL.on{opacity:1}
+#txFlash{position:fixed;inset:0;z-index:5;background:#fff;opacity:0;pointer-events:none;mix-blend-mode:screen}
+.tx-cap{left:50%;bottom:10vh;transform:translate(-50%,20px);font-family:var(--pixel);font-size:.85rem;color:#fff;background:#0008;padding:8px 14px;border-radius:999px}
+.tx-cap.on{transform:translate(-50%,0)}
+.tx-cap.big{bottom:auto;top:16vh;font-family:'Anton',sans-serif;font-size:clamp(2.6rem,8vw,6rem);background:none;text-shadow:0 0 30px #fff}
+/* desi era */
+#desi{position:relative;z-index:2;background-color:#b81d16;background-image:repeating-linear-gradient(45deg,#0000 0 3px,#00000014 3px 4px),repeating-linear-gradient(-45deg,#0000 0 3px,#ffffff0a 3px 4px);padding:90px 3vw}
+.ds-frame{border:14px solid transparent;border-image:repeating-linear-gradient(45deg,#ffb000 0 10px,#1f8a5a 10px 20px,#fff 20px 30px,#ff4fb8 30px 40px) 14;padding:40px 3vw}
+.ds-head{text-align:center;color:#fff}
+.ds-era{font-family:var(--pixel);font-size:.8rem;background:#ffb000;color:#000;padding:6px 12px;border-radius:999px}
+.patakha{font-family:var(--deva);font-weight:400;font-size:clamp(5rem,16vw,12rem);line-height:1.1;color:#ff3d8b;-webkit-text-stroke:4px #141210;paint-order:stroke fill;
+  text-shadow:6px 6px 0 #ffb000,9px 9px 0 #141210;filter:drop-shadow(0 0 0 #fff) drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 4px 0 #fff) drop-shadow(0 -4px 0 #fff);display:inline-block;animation:wob 3s ease-in-out infinite}
+@keyframes wob{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(2deg) scale(1.04)}}
+.ds-head h3{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(2rem,6vw,4.4rem);line-height:.9}
+.ds-head p{font-family:var(--mono);font-size:.8rem;opacity:.9;margin-top:10px}
+.ds-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:40px}
+.ds-p{position:relative;min-height:540px;border-radius:6px;overflow:hidden;box-shadow:0 20px 50px #0005}
+.ds-p canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1}
+.ds-p.wide{grid-column:1/-1;min-height:460px}
+.ds-p .hint{position:absolute;z-index:3;right:14px;bottom:12px;font-family:var(--mono);font-size:.7rem;background:#000a;color:#fff;padding:5px 10px;border-radius:999px}
+.ds-p.chai{background-color:#1f4a2c;background-image:radial-gradient(circle at 25% 25%,#2f6b3e 0 16%,transparent 17%),radial-gradient(circle at 75% 75%,#2f6b3e 0 16%,transparent 17%),radial-gradient(circle at 75% 25%,#c94f2a33 0 8%,transparent 9%),radial-gradient(circle at 25% 75%,#ff4fb833 0 8%,transparent 9%);background-size:90px 90px;outline:6px dotted #ffcc00;outline-offset:-14px}
+.spill{position:absolute;z-index:2;top:26px;left:26px;display:flex;flex-direction:column;pointer-events:none}
+.spill .s1{font-family:'Anton',sans-serif;font-size:clamp(2.4rem,5vw,4rem);line-height:.9;background:linear-gradient(#ffb000,#ff8aa0);-webkit-background-clip:text;color:transparent;-webkit-text-stroke:2px #141210;filter:drop-shadow(4px 4px 0 #141210) drop-shadow(0 0 0 #fff)}
+.spill .s2{font-family:var(--deva);font-size:clamp(3.4rem,7vw,5.6rem);line-height:1.1;background:linear-gradient(#ffb000,#ff8aa0);-webkit-background-clip:text;color:transparent;-webkit-text-stroke:2px #141210;filter:drop-shadow(5px 5px 0 #141210)}
+.ds-btn{position:absolute;z-index:3;left:26px;bottom:76px;font:600 .85rem var(--sans);background:#ffcc00;color:#141210;border:3px solid #141210;box-shadow:4px 4px 0 #141210;padding:10px 16px;border-radius:999px;cursor:pointer}
+.ds-btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #141210}
+.take{position:absolute;z-index:3;left:26px;right:26px;bottom:20px;color:#fff;font-size:.9rem;line-height:1.35}
+.take.pop{animation:tp .5s cubic-bezier(.34,1.56,.64,1)}@keyframes tp{from{opacity:0;transform:translateY(10px) scale(.95)}}
+.ds-p.boom{cursor:pointer;background-color:#2b3a7a;background-image:linear-gradient(118deg,transparent 38%,#9b1b30 38% 60%,transparent 60%),radial-gradient(#ffffff14 1.5px,transparent 1.5px);background-size:auto,22px 22px;outline:10px solid transparent;
+  border:12px solid transparent;border-image:repeating-linear-gradient(90deg,#1f8a5a 0 14px,#ffcc00 14px 20px,#d7261e 20px 26px,#1f8a5a 26px 40px) 12}
+.pesh{position:absolute;z-index:2;top:24px;right:24px;text-align:right;font-family:'Anton',sans-serif;font-size:clamp(2.2rem,4.6vw,3.6rem);line-height:.92;color:#ffe14d;text-shadow:3px 3px 0 #9b1b30;pointer-events:none}
+.pesh .d{font-family:var(--deva);font-size:1.15em}
+.manp{position:absolute;z-index:2;left:24px;bottom:50px;font-family:'Anton',sans-serif;font-size:clamp(1.8rem,3.8vw,3rem);line-height:.92;color:#ffe14d;text-shadow:3px 3px 0 #141210;pointer-events:none}
+.ds-p.sign{background-color:#55524d;background-image:repeating-linear-gradient(100deg,transparent 0 60px,#f2efe6 60px 120px,transparent 120px 240px),radial-gradient(#00000022 1px,transparent 1px);background-size:auto,4px 4px;background-position:0 70%,0 0;display:grid;place-items:center;cursor:pointer}
+.ds-p.sign::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 50% 55%,transparent,#0006)}
+.sign-wrap{position:relative;z-index:2;animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-8px) rotate(1.5deg)}}
+.board{width:min(380px,74vw);aspect-ratio:4/3;background:#fbfbf7;border-radius:4px;box-shadow:0 30px 40px #0007,inset 0 0 0 1px #0001;display:grid;place-items:center;padding:24px;text-align:center;transition:transform .25s}
+.board.flip{transform:rotateX(90deg)}
+.board span{font-family:'Permanent Marker',cursive;font-size:clamp(1.5rem,3.4vw,2.4rem);line-height:1.15;color:#1f3fb0}
+.hand{position:absolute;top:30%;width:34px;height:46px;border-radius:18px 18px 14px 14px;background:linear-gradient(#c98a62,#a8704e);box-shadow:0 6px 10px #0005}
+.hand.l{left:-14px;transform:rotate(-12deg)}.hand.r{right:-14px;transform:rotate(12deg)}
+.ds-p.type{background:#3a0006;background-image:radial-gradient(70% 60% at 50% 40%,#5a0a12,#2a0004)}
+.ds-p.auto{background:#141210;background-image:radial-gradient(#ffffff0c 1px,transparent 1px);background-size:6px 6px;cursor:pointer}
+.rollin{position:absolute;z-index:2;top:24px;left:0;right:0;text-align:center;font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(3rem,9vw,7rem);line-height:.9;color:#f2b33d;
+  -webkit-mask-image:repeating-linear-gradient(0deg,#000 0 3px,#0007 3px 4px),repeating-linear-gradient(90deg,#000 0 7px,#000a 7px 8px);mask-image:repeating-linear-gradient(0deg,#000 0 3px,#0007 3px 4px);pointer-events:none}
+@media(max-width:860px){.ds-grid{grid-template-columns:1fr}}
 /* label cursor */
 .lc{position:fixed;left:0;top:0;z-index:2500;pointer-events:none;width:14px;height:14px;border-radius:50%;background:#fff;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:width .35s cubic-bezier(.34,1.56,.64,1),height .35s cubic-bezier(.34,1.56,.64,1);display:grid;place-items:center}
 .lc span{font-family:var(--pixel);font-size:.65rem;color:#000;opacity:0;transition:opacity .2s}
@@ -503,9 +585,10 @@ body{background:var(--paper);color:var(--ink)}
 </style>
 </head>
 <body>
-<div class="pre" id="pre"><div class="w" style="font-family:var(--deva);font-variation-settings:normal">नव्या</div><div class="t">ruko zara, sabar karo ✋<br>loading a girl who refused to pick one lane…</div><div class="n" id="preN">0</div></div>
+<div class="pre" id="pre"><div class="w">navya</div><div class="t">ruko zara, sabar karo ✋<br>loading a girl who refused to pick one lane…</div><div class="n" id="preN">0</div></div>
 <canvas id="world"></canvas>
 <canvas id="storyGL"></canvas>
+<canvas id="txGL"></canvas><div id="txFlash"></div>
 <div class="lc" id="lc"><span id="lcT">view</span></div>
 
 <nav>
@@ -515,9 +598,7 @@ body{background:var(--paper);color:var(--ink)}
 
 <!-- HERO -->
 <header class="hero" id="top">
-  <svg id="rangoli" viewBox="-200 -200 400 400"></svg>
   <canvas id="particles"></canvas>
-  <div class="deva-name">नव्या गुप्ता</div>
   <svg id="strings"></svg>
 
   <div class="sticker" data-x=".12" data-y=".2" style="--r:-8deg"><div class="emoji">🧬</div></div>
@@ -527,7 +608,6 @@ body{background:var(--paper);color:var(--ink)}
   <div class="sticker" data-x=".55" data-y=".12" style="--r:10deg"><div class="emoji">🧿</div></div>
   <div class="sticker" data-x=".38" data-y=".78" style="--r:3deg"><div class="s" style="background:var(--aqua)">=XLOOKUP(dreams)</div></div>
   <div class="sticker pol" data-x=".66" data-y=".8" style="--r:-12deg"><div class="ph" style="background:var(--marigold)">☕</div>cutting chai</div>
-  <div class="sticker" data-x=".3" data-y=".14" style="--r:-6deg"><div class="truck">HORN<br><b>OK</b><br>PLEASE</div></div>
 
   <div class="hero-meta">
     <p>Bioengineer who codes, prompts &amp; markets. Mummy wanted a doctor. She got a bioengineer who also does marketing. Close enough.</p>
@@ -540,26 +620,76 @@ body{background:var(--paper);color:var(--ink)}
 </div></div>
 
 <!-- ===== V10: DESI SIGNPOSTS ===== -->
-<section id="signs">
-  <div class="sg-head"><p class="sg-deva">किधर जाना है?</p><h2>where to, madam?</h2><p class="sg-sub">click a board. no auto-wala will refuse you here.</p></div>
-  <div class="sg-pole">
-    <a class="sg-b l" href="#ring" style="--bc:var(--marigold);--d:.0s">← projects <small>2 km · no traffic</small></a>
-    <a class="sg-b r" href="#services" style="--bc:#2fa572;--d:.12s">services → <small>fixed rates*</small></a>
-    <a class="sg-b l" href="#contact" style="--bc:var(--sindoor);--d:.24s;color:#fff">← rishta for your brand? <small>contact</small></a>
-    <a class="sg-b r" href="#about" style="--bc:#3a7bd5;--d:.36s;color:#fff">about me → <small>mummy approved</small></a>
-    <a class="sg-b l" href="#finale" style="--bc:#ff7ac0;--d:.48s">← stress buster <small>pop balloons</small></a>
-  </div>
-  <p class="sg-foot">*okay, thoda negotiable. i'm a gupta after all.</p>
-</section>
+
 
 <!-- ===== V7: INFLATABLE NAME ===== -->
+
+
+<!-- ===== V6: VIBE BOARD (keyboard) ===== -->
+
+
+<!-- ===== STORY ===== -->
+
+
+
+
+
+
+
+
+
+
+<!-- 3D RING -->
+
+
+<!-- V5: HORIZON SLICE SLIDER -->
+
+
+<!-- DOMAINS -->
+
+
+<!-- SERVICES: FLORA SLIDER -->
+
+
+<!-- V5: LIFE WALL -->
+
+
+<!-- V5: AURORA GARDEN ABOUT -->
+
+
+<!-- CONTACT KEYBOARD -->
+
+
+<!-- ===== V9: POP FINALE ===== -->
+
+
+<section id="eras">
+  <p class="label">(the multiverse of navya)</p>
+  <h2 class="stack er-h">3 eras.<br>1 girl.</h2>
+  <p class="er-sub">pick one? beta, hum teeno karte hain.</p>
+  <div class="era-grid">
+    <a class="era-card c1" href="#techroom"><span class="en">ERA 01</span><span class="em">💻</span><b>TECH GIRL</b><small>3am debugging · lo-fi · chai</small></a>
+    <a class="era-card c2" href="#labroom"><span class="en">ERA 02</span><span class="em">🧪</span><b>LAB GIRL</b><small>pipettes · petri dishes · neural nets</small></a>
+    <a class="era-card c3" href="#desi"><span class="en">ERA 03</span><span class="em">🛺</span><b>MARKETING GIRL</b><small>पटाका energy · stories that sell</small></a>
+  </div>
+</section>
+
+<section id="techroom" class="era-scene">
+  <div class="es-stick"><canvas id="roomGL"></canvas>
+    <div class="es-title" data-at="0,.14"><span>ERA 01</span><h2>TECH GIRL</h2><p>welcome to my room. ignore the mess, it's "organised chaos".</p></div>
+    <div class="es-cap" data-at=".16,.36">this is where the magic (and 3am debugging) happens 🌙</div>
+    <div class="es-cap" data-at=".36,.58">sticky notes = my project managers. they never micromanage.</div>
+    <div class="es-cap" data-at=".58,.8">the arcade says NAVYA vs DEADLINES. spoiler: navya wins (mostly).</div>
+    <div class="es-cap" data-at=".8,1.01">zoom in. the code is literally my life ↓</div>
+  </div>
+</section>
+
 <section id="inflate">
   <div class="if-top"><p>bioengineer · coder · storyteller<br>based in bhopal, building for the world</p><span class="if-tag">✦ shove them · click to bounce</span></div>
   <canvas id="infl"></canvas>
   <h2 class="if-big">navya gupta</h2>
 </section>
 
-<!-- ===== V6: VIBE BOARD (keyboard) ===== -->
 <section id="vibe">
   <div class="vb-head">
     <p class="vb-kick">✦ interactive · press any key</p>
@@ -572,68 +702,6 @@ body{background:var(--paper);color:var(--ink)}
   <p class="vb-hint">tip: type <b>P</b> <b>A</b> <b>B</b> <b>M</b> <b>X</b> <b>G</b> <b>V</b> <b>K</b> or hit <b>space</b> · drag the stickers around</p>
 </section>
 
-<!-- ===== STORY ===== -->
-<section class="scene" id="prologue" data-ch="0" data-name="prologue">
-  <div class="stick"><div class="pro">
-    <p class="l1">once upon a time, over a cutting chai, a girl couldn't choose just one thing…</p>
-    <h2 class="l2"><b>science.</b> <b>code.</b> <b><em style="font-family:var(--serif);font-weight:400">stories.</em></b></h2>
-    <p class="l3">so she decided to master all three. keep scrolling ↓</p>
-  </div></div>
-</section>
-
-<section class="scene" id="ch1" data-ch="1" data-name="the lab">
-  <div class="stick">
-    <span class="chap">ch.01 — the lab</span>
-    <h2 class="ctitle" style="--cc:#c43d12">the lab</h2>
-    <div id="cells"></div><canvas id="jelly"></canvas>
-    <svg id="helix" viewBox="0 0 200 600" preserveAspectRatio="xMidYMid meet"></svg>
-    <div class="seq"><span id="seqTxt">ATGCGTAC</span><small id="seqSub">decoding life…</small></div>
-    <div class="say" id="say1"><span>it started in a bioengineering lab.</span><span>where i learned life is just <em>code</em> written in A, T, G, C.</span><span>and i thought — what if AI could read it?</span></div>
-  </div>
-</section>
-
-<section class="scene" id="ch2" data-ch="2" data-name="the code">
-  <div class="stick">
-    <canvas id="rain"></canvas>
-    <span class="chap">ch.02 — the code</span>
-    <h2 class="ctitle" style="--cc:#ff7a3d">the code</h2>
-    <div class="code-win"><div class="tb"><i></i><i></i><i></i></div><pre id="codeOut"></pre></div>
-    <div class="say" id="say2"><span>so i taught myself to code.</span><span>python. ML models. prompts that make AI <em>behave.</em></span><span>then i started shipping apps in a weekend.</span></div>
-  </div>
-</section>
-
-<section class="scene" id="ch3" data-ch="3" data-name="the market">
-  <div class="stick">
-    <span class="chap">ch.03 — the plot twist</span>
-    <h2 class="ctitle" style="--cc:#ffc7a3">plot twist</h2>
-    <svg class="chart" viewBox="0 0 300 200"><path id="chartLine" d="M10,180 C60,170 80,150 110,140 S160,120 180,90 S240,40 290,15"/><text class="lbl" x="150" y="195" text-anchor="middle" id="growth">+0%</text></svg>
-    <div class="phone"><div class="screen" id="screen">
-      <div class="notif" style="top:14px">📩 <b>new client:</b> "can you run our socials?"</div>
-      <div class="notif" style="top:66px">💸 <b>invoice paid</b> · ₹25,000</div>
-      <div class="notif" style="top:118px">📊 <b>report ready:</b> weekly MIS.xlsx</div>
-      <div class="notif" style="top:170px">🔥 your reel is trending</div>
-      <div class="post">turning science<br>into stories<br>people pay for.</div>
-      <div class="likes">♥ <span id="likes">0</span> likes</div>
-    </div></div>
-    <div class="say" id="say3"><span>plot twist: great work nobody sees is just a diary.</span><span>so i learned <em>marketing,</em> storytelling &amp; excel ops.</span><span>now the work gets seen — and paid.</span></div>
-  </div>
-</section>
-
-<section class="scene" id="ch4" data-ch="4" data-name="the merge">
-  <div class="stick">
-    <span class="chap" style="color:#fff">ch.04 — the merge</span>
-    <h2 class="ctitle" style="--cc:#ffffff">the merge</h2>
-    <div class="venn">
-      <div class="orb a" id="oa"><span>bio</span></div>
-      <div class="orb b" id="ob"><span>tech</span></div>
-      <div class="orb c" id="oc"><span>marketing</span></div>
-      <div class="core honk">navya</div>
-    </div>
-    <div class="say" id="say4" style="color:#fff"><span>most people pick one lane.</span><span>i built where all three <em>overlap.</em></span><span>then i <em>launch</em> it. here's the proof ↓</span></div>
-  </div>
-</section>
-
-<!-- 3D RING -->
 <section class="ring-sec" id="ring">
   <div class="ring-sticky">
     <div class="ring-title"><p class="label" style="color:#000">(01) selected projects</p><h2 class="glitch" data-t="the reel">the reel</h2></div>
@@ -642,12 +710,72 @@ body{background:var(--paper);color:var(--ink)}
   </div>
 </section>
 
-<!-- V5: HORIZON SLICE SLIDER -->
+<section class="tx" id="tx12" data-from="TECH ERA" data-to="LAB ERA" data-fc="#ff4fb8" data-tc="#6ad0ff" data-c1="#140c24" data-c2="#071226" data-boom="BOOM 💥 tech → lab. ctrl+s kiya na?">
+  <div class="tx-stick"><div class="tx-cap" data-at="0,.32">keep scrolling to detonate ↓</div><div class="tx-cap big" data-at=".44,.6">💥 BOOM</div><div class="tx-cap" data-at=".68,1.01">welcome to the lab. goggles on 🥽</div></div>
+</section>
+
+<section id="labroom" class="era-scene">
+  <div class="es-stick"><canvas id="labGL"></canvas>
+    <div class="es-title lab" data-at="0,.14"><span>ERA 02</span><h2>LAB GIRL</h2><p>pipettes, petri dishes &amp; neural nets.</p></div>
+    <div class="es-cap" data-at=".16,.36">this microscope has seen things. mostly my 8am face. 🔬</div>
+    <div class="es-cap" data-at=".36,.52">flask of ambition. highly reactive. handle with care.</div>
+    <div class="es-cap" data-at=".52,.72">test tubes &gt; tinder. better chemistry. 🧪</div>
+    <div class="es-cap" data-at=".72,.88">i teach AI to read scans like these. it's faster than me. rude.</div>
+    <div class="defn" data-at=".88,1.01"><b>BIOENGINEER:</b><i>(noun)</i><p>a person who uses fancy gadgets and computers to fix humans and turn them into bionic superheroes… and still can't fix her own sleep schedule.</p></div>
+  </div>
+</section>
+
 <section id="horizon"><canvas id="hzGL"></canvas><div id="hzS"></div>
   <div class="hz-ui"><span class="n" id="hzN">01 <small>/ 09</small></span><span class="bt"><button id="hzP" aria-label="previous">←</button><button id="hzX" aria-label="next">→</button></span></div>
 </section>
 
-<!-- DOMAINS -->
+<section id="services" class="flora">
+  <div class="fl-left">
+    <div class="idx"><b></b><span id="flIdx">01 / 05</span> · services</div>
+    <h2 id="flTitle"></h2>
+    <p id="flDesc"></p>
+    <div class="fl-meta"><div><small>starting at</small><span id="flPrice"></span></div><div><small>delivery</small><span id="flTime"></span></div></div>
+    <div class="fl-nav"><button id="flPrev" aria-label="previous">←</button><button id="flNext" aria-label="next">→</button><span class="fl-dots" id="flDots"></span></div>
+  </div>
+  <div class="fl-center"><canvas id="flGL"></canvas></div>
+  <div class="fl-right">
+    <div class="fl-card" id="flCard"><div class="th"><img id="flMini" alt="next service preview"></div><div class="cap"><small>next up</small><span id="flNextName"></span></div></div>
+    <a href="#contact" class="fl-hire">hire for this ↗</a>
+  </div>
+</section>
+
+<section class="tx" id="tx23" data-from="LAB ERA" data-to="MARKETING ERA" data-fc="#6ad0ff" data-tc="#ffb000" data-c1="#071226" data-c2="#b81d16" data-boom="BOOM 💥 lab → marketing. ab drama shuru 💅">
+  <div class="tx-stick"><div class="tx-cap" data-at="0,.32">one more boom. hold your chai ↓</div><div class="tx-cap big" data-at=".44,.6">💥 पटाका!</div><div class="tx-cap" data-at=".68,1.01">entering: marketing girl era 💅</div></div>
+</section>
+
+<section id="desi"><div class="ds-frame">
+  <div class="ds-head"><span class="ds-era">ERA 03</span><h2 class="patakha">पटाका</h2><h3>MARKETING GIRL ERA</h3><p>loud colours. louder ideas. desi to the core, global in the brief.</p></div>
+  <div class="ds-grid">
+    <div class="ds-p chai" id="chaiPanel"><canvas id="chaiGL"></canvas><div class="spill"><span class="s1">SPILL<br>THE</span><span class="s2">चाय</span></div><button id="spillBtn" class="ds-btn">spill a marketing hot take ☕</button><p class="take" id="takeTxt">click the button. i have opinions.</p></div>
+    <div class="ds-p boom" id="boomPanel"><canvas id="boomGL"></canvas><div class="pesh"><span class="d">पेश</span> KARTE<br>HAI!</div><div class="manp">AAPKA<br>MANPASAND<br>MARKETING!</div><span class="hint">tap to turn it up 🔊</span></div>
+    <div class="ds-p sign"><div class="sign-wrap"><div class="board" id="signBoard"><span id="signTxt">YOUR CONTENT NEEDS TO TELL A STORY</span></div><i class="hand l"></i><i class="hand r"></i></div><span class="hint">tap the sign ✦</span></div>
+    <div class="ds-p type" id="typePanel"><canvas id="typeGL"></canvas><span class="hint">scroll to type ⌨</span></div>
+    <div class="ds-p auto wide" id="autoPanel"><h3 class="rollin">DESI ME<br>ROLLIN'</h3><canvas id="autoGL"></canvas><span class="hint">honk? tap it 📯</span></div>
+  </div>
+</div></section>
+
+<section id="signs">
+  <div class="sg-head"><p class="sg-deva">किधर जाना है?</p><h2>where to, madam?</h2><p class="sg-sub">click a board. no auto-wala will refuse you here.</p></div>
+  <div class="sg-pole">
+    <a class="sg-b l" href="#ring" style="--bc:var(--marigold);--d:.0s">← projects <small>2 km · no traffic</small></a>
+    <a class="sg-b r" href="#services" style="--bc:#2fa572;--d:.12s">services → <small>fixed rates*</small></a>
+    <a class="sg-b l" href="#contact" style="--bc:var(--sindoor);--d:.24s;color:#fff">← rishta for your brand? <small>contact</small></a>
+    <a class="sg-b r" href="#about" style="--bc:#3a7bd5;--d:.36s;color:#fff">about me → <small>mummy approved</small></a>
+    <a class="sg-b l" href="#finale" style="--bc:#ff7ac0;--d:.48s">← stress buster <small>pop balloons</small></a>
+  </div>
+  <p class="sg-foot">*okay, thoda negotiable. i'm a gupta after all.</p>
+</section>
+
+<section id="life"><div class="stk">
+  <div class="wall" id="wall"></div>
+  <div class="life-h" id="lifeH"><h2 class="stack" id="lifeT" style="color:#111">a life beyond the screen</h2><p>travel · food · fashion · money · stories</p></div>
+</div></section>
+
 <section id="work">
   <div class="dom-head rv">
     <div><p class="label">(02) three worlds, one operator</p><h2 class="glitch stack" data-t="domains" style="font-family:'Anton',sans-serif;font-weight:400">domains</h2></div>
@@ -680,29 +808,6 @@ body{background:var(--paper);color:var(--ink)}
   </div>
 </section>
 
-<!-- SERVICES: FLORA SLIDER -->
-<section id="services" class="flora">
-  <div class="fl-left">
-    <div class="idx"><b></b><span id="flIdx">01 / 05</span> · services</div>
-    <h2 id="flTitle"></h2>
-    <p id="flDesc"></p>
-    <div class="fl-meta"><div><small>starting at</small><span id="flPrice"></span></div><div><small>delivery</small><span id="flTime"></span></div></div>
-    <div class="fl-nav"><button id="flPrev" aria-label="previous">←</button><button id="flNext" aria-label="next">→</button><span class="fl-dots" id="flDots"></span></div>
-  </div>
-  <div class="fl-center"><canvas id="flGL"></canvas></div>
-  <div class="fl-right">
-    <div class="fl-card" id="flCard"><div class="th"><img id="flMini" alt="next service preview"></div><div class="cap"><small>next up</small><span id="flNextName"></span></div></div>
-    <a href="#contact" class="fl-hire">hire for this ↗</a>
-  </div>
-</section>
-
-<!-- V5: LIFE WALL -->
-<section id="life"><div class="stk">
-  <div class="wall" id="wall"></div>
-  <div class="life-h" id="lifeH"><h2 class="stack" id="lifeT" style="color:#111">a life beyond the screen</h2><p>travel · food · fashion · money · stories</p></div>
-</div></section>
-
-<!-- V5: AURORA GARDEN ABOUT -->
 <section class="about" id="about">
   <canvas id="garden"></canvas>
   <p class="label">(04) about · move your cursor to ripple the lake</p>
@@ -716,7 +821,6 @@ body{background:var(--paper);color:var(--ink)}
   </div>
 </section>
 
-<!-- CONTACT KEYBOARD -->
 <section class="contact" id="contact">
   <canvas id="nebula"></canvas>
   <div>
@@ -748,12 +852,63 @@ body{background:var(--paper);color:var(--ink)}
   </div>
 </section>
 
-<!-- ===== V9: POP FINALE ===== -->
 <section id="finale">
   <canvas id="popGL"></canvas>
   <div class="fn-top"><h2>one last thing:<br>pop them all</h2><p class="fn-sub">stress buster · doctor recommended (i'm almost a doctor)</p><span class="ct"><span id="fnN">0</span>/<span id="fnT">0</span> popped</span></div>
   <div class="fn-win" id="fnWin"><div class="card"><h3>you popped<br>every balloon 🎉</h3><p>itni mehnat? you deserve a chai. let's build something together.</p><a href="mailto:hello@example.com">hello@example.com ↗</a></div></div>
 </section>
+
+<div class="story-hidden"><section class="scene" id="prologue" data-ch="0" data-name="prologue">
+  <div class="stick"><div class="pro">
+    <p class="l1">once upon a time, over a cutting chai, a girl couldn't choose just one thing…</p>
+    <h2 class="l2"><b>science.</b> <b>code.</b> <b><em style="font-family:var(--serif);font-weight:400">stories.</em></b></h2>
+    <p class="l3">so she decided to master all three. keep scrolling ↓</p>
+  </div></div>
+</section><section class="scene" id="ch1" data-ch="1" data-name="the lab">
+  <div class="stick">
+    <span class="chap">ch.01 — the lab</span>
+    <h2 class="ctitle" style="--cc:#c43d12">the lab</h2>
+    <div id="cells"></div><canvas id="jelly"></canvas>
+    <svg id="helix" viewBox="0 0 200 600" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="seq"><span id="seqTxt">ATGCGTAC</span><small id="seqSub">decoding life…</small></div>
+    <div class="say" id="say1"><span>it started in a bioengineering lab.</span><span>where i learned life is just <em>code</em> written in A, T, G, C.</span><span>and i thought — what if AI could read it?</span></div>
+  </div>
+</section><section class="scene" id="ch2" data-ch="2" data-name="the code">
+  <div class="stick">
+    <canvas id="rain"></canvas>
+    <span class="chap">ch.02 — the code</span>
+    <h2 class="ctitle" style="--cc:#ff7a3d">the code</h2>
+    <div class="code-win"><div class="tb"><i></i><i></i><i></i></div><pre id="codeOut"></pre></div>
+    <div class="say" id="say2"><span>so i taught myself to code.</span><span>python. ML models. prompts that make AI <em>behave.</em></span><span>then i started shipping apps in a weekend.</span></div>
+  </div>
+</section><section class="scene" id="ch3" data-ch="3" data-name="the market">
+  <div class="stick">
+    <span class="chap">ch.03 — the plot twist</span>
+    <h2 class="ctitle" style="--cc:#ffc7a3">plot twist</h2>
+    <svg class="chart" viewBox="0 0 300 200"><path id="chartLine" d="M10,180 C60,170 80,150 110,140 S160,120 180,90 S240,40 290,15"/><text class="lbl" x="150" y="195" text-anchor="middle" id="growth">+0%</text></svg>
+    <div class="phone"><div class="screen" id="screen">
+      <div class="notif" style="top:14px">📩 <b>new client:</b> "can you run our socials?"</div>
+      <div class="notif" style="top:66px">💸 <b>invoice paid</b> · ₹25,000</div>
+      <div class="notif" style="top:118px">📊 <b>report ready:</b> weekly MIS.xlsx</div>
+      <div class="notif" style="top:170px">🔥 your reel is trending</div>
+      <div class="post">turning science<br>into stories<br>people pay for.</div>
+      <div class="likes">♥ <span id="likes">0</span> likes</div>
+    </div></div>
+    <div class="say" id="say3"><span>plot twist: great work nobody sees is just a diary.</span><span>so i learned <em>marketing,</em> storytelling &amp; excel ops.</span><span>now the work gets seen — and paid.</span></div>
+  </div>
+</section><section class="scene" id="ch4" data-ch="4" data-name="the merge">
+  <div class="stick">
+    <span class="chap" style="color:#fff">ch.04 — the merge</span>
+    <h2 class="ctitle" style="--cc:#ffffff">the merge</h2>
+    <div class="venn">
+      <div class="orb a" id="oa"><span>bio</span></div>
+      <div class="orb b" id="ob"><span>tech</span></div>
+      <div class="orb c" id="oc"><span>marketing</span></div>
+      <div class="core honk">navya</div>
+    </div>
+    <div class="say" id="say4" style="color:#fff"><span>most people pick one lane.</span><span>i built where all three <em>overlap.</em></span><span>then i <em>launch</em> it. here's the proof ↓</span></div>
+  </div>
+</section></div>
 
 <footer><span>© 2026 navya gupta</span><span id="clock">bhopal</span><span>made with python brain &amp; marketing heart</span></footer>
 <div class="toast" id="toast"></div>
@@ -870,7 +1025,7 @@ addEventListener('scroll',()=>{const r=lead.getBoundingClientRect(),p=Math.min(M
 
 /* ===== keyboard: real keys press too ===== */
 let tT;const icons=['arre!','wah','oho','psst','uff'];
-const toast=m=>{const t=$('#toast');t.innerHTML=`<span class="ic">${icons[Math.random()*icons.length|0]}</span><span>${m}</span>`;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2600)};
+window.toast=m=>toast(m);const toast=m=>{const t=$('#toast');t.innerHTML=`<span class="ic">${icons[Math.random()*icons.length|0]}</span><span>${m}</span>`;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2600)};
 $('#esc').onclick=()=>toast('no escape. rishta pakka ✦');
 $('#cv').onclick=()=>toast('cv aa raha hai, sabar karo ✦');
 addEventListener('keydown',e=>{const map={h:'hire me',e:'esc',s:'services',c:'cv'};const k=[...$$('.key')].find(x=>x.textContent===map[e.key.toLowerCase()]);if(k&&!e.metaKey&&!e.ctrlKey&&document.activeElement.tagName!=='INPUT'){k.classList.add('down');setTimeout(()=>k.classList.remove('down'),120)}});
@@ -981,7 +1136,7 @@ function fontTick(){
 fontTick();
 
 /* =================== V3: 3D PARTICLE WORLD =================== */
-(()=>{if(!window.THREE)return;
+(()=>{if(!window.THREE)return;if(!(document.querySelector('.scene')||{}).offsetHeight)return;
 const N=innerWidth<700?5000:9000;
 const cv=$('#world'),renderer=new THREE.WebGLRenderer({canvas:cv,antialias:false,alpha:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -1318,7 +1473,7 @@ void main(){vec2 uv=gl_FragCoord.xy/uR;float asp=uR.x/uR.y;vec2 p=vec2((uv.x-.5)
 })();
 
 /* =================== V9: MODERN 3D STORY =================== */
-(()=>{if(!window.makeStudio)return;const cv=$('#storyGL'),scenes=[...$$('.scene')];if(!scenes.length)return;
+(()=>{if(!window.makeStudio)return;const cv=$('#storyGL'),scenes=[...$$('.scene')];if(!scenes.length||!scenes[0].offsetHeight)return;
   const st=makeStudio(cv,{items:[
     {obj:'chai',bg:['#5a1a0c','#140803'],glow:'#ffa400',rim:'#ffb48a'},
     {obj:'dna',args:['#ff7a3d'],bg:['#5a2410','#140803'],glow:'#ffb48a',rim:'#ff7a3d'},
@@ -1374,5 +1529,6 @@ void main(){vec2 uv=gl_FragCoord.xy/uR;float asp=uR.x/uR.y;vec2 p=vec2((uv.x-.5)
 })();
 setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'})+' IST · bhopal',1000);
 </script>
+<script src="js/eras.js"></script>
 </body>
 </html>

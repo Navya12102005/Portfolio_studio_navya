@@ -78,6 +78,63 @@
         tg.center(); const n1 = mesh(tg, M.gold()); n1.position.z = 0.16; const n2 = mesh(tg, M.gold()); n2.position.z = -0.16; n2.rotation.y = Math.PI; g.add(n1, n2); }
       g.userData.update = (t) => { g.rotation.y = t * 0.8; g.position.y = Math.sin(t * 1.2) * 0.08; }; return g;
     },
+    kulhads() {
+      const g = new THREE.Group(), pts = [];
+      [[0,-0.62],[0.42,-0.62],[0.46,-0.55],[0.72,0.5],[0.76,0.6],[0.7,0.62],[0.65,0.52],[0.41,-0.5],[0,-0.5]].forEach(([x,y])=>pts.push(new THREE.Vector2(x,y)));
+      const clay = new THREE.MeshStandardMaterial({ color: '#b5562b', roughness: 0.82 }), geo = new THREE.LatheGeometry(pts, 64);
+      const cups = [-0.85, 0.85].map((x, i) => { const c = new THREE.Group(); c.add(mesh(geo, clay));
+        const top = mesh(new THREE.CircleGeometry(0.66, 48), M.ceramic('#c8945e')); top.rotation.x = -Math.PI / 2; top.position.y = 0.47; c.add(top);
+        for (let k = 0; k < 26; k++) { const r = Math.sqrt(Math.random()) * 0.55, a = Math.random() * 6.28, b = mesh(new THREE.SphereGeometry(0.025 + Math.random() * 0.04, 10, 8), M.ceramic('#e6c391')); b.position.set(Math.cos(a) * r, 0.48, Math.sin(a) * r); b.scale.y = 0.5; c.add(b); }
+        c.position.x = x; c.userData.s = i ? -1 : 1; g.add(c); return c; });
+      g.userData.update = (t) => { const k = Math.max(0, Math.sin(t * 1.6)) ** 6; cups.forEach((c) => { c.rotation.z = -c.userData.s * (0.25 + 0.2 * k); c.position.x = c.userData.s * -(0.95 - 0.12 * k); c.position.y = Math.sin(t * 1.2 + c.userData.s) * 0.05; }); g.rotation.y = Math.sin(t * 0.4) * 0.3; g.rotation.x = 0.35; };
+      return g;
+    },
+    boombox() {
+      const g = new THREE.Group(), cream = M.ceramic('#e8dcc0'), dark = new THREE.MeshStandardMaterial({ color: '#232323', roughness: 0.92 });
+      const body = mesh(new THREE.BoxGeometry(3.2, 1.6, 0.75), cream); g.add(body);
+      const strip = mesh(new THREE.BoxGeometry(3.22, 0.28, 0.77), M.ceramic('#1c1c1c')); strip.position.y = 0.62; g.add(strip);
+      const cones = [-1.05, 1.05].map((x) => { const sp = new THREE.Group(); const grill = mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.06, 48), dark); grill.rotation.x = Math.PI / 2; sp.add(grill);
+        const rim = mesh(new THREE.TorusGeometry(0.57, 0.05, 16, 64), M.chrome()); sp.add(rim); const cap = mesh(new THREE.SphereGeometry(0.16, 24, 16), M.chrome()); cap.scale.z = 0.4; cap.position.z = 0.05; sp.add(cap);
+        sp.position.set(x, -0.12, 0.39); g.add(sp); return sp; });
+      const win = mesh(new THREE.BoxGeometry(0.9, 0.5, 0.05), new THREE.MeshPhysicalMaterial({ color: '#111', roughness: 0.05, metalness: 0.2, clearcoat: 1 })); win.position.set(0, -0.15, 0.38); g.add(win);
+      for (let i = 0; i < 6; i++) { const b = mesh(new THREE.BoxGeometry(0.16, 0.08, 0.14), M.ceramic(i % 2 ? '#c43d12' : '#3a3a3a')); b.position.set(-0.45 + i * 0.18, 0.84, 0.05); g.add(b); }
+      const handle = mesh(new THREE.TorusGeometry(1.1, 0.06, 16, 64, Math.PI), M.chrome()); handle.position.y = 0.8; g.add(handle);
+      const ant = mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.8, 8), M.chrome()); ant.position.set(1.3, 1.5, -0.2); ant.rotation.z = -0.5; g.add(ant);
+      g.userData.beat = 1; g.rotation.z = -0.18;
+      g.userData.update = (t) => { const b = g.userData.beat, k = Math.abs(Math.sin(t * 4 * b)); g.position.y = k * 0.1; cones.forEach((c) => c.scale.setScalar(1 + k * 0.06 * b)); g.rotation.y = Math.sin(t * 0.6) * 0.35; };
+      return g;
+    },
+    auto() {
+      const g = new THREE.Group(), red = M.ceramic('#d7261e'), yel = M.ceramic('#ffb000'), grn = M.ceramic('#1f8a5a'), black = new THREE.MeshStandardMaterial({ color: '#111', roughness: 0.7 });
+      const sh = new THREE.Shape(); sh.moveTo(-1.5, 0.25); sh.lineTo(1.25, 0.25); sh.lineTo(1.6, 0.55); sh.lineTo(1.55, 1.05); sh.lineTo(1.15, 1.6); sh.lineTo(-1.5, 1.6); sh.lineTo(-1.5, 0.25);
+      const body = mesh(new THREE.ExtrudeGeometry(sh, { depth: 1.3, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 4 }), red); body.position.z = -0.65; g.add(body);
+      const roof = mesh(new THREE.BoxGeometry(2.9, 0.14, 1.5), yel); roof.position.set(-0.2, 1.72, 0); g.add(roof);
+      [-1, 1].forEach((s) => { const door = mesh(new THREE.BoxGeometry(1.3, 0.95, 0.02), grn); door.position.set(-0.45, 0.95, s * 0.72); g.add(door);
+        const stripe = mesh(new THREE.BoxGeometry(2.8, 0.1, 0.02), yel); stripe.position.set(-0.1, 0.42, s * 0.73); g.add(stripe);
+        for (let i = 0; i < 12; i++) { const d = mesh(new THREE.SphereGeometry(0.025, 8, 6), M.ceramic('#ffffff')); d.position.set(-1.35 + i * 0.24, 0.55, s * 0.74); g.add(d); } });
+      const glass = mesh(new THREE.PlaneGeometry(0.75, 1.2), new THREE.MeshPhysicalMaterial({ color: '#cfefff', transmission: 0.9, roughness: 0.05, thickness: 0.05 })); glass.position.set(1.37, 1.32, 0); glass.rotation.set(0, Math.PI / 2, 0.6); g.add(glass);
+      const lamp = mesh(new THREE.SphereGeometry(0.12, 16, 12), M.emit('#ffe08a')); lamp.position.set(1.62, 0.8, 0); g.add(lamp);
+      const wheels = [[1.15, 0], [-1.0, 0.7], [-1.0, -0.7]].map(([x, z]) => { const w = new THREE.Group(); const tyre = mesh(new THREE.TorusGeometry(0.26, 0.1, 16, 32), black); w.add(tyre);
+        const hub = mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.1, 24), yel); hub.rotation.x = Math.PI / 2; w.add(hub); w.position.set(x, 0.3, z); g.add(w); return w; });
+      g.userData.x = 0; let lx = 0;
+      g.userData.update = (t) => { const x = g.userData.x; wheels.forEach((w) => { w.rotation.z -= (x - lx) / 0.36; }); lx = x; g.position.x = x; g.position.y = Math.abs(Math.sin(t * 9)) * 0.03; g.rotation.y = -0.35; };
+      g.scale.setScalar(0.85); return g;
+    },
+    typewriter() {
+      const g = new THREE.Group(), maroon = new THREE.MeshPhysicalMaterial({ color: '#6e0f1a', roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.08 });
+      const base = mesh(new THREE.BoxGeometry(3.2, 0.7, 2.2), maroon); base.position.y = -0.6; g.add(base);
+      const hood = mesh(new THREE.BoxGeometry(3.0, 0.55, 0.9), maroon); hood.position.set(0, -0.05, -0.55); hood.rotation.x = -0.15; g.add(hood);
+      const roller = mesh(new THREE.CylinderGeometry(0.16, 0.16, 3.2, 32), new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughness: 0.6 })); roller.rotation.z = Math.PI / 2; roller.position.set(0, 0.32, -0.75); g.add(roller);
+      const cv = document.createElement('canvas'); cv.width = 512; cv.height = 640; const cx = cv.getContext('2d'); const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+      const paper = mesh(new THREE.PlaneGeometry(1.9, 2.4), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 })); paper.position.set(0, 1.45, -0.82); paper.rotation.x = -0.12; g.add(paper);
+      const rows = [12, 11, 10, 9]; rows.forEach((n, r) => { for (let i = 0; i < n; i++) { const k = mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.07, 20), M.ceramic('#f1ece2')); k.position.set((i - (n - 1) / 2) * 0.24 + r * 0.06, -0.2 - r * 0.03, 0.15 + r * 0.24); k.rotation.x = 0.25; g.add(k); } });
+      const space = mesh(new THREE.BoxGeometry(1.5, 0.07, 0.16), M.ceramic('#f1ece2')); space.position.set(0.1, -0.34, 1.12); g.add(space);
+      const lever = mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.8, 8), M.chrome()); lever.position.set(-1.8, 0.45, -0.7); lever.rotation.z = 1.1; g.add(lever);
+      g.userData.text = 'YOU LOOK\nLIKE MY\nNEXT\nCLIENT'; g.userData.n = 0; let last = -1;
+      g.userData.update = (t) => { const n = Math.floor(g.userData.n); if (n !== last) { last = n; cx.fillStyle = '#f5f2ea'; cx.fillRect(0, 0, 512, 640); cx.fillStyle = '#6e0f1a'; cx.font = 'bold 64px Silkscreen, monospace'; cx.textAlign = 'center';
+          g.userData.text.slice(0, n).split('\n').forEach((l, i) => cx.fillText(l, 256, 170 + i * 92)); tex.needsUpdate = true; } g.rotation.y = Math.sin(t * 0.4) * 0.25; g.rotation.x = 0.28; };
+      g.position.y = -0.2; g.scale.setScalar(0.92); return g;
+    },
     chai() {
       const g = new THREE.Group();
       const glass = mesh(new THREE.CylinderGeometry(0.95, 0.72, 2.3, 14, 1, true), Object.assign(M.glass('#fff6e6', 5), { flatShading: true, side: THREE.DoubleSide })); g.add(glass);
@@ -116,7 +173,7 @@
   };
 
   function makeStudio(canvas, opts = {}) {
-    const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: !!opts.preserve });
+    const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: !!opts.transparent, preserveDrawingBuffer: !!opts.preserve });
     r.setPixelRatio(Math.min(devicePixelRatio, opts.pr || 1.75)); r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.05;
     r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
     const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(32, 1, 0.1, 100); cam.position.set(0, 0.6, 8.2); cam.lookAt(0, 0, 0);
@@ -125,7 +182,7 @@
     const bd = new THREE.Mesh(new THREE.SphereGeometry(40, 48, 32), new THREE.ShaderMaterial({ side: THREE.BackSide, uniforms: U, depthWrite: false,
       vertexShader: 'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
       fragmentShader: 'uniform vec3 c1,c2,glow;varying vec3 vP;void main(){float y=vP.y*.5+.5;vec3 c=mix(c2,c1,smoothstep(.3,.9,y))*.62;float g=pow(max(0.,dot(vP,normalize(vec3(.25,.05,-1.)))),6.);c+=glow*g*.9;gl_FragColor=vec4(c,1.);}' }));
-    sc.add(bd);
+    if (!opts.transparent) sc.add(bd); else r.setClearColor(0x000000, 0);
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.35 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -1.8; ground.receiveShadow = true; sc.add(ground);
     const key = new THREE.SpotLight(0xffffff, 2.2, 30, 0.6, 0.8); key.position.set(3, 7, 5); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.radius = 6; key.shadow.bias = -0.0005; sc.add(key);
     const rim = new THREE.PointLight(0xffffff, 3, 20); rim.position.set(-4, 2, -3); sc.add(rim);
@@ -152,7 +209,7 @@
       holder.children.forEach((w) => { const g = w.userData.inner; g.userData.update && g.userData.update(t); w.rotation.y = mouse.x * 0.8; w.rotation.x = mouse.y * 0.4; });
       r.render(sc, cam); }
     (function loop() { requestAnimationFrame(loop); if (visible && !opts.manual) render(); })();
-    return { set, render, resize, renderer: r, canvas };
+    return { set, render, resize, renderer: r, canvas, inner: () => cur && cur.userData.inner };
   }
   window.makeStudio = makeStudio; window.STUDIO_BUILDERS = B;
 })();
