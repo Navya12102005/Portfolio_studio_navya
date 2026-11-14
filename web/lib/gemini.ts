@@ -5,10 +5,20 @@
  * tools from the spec, executes them against n8n when the model calls
  * one, and returns the model's final natural-language reply.
  *
- * Every failure mode (missing key, network error, bad response shape,
+ * Every failure mode (no credential, network error, bad response shape,
  * n8n timeout inside a tool call) is caught and surfaced as a thrown
  * GeminiError — app/api/jarvis/route.ts catches that and falls back to
  * the local keyword router, so a visitor never sees a raw error.
+ *
+ * Auth: the API key is a network-level credential injected by this
+ * environment's outbound proxy into the `x-goog-api-key` header on
+ * requests to generativelanguage.googleapis.com — this code never reads
+ * or holds the key itself. It sends a placeholder header value; the
+ * proxy overwrites it with the real key in flight. (Gemini's REST API
+ * supports this header as a documented alternative to the `?key=` query
+ * param — used here specifically because a header can be proxy-injected,
+ * a query string generally can't.) Set GEMINI_DISABLE=1 to force the
+ * local router even when a credential may be present.
  */
 import { scopeAndLogLead, checkAvailabilityAndBook, dispatchServiceDossier } from "./n8n";
 
@@ -20,7 +30,7 @@ const MAX_TOOL_ROUNDS = 4;
 export class GeminiError extends Error {}
 
 export function isGeminiConfigured(): boolean {
-  return !!process.env.GEMINI_API_KEY;
+  return process.env.GEMINI_DISABLE !== "1";
 }
 
 const SYSTEM_INSTRUCTION = `You are J.A.R.V.I.S., the AI assistant running Studio Navya — Navya Gupta's portfolio.
@@ -97,13 +107,19 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 type GPart = { text?: string; functionCall?: { name: string; args: Record<string, unknown> }; functionResponse?: { name: string; response: unknown } };
 type GContent = { role: "user" | "model" | "function"; parts: GPart[] };
 
-async function callGemini(contents: GContent[], apiKey: string): Promise<{ parts: GPart[] }> {
+async function callGemini(contents: GContent[]): Promise<{ parts: GPart[] }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const res = await fetch(`${API_BASE}/models/${MODEL}:generateContent?key=${apiKey}`, {
+    const res = await fetch(`${API_BASE}/models/${MODEL}:generateContent`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        // Placeholder — this environment's outbound proxy overwrites this
+        // header with the real credential for this host. Never put a real
+        // key here.
+        "x-goog-api-key": "proxy-injected",
+      },
       signal: controller.signal,
       body: JSON.stringify({
         contents,
@@ -133,13 +149,12 @@ async function callGemini(contents: GContent[], apiKey: string): Promise<{ parts
  * text. Throws GeminiError on any failure — callers should catch and
  * fall back to the local router. */
 export async function runJarvisTurn(prompt: string): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new GeminiError("GEMINI_API_KEY not configured");
+  if (!isGeminiConfigured()) throw new GeminiError("Gemini disabled via GEMINI_DISABLE");
 
   const contents: GContent[] = [{ role: "user", parts: [{ text: prompt }] }];
 
   for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-    const { parts } = await callGemini(contents, apiKey);
+    const { parts } = await callGemini(contents);
     const call = parts.find((p) => p.functionCall)?.functionCall;
 
     if (!call) {
