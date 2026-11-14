@@ -9,12 +9,99 @@ export const BackgroundVertexShader = `
 export const BackgroundFragmentShader = `
   uniform vec2 uResolution;
   uniform vec2 uMouse;
+  uniform vec2 uVelocity;
   uniform float uTime;
   varying vec2 vUv;
 
   // Pseudo-random noise function for blueprint grid & particle grain
   float random(vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+  }
+
+  // A gently undulating floor, expressed as a signed distance along Y so
+  // the loop below is a real sphere-trace (shrinking steps toward the
+  // surface), not just a one-shot analytic plane intersection.
+  float floorSDF(vec3 pos, float time) {
+    float ripple = 0.06 * sin(pos.x * 1.4 + time * 0.6) * cos(pos.z * 1.1 - time * 0.4);
+    return pos.y - (-1.0 + ripple);
+  }
+
+  // Short raymarch (sphere-trace) from a fake low camera toward the
+  // rippling floor below. Returns hit distance as t (negative if missed)
+  // and the hit point's XZ for grid shading.
+  vec3 raymarchGrid(vec2 p, float time) {
+    vec3 ro = vec3(0.0, 1.3, 0.0);
+    // pitch depends on p.y, not a fixed constant: pixels near the horizon
+    // cutoff (p.y ~ 0.05) aim nearly flat/far, pixels near the bottom of
+    // the screen (p.y ~ -1) aim steeply down/close — without this the
+    // "floor" collapses into one flat band instead of a receding grid.
+    float pitch = p.y - 0.08;
+    vec3 rd = normalize(vec3(p.x * 1.2, pitch, -1.0));
+    float t = 0.0;
+    for (int i = 0; i < 20; i++) {
+      vec3 pos = ro + rd * t;
+      float d = floorSDF(pos, time);
+      if (d < 0.001) break;
+      t += d;
+      if (t > 40.0) { t = -1.0; break; }
+    }
+    vec3 hit = ro + rd * t;
+    return vec3(hit.x, hit.z, t);
+  }
+
+  // Grid line pattern on the floor's hit XZ, brighter near the cursor's
+  // own projection onto the floor (a "radar ping" highlight) and reactive
+  // to cursor velocity (brief flash on fast movement).
+  vec3 sciFiGrid(vec2 p, vec2 mouseP, float speed, float time) {
+    vec3 march = raymarchGrid(p, time);
+    if (march.z < 0.0) return vec3(0.0);
+    vec2 hitXZ = march.xy;
+    float dist = march.z;
+
+    vec2 cell = fract(hitXZ * 1.6) - 0.5;
+    float lineWidth = 0.02 + dist * 0.004;
+    float gridLine = smoothstep(lineWidth, 0.0, abs(cell.x)) + smoothstep(lineWidth, 0.0, abs(cell.y));
+    gridLine = clamp(gridLine, 0.0, 1.0);
+
+    // where the cursor's own ray hits the same floor, for the radar ping
+    vec3 mouseMarch = raymarchGrid(mouseP, time);
+    float ping = 0.0;
+    if (mouseMarch.z > 0.0) {
+      float pingDist = length(hitXZ - mouseMarch.xy);
+      ping = smoothstep(1.4, 0.0, pingDist) * (0.4 + 0.6 * clamp(speed / 1800.0, 0.0, 1.0));
+    }
+
+    float fog = exp(-dist * 0.11);
+    vec3 col = vec3(0.0, 0.85, 1.0) * gridLine * fog * 0.6;
+    col += vec3(1.0, 0.6, 0.1) * ping * fog;
+    return col;
+  }
+
+  // Single-pass tiled starfield: each cell gets one randomly-placed,
+  // twinkling point. Fast cursor movement stretches stars into short
+  // streaks along the velocity direction — cheap motion-blur stand-in,
+  // not a real blur (a handful of extra samples along -velocity).
+  float stars(vec2 p, vec2 velocity, float time) {
+    float brightness = 0.0;
+    vec2 dir = velocity;
+    float speed = length(dir);
+    vec2 dirNorm = speed > 0.001 ? dir / speed : vec2(0.0);
+    int samples = speed > 40.0 ? 4 : 1;
+    float streakLen = clamp(speed * 0.00035, 0.0, 0.12);
+
+    for (int s = 0; s < 4; s++) {
+      if (s >= samples) break;
+      vec2 sp = p - dirNorm * streakLen * (float(s) / 3.0);
+      vec2 cell = floor(sp * 22.0);
+      vec2 local = fract(sp * 22.0) - 0.5;
+      vec2 starPos = vec2(random(cell), random(cell + 17.0)) - 0.5;
+      float d = length(local - starPos * 0.7);
+      float size = 0.015 + 0.02 * random(cell + 3.1);
+      float twinkle = 0.5 + 0.5 * sin(time * (1.0 + random(cell + 9.0) * 2.0) + random(cell) * 30.0);
+      float star = smoothstep(size, 0.0, d) * twinkle;
+      brightness = max(brightness, star * (1.0 - float(s) / float(samples) * 0.6));
+    }
+    return brightness;
   }
 
   // Manhattan-routed PCB trace lines + glowing via-dots on a coarse grid,
@@ -93,6 +180,19 @@ export const BackgroundFragmentShader = `
 
     // Apply grid and spotlight illumination
     color += gridColor + (spotlightColor * spotlight * 0.35);
+
+    // Raymarched sci-fi floor grid, below the horizon line (p.y < 0 in
+    // this shader's centered NDC-like space), reactive to cursor velocity.
+    float cursorSpeed = length(uVelocity);
+    if (p.y < 0.05) {
+      vec2 mouseNDCForGrid = (uMouse / uResolution.xy) * 2.0 - 1.0;
+      mouseNDCForGrid.y = -mouseNDCForGrid.y;
+      color += sciFiGrid(p, vec2(mouseNDCForGrid.x * (uResolution.x / uResolution.y), mouseNDCForGrid.y), cursorSpeed, uTime);
+    }
+
+    // Procedural starfield / dust, speed-streaking with cursor velocity
+    float starBrightness = stars(p * 1.4, uVelocity, uTime);
+    color += vec3(0.75, 0.95, 1.0) * starBrightness * 0.8;
 
     // Schematic reveal, masked tightly to the cursor spotlight: PCB
     // traces (cyan), flow streamlines (amber), and math-notation strokes

@@ -6,6 +6,7 @@ import { BlendFunction } from "postprocessing";
 import { Suspense } from "react";
 import * as THREE from "three";
 import DustField from "./DustField";
+import DataStreamField from "./DataStreamField";
 import SchematicLayer from "./SchematicLayer";
 import BootHorizon from "./BootHorizon";
 import { BioEngineeringScene } from "./BioEngineeringScene";
@@ -55,6 +56,7 @@ export default function SceneRoot({
           <SchematicLayer />
           <BootHorizon pitch={pitch} />
           <DustField velocity={scrollVelocity} />
+          <DataStreamField />
           {/* Scene 2 centerpiece — mounted now for verification; proper
               scroll-triggered scene choreography/domain switching is the
               next milestone, so camera framing here is provisional. */}
