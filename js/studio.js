@@ -78,6 +78,28 @@
         tg.center(); const n1 = mesh(tg, M.gold()); n1.position.z = 0.16; const n2 = mesh(tg, M.gold()); n2.position.z = -0.16; n2.rotation.y = Math.PI; g.add(n1, n2); }
       g.userData.update = (t) => { g.rotation.y = t * 0.8; g.position.y = Math.sin(t * 1.2) * 0.08; }; return g;
     },
+    chai() {
+      const g = new THREE.Group();
+      const glass = mesh(new THREE.CylinderGeometry(0.95, 0.72, 2.3, 14, 1, true), Object.assign(M.glass('#fff6e6', 5), { flatShading: true, side: THREE.DoubleSide })); g.add(glass);
+      const bottom = mesh(new THREE.CylinderGeometry(0.72, 0.72, 0.18, 14), Object.assign(M.glass('#fff6e6', 3), { flatShading: true })); bottom.position.y = -1.1; g.add(bottom);
+      const tea = mesh(new THREE.CylinderGeometry(0.86, 0.68, 1.7, 28), M.ceramic('#a8602a')); tea.position.y = -0.25; tea.material.roughness = 0.18; g.add(tea);
+      const foam = mesh(new THREE.CylinderGeometry(0.87, 0.87, 0.05, 28), M.ceramic('#d9a066')); foam.position.y = 0.62; g.add(foam);
+      const cvs = document.createElement('canvas'); cvs.width = cvs.height = 64; const cx = cvs.getContext('2d'); const gr = cx.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); cx.fillStyle = gr; cx.fillRect(0, 0, 64, 64);
+      const tex = new THREE.CanvasTexture(cvs), puffs = [];
+      for (let i = 0; i < 22; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.5 })); sp.userData.o = i / 22; puffs.push(sp); g.add(sp); }
+      g.rotation.z = 0.08; g.userData.update = (t) => { g.rotation.y = t * 0.35;
+        puffs.forEach((p, i) => { const k = (p.userData.o + t * 0.18) % 1; p.position.set(Math.sin(k * 9 + i) * 0.35 * k, 0.75 + k * 2.4, Math.cos(k * 7 + i) * 0.2 * k); p.scale.setScalar(0.35 + k * 1.1); p.material.opacity = 0.45 * Math.sin(k * Math.PI); }); };
+      return g;
+    },
+    code() {
+      const g = new THREE.Group();
+      if (window.Font && window.HELV_BOLD) { const f = new Font(window.HELV_BOLD);
+        const mk = (ch, m, x) => { const tg = new TextGeometry(ch, { font: f, size: 1.15, height: 0.4, curveSegments: 12, bevelEnabled: true, bevelThickness: 0.12, bevelSize: 0.06, bevelSegments: 8 }); tg.center(); const o = mesh(tg, m); o.position.x = x; g.add(o); return o; };
+        mk('<', M.chrome(), -1.15); mk('/', M.glass('#ff7a3d', 0.5), 0); mk('>', M.chrome(), 1.15); }
+      const cubes = []; for (let i = 0; i < 9; i++) { const c = mesh(new THREE.BoxGeometry(0.22, 0.22, 0.22), i % 3 ? M.glass('#ffb48a', 0.6) : M.gold()); c.userData.a = (i / 9) * Math.PI * 2; c.userData.r = 1.9 + (i % 3) * 0.25; cubes.push(c); g.add(c); }
+      g.userData.update = (t) => { g.rotation.y = Math.sin(t * 0.5) * 0.45; g.rotation.x = Math.sin(t * 0.3) * 0.12;
+        cubes.forEach((c) => { const a = c.userData.a + t * 0.5; c.position.set(Math.cos(a) * c.userData.r, Math.sin(a * 1.5) * 0.9, Math.sin(a) * c.userData.r * 0.6); c.rotation.set(t, t * 1.3, 0); }); }; return g;
+    },
     flower(c = '#d4ff3a', n = 8, layers = 2) {
       const g = new THREE.Group(), pg = new THREE.SphereGeometry(1, 40, 20); pg.scale(0.3, 0.95, 0.07); pg.translate(0, 0.95, 0);
       const pm = M.glass(c, 0.5); pm.iridescence = 0.45; const petals = [];
