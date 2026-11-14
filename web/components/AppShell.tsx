@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/lib/useLenis";
@@ -29,6 +29,23 @@ export default function AppShell() {
   const pitch = useRef(0);
   const bootRef = useRef<HTMLDivElement>(null);
   const wakeRef = useRef<HTMLDivElement>(null);
+
+  // Deferred-by-one-frame mirror of secondBrainOpen for gating the main
+  // canvas. Both SceneRoot and SecondBrainView own an R3F <Canvas>, each
+  // with its own internal react-reconciler root; flipping the same store
+  // flag unmounts one and mounts the other in the SAME React commit,
+  // which races with drei's <Html> portal teardown inside SceneRoot's
+  // OperationsArenaScene (confirmed via a removeChild DOMException and
+  // "synchronously unmount a root while rendering" warnings). Mirroring
+  // the flag one animation frame later puts the unmount/mount in separate
+  // commits, which is all it takes to avoid the race on both open and
+  // close — the brief single frame where neither or both canvases are
+  // mounted is not visible to a user.
+  const [secondBrainOpenDeferred, setSecondBrainOpenDeferred] = useState(secondBrainOpen);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setSecondBrainOpenDeferred(secondBrainOpen));
+    return () => cancelAnimationFrame(raf);
+  }, [secondBrainOpen]);
 
   // Lenis drives scroll; ScrollTrigger needs to hear about it on every tick.
   useEffect(() => {
@@ -72,7 +89,7 @@ export default function AppShell() {
           `determined` stays false until the client-side GPU/width check
           has actually run, so the full scene is never even briefly
           mounted on a low-power device while that check is pending. */}
-      {perf.determined && !secondBrainOpen && (perf.tier === "low" ? <LightweightFallback /> : <SceneRoot scrollVelocity={velocity} pitch={pitch} />)}
+      {perf.determined && !secondBrainOpenDeferred && (perf.tier === "low" ? <LightweightFallback /> : <SceneRoot scrollVelocity={velocity} pitch={pitch} />)}
       <Cursor />
       <PerimeterHUD />
       <BioTelemetryWidget />

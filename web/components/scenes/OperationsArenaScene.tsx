@@ -1,40 +1,59 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useProjectModalStore, type ProjectId } from "@/lib/projectModalStore";
 
 const PANEL_PROJECTS: ProjectId[] = ["ops-mailchimp", "ops-excel"];
 
-/** A small, non-interactive live-looking preview rendered inside each
- *  panel via drei's <Html> (billboarded DOM content in 3D space) — raw
- *  WebGL text needs a font atlas, so readable preview content goes
- *  through Html instead. pointerEvents="none" so clicks still reach the
- *  panel mesh behind it (which opens the real case study). */
+/** Draws a preview (KPI bar chart or campaign stats) onto an offscreen 2D
+ *  canvas and returns it as a texture. A pure-WebGL canvas texture, not a
+ *  drei <Html> DOM portal: this scene (SceneRoot) can be unmounted at any
+ *  time the Second Brain graph opens, and an Html portal's imperative
+ *  per-frame DOM work raced with that unmount (confirmed via a
+ *  removeChild DOMException + "synchronously unmount a root while
+ *  rendering" warnings) regardless of prop tuning (occlude on/off) or
+ *  staggering the unmount by a frame — baking the preview into a texture
+ *  sidesteps the whole class of bug. */
+function createPreviewTexture(kind: "mailchimp" | "excel"): THREE.CanvasTexture {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 160;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = "#061018";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#9fe8ff";
+  ctx.font = "12px monospace";
+
+  if (kind === "excel") {
+    ctx.fillText("KPI DASHBOARD // LIVE", 12, 20);
+    const bars = [60, 85, 40, 95, 70];
+    const barWidth = 28;
+    bars.forEach((h, i) => {
+      const barHeight = (h / 100) * 90;
+      ctx.fillStyle = "#00F0FF";
+      ctx.fillRect(16 + i * (barWidth + 8), 140 - barHeight, barWidth, barHeight);
+    });
+  } else {
+    ctx.fillText("CAMPAIGN // AUTOMATED", 12, 20);
+    ctx.font = "14px monospace";
+    ctx.fillText("Open rate: 42.8%", 12, 60);
+    ctx.fillText("Click rate: 11.3%", 12, 86);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 function PanelPreview({ kind }: { kind: "mailchimp" | "excel" }) {
+  const texture = useMemo(() => createPreviewTexture(kind), [kind]);
   return (
-    <Html transform occlude distanceFactor={2.1} pointerEvents="none" style={{ width: "180px" }}>
-      <div className="sn-hud-text select-none" style={{ fontSize: "7px", color: "#9fe8ff", lineHeight: 1.4 }}>
-        {kind === "excel" ? (
-          <>
-            <div style={{ opacity: 0.7, marginBottom: 4 }}>KPI DASHBOARD // LIVE</div>
-            <div style={{ display: "flex", gap: 3, alignItems: "flex-end", height: 24 }}>
-              {[60, 85, 40, 95, 70].map((h, i) => (
-                <div key={i} style={{ width: 8, height: `${h}%`, background: "#00F0FF", opacity: 0.8 }} />
-              ))}
-            </div>
-          </>
-        ) : (
-          <>
-            <div style={{ opacity: 0.7, marginBottom: 4 }}>CAMPAIGN // AUTOMATED</div>
-            <div>Open rate: 42.8%</div>
-            <div>Click rate: 11.3%</div>
-          </>
-        )}
-      </div>
-    </Html>
+    <mesh position={[0, 0, 0.01]}>
+      <planeGeometry args={[1.2, 0.75]} />
+      <meshBasicMaterial map={texture} transparent opacity={0.95} toneMapped={false} />
+    </mesh>
   );
 }
 
