@@ -574,6 +574,28 @@ body{background:var(--paper);color:var(--ink)}
 .rollin{position:absolute;z-index:0;top:24px;left:0;right:0;text-align:center;font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(3rem,9vw,7rem);line-height:.9;color:#f2b33d;
   -webkit-mask-image:repeating-linear-gradient(0deg,#000 0 3px,#0007 3px 4px),repeating-linear-gradient(90deg,#000 0 7px,#000a 7px 8px);mask-image:repeating-linear-gradient(0deg,#000 0 3px,#0007 3px 4px);pointer-events:none}
 @media(max-width:860px){.ds-grid{grid-template-columns:1fr}}
+/* ===== V12: REAL 3D + MOTION ===== */
+.spr{--w:140px;width:var(--w);height:var(--w);background:var(--img) 0 0/calc(var(--w)*24) var(--w) no-repeat;animation:spin24 2.8s steps(24) infinite;filter:drop-shadow(0 12px 16px #0005)}
+@keyframes spin24{to{background-position:calc(var(--w)*-24) 0}}
+.sticker .spr{animation-duration:3.2s}.sticker:nth-child(odd) .spr{animation-duration:4s}
+.sticker.pol .ph{width:110px;height:110px;overflow:hidden;display:grid;place-items:center}
+.era-card .em{font-size:0;filter:none}.era-card .em .spr{animation-duration:3.6s}
+.deco{position:absolute;z-index:2;pointer-events:none;animation:floaty 5s ease-in-out infinite}
+.deco.j1{left:6%;top:10px}.deco.j2{right:6%;top:30px;animation-delay:-2s}.deco.j2 .spr{animation-direction:reverse}
+.deco.l1{right:14px;top:150px}.deco.l2{left:42%;top:12px;animation-delay:-1.5s}
+@keyframes floaty{0%,100%{translate:0 0;rotate:-4deg}50%{translate:0 -14px;rotate:4deg}}
+.ds-head{position:relative}
+/* 3D extruded desi headlines */
+.patakha{text-shadow:1px 1px 0 #c9136a,2px 2px 0 #b8105f,3px 3px 0 #a50d55,4px 4px 0 #920a4b,5px 5px 0 #7f0841,6px 6px 0 #ffb000,8px 8px 0 #e09a00,10px 10px 0 #141210,14px 16px 24px #0008!important;animation:sway3d 4s ease-in-out infinite!important}
+.ds-head h3,.pesh,.manp,.rollin{text-shadow:1px 1px 0 #b8860b,2px 2px 0 #a67808,3px 3px 0 #946a06,4px 4px 0 #825c04,5px 5px 0 #141210,8px 10px 16px #0007!important;animation:sway3d 5s ease-in-out infinite}
+.pesh{animation-delay:-1s}.manp{animation-delay:-2.5s}
+.spill{animation:sway3d 4.5s ease-in-out infinite}
+.spill .s1,.spill .s2{filter:drop-shadow(1px 1px 0 #141210) drop-shadow(1px 1px 0 #141210) drop-shadow(1px 1px 0 #141210) drop-shadow(2px 2px 0 #141210) drop-shadow(6px 8px 10px #0007)!important}
+@keyframes sway3d{0%,100%{transform:perspective(700px) rotateY(-9deg) rotateX(5deg)}50%{transform:perspective(700px) rotateY(9deg) rotateX(-4deg) translateY(-6px)}}
+.ds-p.sign{display:block}
+/* everything gently alive */
+.idle{animation:idleY var(--idur,5s) ease-in-out var(--idel,0s) infinite}
+@keyframes idleY{0%,100%{translate:0 0}50%{translate:0 var(--iamp,-7px)}}
 /* label cursor */
 .lc{position:fixed;left:0;top:0;z-index:2500;pointer-events:none;width:14px;height:14px;border-radius:50%;background:#fff;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:width .35s cubic-bezier(.34,1.56,.64,1),height .35s cubic-bezier(.34,1.56,.64,1);display:grid;place-items:center}
 .lc span{font-family:var(--pixel);font-size:.65rem;color:#000;opacity:0;transition:opacity .2s}
@@ -601,13 +623,13 @@ body{background:var(--paper);color:var(--ink)}
   <canvas id="particles"></canvas>
   <svg id="strings"></svg>
 
-  <div class="sticker" data-x=".12" data-y=".2" style="--r:-8deg"><div class="emoji">🧬</div></div>
-  <div class="sticker pol" data-x=".78" data-y=".16" style="--r:7deg"><div class="ph" style="background:var(--lime)">🤖</div>ai / ml</div>
+  <div class="sticker" data-x=".12" data-y=".2" style="--r:-8deg"><div class="spr" style="--img:url(assets/spin/dna.png);--w:150px"></div></div>
+  <div class="sticker pol" data-x=".78" data-y=".16" style="--r:7deg"><div class="ph" style="background:var(--lime)"><div class="spr" style="--img:url(assets/spin/code.png);--w:110px"></div></div>ai / ml</div>
   <div class="sticker" data-x=".84" data-y=".62" style="--r:-4deg"><div class="s">prompt_engineer.py</div></div>
-  <div class="sticker pol" data-x=".1" data-y=".64" style="--r:-6deg"><div class="ph" style="background:var(--pink)">📈</div>growth</div>
-  <div class="sticker" data-x=".55" data-y=".12" style="--r:10deg"><div class="emoji">🧿</div></div>
+  <div class="sticker pol" data-x=".1" data-y=".64" style="--r:-6deg"><div class="ph" style="background:var(--pink)"><div class="spr" style="--img:url(assets/spin/coin.png);--w:110px"></div></div>growth</div>
+  <div class="sticker" data-x=".55" data-y=".12" style="--r:10deg"><div class="spr" style="--img:url(assets/spin/gem.png);--w:120px"></div></div>
   <div class="sticker" data-x=".38" data-y=".78" style="--r:3deg"><div class="s" style="background:var(--aqua)">=XLOOKUP(dreams)</div></div>
-  <div class="sticker pol" data-x=".66" data-y=".8" style="--r:-12deg"><div class="ph" style="background:var(--marigold)">☕</div>cutting chai</div>
+  <div class="sticker pol" data-x=".66" data-y=".8" style="--r:-12deg"><div class="ph" style="background:var(--marigold)"><div class="spr" style="--img:url(assets/spin/chai.png);--w:110px"></div></div>cutting chai</div>
 
   <div class="hero-meta">
     <p>Bioengineer who codes, prompts &amp; markets. Mummy wanted a doctor. She got a bioengineer who also does marketing. Close enough.</p>
@@ -668,9 +690,9 @@ body{background:var(--paper);color:var(--ink)}
   <h2 class="stack er-h">3 eras.<br>1 girl.</h2>
   <p class="er-sub">pick one? beta, hum teeno karte hain.</p>
   <div class="era-grid">
-    <a class="era-card c1" href="#techroom"><span class="en">ERA 01</span><span class="em">💻</span><b>TECH GIRL</b><small>3am debugging · lo-fi · chai</small></a>
-    <a class="era-card c2" href="#labroom"><span class="en">ERA 02</span><span class="em">🧪</span><b>LAB GIRL</b><small>pipettes · petri dishes · neural nets</small></a>
-    <a class="era-card c3" href="#desi"><span class="en">ERA 03</span><span class="em">🛺</span><b>MARKETING GIRL</b><small>पटाका energy · stories that sell</small></a>
+    <a class="era-card c1" href="#techroom"><span class="en">ERA 01</span><span class="em"><div class="spr" style="--img:url(assets/spin/code.png);--w:210px"></div></span><b>TECH GIRL</b><small>3am debugging · lo-fi · chai</small></a>
+    <a class="era-card c2" href="#labroom"><span class="en">ERA 02</span><span class="em"><div class="spr" style="--img:url(assets/spin/dnab.png);--w:210px"></div></span><b>LAB GIRL</b><small>pipettes · petri dishes · neural nets</small></a>
+    <a class="era-card c3" href="#desi"><span class="en">ERA 03</span><span class="em"><div class="spr" style="--img:url(assets/spin/auto.png);--w:230px"></div></span><b>MARKETING GIRL</b><small>पटाका energy · stories that sell</small></a>
   </div>
 </section>
 
@@ -749,11 +771,11 @@ body{background:var(--paper);color:var(--ink)}
 </section>
 
 <section id="desi"><div class="ds-frame">
-  <div class="ds-head"><span class="ds-era">ERA 03</span><h2 class="patakha">पटाका</h2><h3>MARKETING GIRL ERA</h3><p>loud colours. louder ideas. desi to the core, global in the brief.</p></div>
+  <div class="ds-head"><div class="deco j1"><div class="spr" style="--img:url(assets/spin/jhumka.png);--w:150px"></div></div><div class="deco j2"><div class="spr" style="--img:url(assets/spin/jhumka.png);--w:150px"></div></div><span class="ds-era">ERA 03</span><h2 class="patakha">पटाका</h2><h3>MARKETING GIRL ERA</h3><p>loud colours. louder ideas. desi to the core, global in the brief.</p></div>
   <div class="ds-grid">
-    <div class="ds-p chai" id="chaiPanel"><canvas id="chaiGL"></canvas><div class="spill"><span class="s1">SPILL<br>THE</span><span class="s2">चाय</span></div><button id="spillBtn" class="ds-btn">spill a marketing hot take ☕</button><p class="take" id="takeTxt">click the button. i have opinions.</p></div>
+    <div class="ds-p chai" id="chaiPanel"><canvas id="chaiGL"></canvas><div class="spill"><span class="s1">SPILL<br>THE</span><span class="s2">चाय</span></div><div class="deco l1"><div class="spr" style="--img:url(assets/spin/lotus.png);--w:130px"></div></div><div class="deco l2"><div class="spr" style="--img:url(assets/spin/lotus.png);--w:100px"></div></div><button id="spillBtn" class="ds-btn">spill a marketing hot take ☕</button><p class="take" id="takeTxt">click the button. i have opinions.</p></div>
     <div class="ds-p boom" id="boomPanel"><canvas id="boomGL"></canvas><div class="pesh"><span class="d">पेश</span> KARTE<br>HAI!</div><div class="manp">AAPKA<br>MANPASAND<br>MARKETING!</div><span class="hint">tap to turn it up 🔊</span></div>
-    <div class="ds-p sign"><div class="sign-wrap"><div class="board" id="signBoard"><span id="signTxt">YOUR CONTENT NEEDS TO TELL A STORY</span></div><i class="hand l"></i><i class="hand r"></i></div><span class="hint">tap the sign ✦</span></div>
+    <div class="ds-p sign" id="signPanel"><canvas id="signGL"></canvas><span class="hint">tap the sign ✦</span></div>
     <div class="ds-p type" id="typePanel"><canvas id="typeGL"></canvas><span class="hint">scroll to type ⌨</span></div>
     <div class="ds-p auto wide" id="autoPanel"><h3 class="rollin">DESI ME<br>ROLLIN'</h3><canvas id="autoGL"></canvas><span class="hint">honk? tap it 📯</span></div>
   </div>
@@ -935,15 +957,15 @@ function build(){
   oc.fillText('navya',W/2,H*.46);
   const d=oc.getImageData(0,0,W,H).data,gap=W<700?4:5;P=[];
   for(let y=0;y<H;y+=gap)for(let x=0;x<W;x+=gap)if(d[(y*W+x)*4+3]>128)
-    P.push({hx:x,hy:y,x:Math.random()*W,y:Math.random()*H,vx:0,vy:0});
+    P.push({hx:x,hy:y,hz:(Math.random()-.5)*70,x:Math.random()*W,y:Math.random()*H,vx:0,vy:0});
 }
 function draw(){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fff';
-  for(const p of P){
+  ctx.clearRect(0,0,W,H);const tt=performance.now()/1000,ry=(mouse.x>-1e3?(mouse.x/W-.5)*.9:Math.sin(tt*.5)*.35),rx=(mouse.y>-1e3?(mouse.y/H-.5)*-.6:Math.sin(tt*.37)*.15),cy0=Math.cos(ry),sy0=Math.sin(ry),cx0=Math.cos(rx),sx0=Math.sin(rx),CX=W/2,CY=H*.46;
+  for(const p of P){const X=p.hx-CX,Y=p.hy-CY,Z=p.hz,X1=X*cy0+Z*sy0,Z1=-X*sy0+Z*cy0,Y1=Y*cx0-Z1*sx0,Z2=Y*sx0+Z1*cx0,ps=700/(700+Z2);p.tx=CX+X1*ps;p.ty=CY+Y1*ps;p.ps=ps;
     const dx=p.x-mouse.x,dy=p.y-mouse.y,dist=dx*dx+dy*dy,R=110*110;
     if(dist<R){const f=(R-dist)/R*6,a=Math.atan2(dy,dx);p.vx+=Math.cos(a)*f;p.vy+=Math.sin(a)*f;}
-    p.vx+=(p.hx-p.x)*.06;p.vy+=(p.hy-p.y)*.06;p.vx*=.82;p.vy*=.82;p.x+=p.vx;p.y+=p.vy;
-    ctx.fillRect(p.x,p.y,2,2);
+    p.vx+=(p.tx-p.x)*.06;p.vy+=(p.ty-p.y)*.06;p.vx*=.82;p.vy*=.82;p.x+=p.vx;p.y+=p.vy;
+    const sh=Math.round(200+55*(p.ps-.9)*5);ctx.fillStyle=`rgb(255,${Math.min(255,sh)},${Math.min(255,sh-20)})`;ctx.fillRect(p.x,p.y,2.4*p.ps,2.4*p.ps);
   }
   requestAnimationFrame(draw);
 }
@@ -1527,6 +1549,8 @@ void main(){vec2 uv=gl_FragCoord.xy/uR;float asp=uR.x/uR.y;vec2 p=vec2((uv.x-.5)
   for(let i=0;i<48;i++){const a=i/48*Math.PI*2;h+=`<circle cx="${Math.cos(a)*196}" cy="${Math.sin(a)*196}" r="3" fill="#fff"/>`}h+='<circle r="22" fill="none" stroke="#fff" stroke-width="2"/><circle r="10" fill="#ffa400"/>';rg.innerHTML=h}
   const sg=$('#signs');if(sg){new IntersectionObserver(es=>{if(es[0].isIntersecting){sg.classList.add('in');toast('kidhar jaana hai? pick a board ✦')}},{threshold:.35}).observe(sg)}
 })();
+/* =================== V12: EVERYTHING MOVES =================== */
+document.querySelectorAll('.b,.tile,.fl-card,.fl-hire,.vb-kick,.vb-count,.label,.era-card small,.chips span,.btn2,.ds-btn,.if-tag,.fn-top .ct,.sg-sub,.er-sub,#work h2,#signs h2,.tab,.key,.slab .e').forEach((el,i)=>{el.classList.add('idle');el.style.setProperty('--idel',(-Math.random()*5).toFixed(2)+'s');el.style.setProperty('--idur',(4+Math.random()*3).toFixed(2)+'s');el.style.setProperty('--iamp',(-(3+Math.random()*7)).toFixed(1)+'px')});
 setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'})+' IST · bhopal',1000);
 </script>
 <script src="js/eras.js"></script>

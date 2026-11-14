@@ -1,6 +1,7 @@
 /* Realistic 3D studio: glass, chrome, gold, iridescent objects with soft shadows.
    makeStudio(canvas, {items:[{obj, bg:[top,bottom], rim, c}], offsetX, preserve}) -> {set(i, instant), render()} */
 (function () {
+  if (THREE.ColorManagement) { THREE.ColorManagement.legacyMode = false; THREE.ColorManagement.enabled = true; }
   const M = {
     glass: (c, ad = 1.4) => new THREE.MeshPhysicalMaterial({ color: '#ffffff', transmission: 1, roughness: 0.03, thickness: 1.4, ior: 1.5,
       attenuationColor: new THREE.Color(c), attenuationDistance: ad, specularIntensity: 1, envMapIntensity: 1.3, clearcoat: 1, clearcoatRoughness: 0.04 }),
@@ -83,8 +84,15 @@
       [[0,-0.62],[0.42,-0.62],[0.46,-0.55],[0.72,0.5],[0.76,0.6],[0.7,0.62],[0.65,0.52],[0.41,-0.5],[0,-0.5]].forEach(([x,y])=>pts.push(new THREE.Vector2(x,y)));
       const clay = new THREE.MeshStandardMaterial({ color: '#b5562b', roughness: 0.82 }), geo = new THREE.LatheGeometry(pts, 64);
       const cups = [-0.85, 0.85].map((x, i) => { const c = new THREE.Group(); c.add(mesh(geo, clay));
-        const top = mesh(new THREE.CircleGeometry(0.66, 48), M.ceramic('#c8945e')); top.rotation.x = -Math.PI / 2; top.position.y = 0.47; c.add(top);
-        for (let k = 0; k < 26; k++) { const r = Math.sqrt(Math.random()) * 0.55, a = Math.random() * 6.28, b = mesh(new THREE.SphereGeometry(0.025 + Math.random() * 0.04, 10, 8), M.ceramic('#e6c391')); b.position.set(Math.cos(a) * r, 0.48, Math.sin(a) * r); b.scale.y = 0.5; c.add(b); }
+        const ec = document.createElement('canvas'); ec.width = ec.height = 512; const ex = ec.getContext('2d'); ex.fillStyle = '#c99a63'; ex.fillRect(0, 0, 512, 512);
+        for (let k = 0; k < 900; k++) { ex.fillStyle = `rgba(255,235,200,${Math.random() * 0.25})`; ex.beginPath(); ex.arc(Math.random() * 512, Math.random() * 512, 2 + Math.random() * 7, 0, 7); ex.fill(); }
+        ex.save(); ex.translate(256, 270); if (i) ex.scale(-1, 1); ex.fillStyle = '#d0167a'; ex.beginPath(); ex.moveTo(-170, 10); ex.quadraticCurveTo(0, -120, 170, 10); ex.quadraticCurveTo(0, 90, -170, 10); ex.fill();
+        ex.fillStyle = '#c99a63'; ex.beginPath(); ex.ellipse(0, 6, 120, 42, 0, 0, 7); ex.fill(); ex.fillStyle = '#d0167a'; ex.beginPath(); ex.arc(0, 4, 40, 0, 7); ex.fill(); ex.fillStyle = '#c99a63'; ex.beginPath(); ex.arc(12, -6, 12, 0, 7); ex.fill();
+        ex.strokeStyle = '#d0167a'; ex.lineWidth = 7; for (let k = 0; k < 12; k++) { const x = -150 + k * 26; ex.beginPath(); ex.moveTo(x, -20 - Math.sin(k / 11 * Math.PI) * 50); ex.lineTo(x - 14, -60 - Math.sin(k / 11 * Math.PI) * 70); ex.stroke(); }
+        ex.lineWidth = 26; ex.lineCap = 'round'; ex.beginPath(); ex.moveTo(-170, -130); ex.quadraticCurveTo(0, -200, 170, -150); ex.stroke(); ex.restore();
+        const et = new THREE.CanvasTexture(ec); et.encoding = THREE.sRGBEncoding;
+        const top = mesh(new THREE.CircleGeometry(0.66, 48), new THREE.MeshPhysicalMaterial({ map: et, roughness: 0.6 })); top.rotation.x = -Math.PI / 2; top.rotation.z = i ? 0.2 : -0.2; top.position.y = 0.47; c.add(top);
+        for (let k = 0; k < 0; k++) { const r = Math.sqrt(Math.random()) * 0.55, a = Math.random() * 6.28, b = mesh(new THREE.SphereGeometry(0.025 + Math.random() * 0.04, 10, 8), M.ceramic('#e6c391')); b.position.set(Math.cos(a) * r, 0.48, Math.sin(a) * r); b.scale.y = 0.5; c.add(b); }
         c.position.x = x; c.userData.s = i ? -1 : 1; g.add(c); return c; });
       g.userData.update = (t) => { const k = Math.max(0, Math.sin(t * 1.6)) ** 6; cups.forEach((c) => { c.rotation.z = -c.userData.s * (0.25 + 0.2 * k); c.position.x = c.userData.s * -(0.95 - 0.12 * k); c.position.y = Math.sin(t * 1.2 + c.userData.s) * 0.05; }); g.rotation.y = Math.sin(t * 0.4) * 0.3; g.rotation.x = 0.35; };
       return g;
@@ -100,6 +108,7 @@
       for (let i = 0; i < 6; i++) { const b = mesh(new THREE.BoxGeometry(0.16, 0.08, 0.14), M.ceramic(i % 2 ? '#c43d12' : '#3a3a3a')); b.position.set(-0.45 + i * 0.18, 0.84, 0.05); g.add(b); }
       const handle = mesh(new THREE.TorusGeometry(1.1, 0.06, 16, 64, Math.PI), M.chrome()); handle.position.y = 0.8; g.add(handle);
       const ant = mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.8, 8), M.chrome()); ant.position.set(1.3, 1.5, -0.2); ant.rotation.z = -0.5; g.add(ant);
+      const hd = B.hand('#c41e3a', '#ffc95e', 3); hd.position.set(-0.2, 1.95, 0.05); hd.rotation.set(Math.PI / 2, 0, Math.PI * 0.85); hd.scale.setScalar(1.4); g.add(hd);
       g.userData.beat = 1; g.rotation.z = -0.18;
       g.userData.update = (t) => { const b = g.userData.beat, k = Math.abs(Math.sin(t * 4 * b)); g.position.y = k * 0.1; cones.forEach((c) => c.scale.setScalar(1 + k * 0.06 * b)); g.rotation.y = Math.sin(t * 0.6) * 0.35; };
       return g;
@@ -119,6 +128,58 @@
       g.userData.x = 0; let lx = 0;
       g.userData.update = (t) => { const x = g.userData.x; wheels.forEach((w) => { w.rotation.z -= (x - lx) / 0.36; }); lx = x; g.position.x = x; g.position.y = Math.abs(Math.sin(t * 9)) * 0.03; g.rotation.y = -0.35; };
       g.scale.setScalar(0.85); return g;
+    },
+    hand(nail = '#2a4bff', ring = '#ffc95e', bangles = 0) {
+      const g = new THREE.Group(), skin = new THREE.MeshPhysicalMaterial({ color: '#8d5a3b', roughness: 0.5, sheen: 0.5, sheenColor: new THREE.Color('#ffcfb0'), clearcoat: 0.15 });
+      const nm = new THREE.MeshPhysicalMaterial({ color: nail, roughness: 0.12, clearcoat: 1 }), rm = M.gold(); rm.color.set(ring);
+      const palm = mesh(new THREE.SphereGeometry(0.3, 40, 28), skin); palm.scale.set(1, 0.42, 1.15); g.add(palm); const fingers = [];
+      [[-0.2, 0.22], [-0.07, 0.3], [0.07, 0.31], [0.2, 0.26]].forEach(([x, len], i) => { const f = new THREE.Group(); f.position.set(x, 0, 0.28);
+        const seg = mesh(new THREE.CapsuleGeometry(0.052, len, 8, 16), skin); seg.rotation.x = Math.PI / 2; seg.position.z = len / 2; f.add(seg);
+        const n = mesh(new THREE.SphereGeometry(0.05, 16, 10), nm); n.scale.set(1, 0.45, 1.5); n.position.set(0, 0.03, len + 0.02); f.add(n);
+        if (i === 1 || i === 3) { const r = mesh(new THREE.TorusGeometry(0.058, 0.014, 10, 24), rm); r.position.z = 0.06; f.add(r); }
+        f.rotation.x = 0.35; f.userData.i = i; fingers.push(f); g.add(f); });
+      const th = new THREE.Group(); const ts = mesh(new THREE.CapsuleGeometry(0.06, 0.2, 8, 16), skin); ts.rotation.x = Math.PI / 2; ts.position.z = 0.1; th.add(ts); th.position.set(-0.3, -0.02, 0.12); th.rotation.y = -0.7; g.add(th);
+      const wrist = mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.9, 32), skin); wrist.rotation.x = Math.PI / 2; wrist.position.z = -0.6; wrist.scale.y = 1; g.add(wrist);
+      for (let b = 0; b < bangles; b++) { const bg = mesh(new THREE.TorusGeometry(0.24, 0.035, 12, 40), b % 2 ? M.gold() : new THREE.MeshPhysicalMaterial({ color: '#111', roughness: 0.2, clearcoat: 1 })); bg.position.z = -0.45 - b * 0.08; g.add(bg); }
+      g.userData.fingers = fingers; return g;
+    },
+    lotus() {
+      const g = new THREE.Group(), pg = new THREE.SphereGeometry(1, 40, 20); pg.scale(0.32, 0.9, 0.12); pg.translate(0, 0.85, 0);
+      const pm = new THREE.MeshPhysicalMaterial({ color: '#ff4f8b', roughness: 0.35, sheen: 1, sheenColor: new THREE.Color('#ffd0e0'), clearcoat: 0.4, side: THREE.DoubleSide });
+      [[8, 0.55, 1], [8, 0.95, 0.85], [6, 1.25, 0.7]].forEach(([n, tilt, sc], l) => { for (let i = 0; i < n; i++) { const pv = new THREE.Group(); pv.rotation.y = (i / n) * Math.PI * 2 + l * 0.4; const p = mesh(pg, pm); p.rotation.x = tilt; p.scale.setScalar(sc); pv.add(p); g.add(pv); } });
+      const c = mesh(new THREE.CylinderGeometry(0.22, 0.18, 0.12, 24), new THREE.MeshPhysicalMaterial({ color: '#ffd23f', roughness: 0.4 })); c.position.y = 0.06; g.add(c);
+      const leaf = mesh(new THREE.CircleGeometry(1.5, 48, 0.3, Math.PI * 1.85), new THREE.MeshPhysicalMaterial({ color: '#1f6b3a', roughness: 0.5, side: THREE.DoubleSide })); leaf.rotation.x = -Math.PI / 2; leaf.position.y = -0.15; g.add(leaf);
+      g.rotation.x = 0.4; g.userData.update = (t) => { g.rotation.y = t * 0.3; }; return g;
+    },
+    jhumka() {
+      const g = new THREE.Group(), silver = new THREE.MeshStandardMaterial({ color: '#e8e8ee', metalness: 1, roughness: 0.22 });
+      const hook = mesh(new THREE.TorusGeometry(0.25, 0.035, 12, 32, Math.PI * 1.3), silver); hook.position.y = 1.55; g.add(hook);
+      const stud = mesh(new THREE.SphereGeometry(0.28, 32, 24), silver); stud.position.y = 1.15; g.add(stud);
+      const gem = mesh(new THREE.SphereGeometry(0.14, 24, 16), new THREE.MeshPhysicalMaterial({ color: '#d7261e', roughness: 0.05, transmission: 0.4, clearcoat: 1 })); gem.position.set(0, 1.15, 0.22); g.add(gem);
+      const bell = mesh(new THREE.SphereGeometry(0.8, 48, 32, 0, Math.PI * 2, 0, Math.PI * 0.55), Object.assign(silver.clone(), { side: THREE.DoubleSide })); bell.position.y = 0.4; g.add(bell);
+      for (let k = 0; k < 14; k++) { const a = (k / 14) * Math.PI * 2, b = mesh(new THREE.SphereGeometry(0.07, 12, 10), silver); b.position.set(Math.cos(a) * 0.68, 0.12, Math.sin(a) * 0.68); g.add(b);
+        const d = mesh(new THREE.SphereGeometry(0.06, 12, 10), silver); d.position.set(Math.cos(a) * 0.68, -0.08, Math.sin(a) * 0.68); g.add(d); }
+      for (let k = 0; k < 18; k++) { const a = (k / 18) * Math.PI * 2, r = mesh(new THREE.TorusGeometry(0.05, 0.015, 8, 16), silver); r.position.set(Math.cos(a) * 0.55, 0.85, Math.sin(a) * 0.55); r.lookAt(0, 0.85, 0); g.add(r); }
+      g.position.y = -0.4; g.userData.update = (t) => { g.rotation.z = Math.sin(t * 2) * 0.12; }; return g;
+    },
+    placard() {
+      const g = new THREE.Group(), cv = document.createElement('canvas'); cv.width = 1024; cv.height = 768; const cx = cv.getContext('2d'); const tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 8;
+      const draw = (txt) => { cx.fillStyle = '#fbfbf6'; cx.fillRect(0, 0, 1024, 768); for (let i = 0; i < 3000; i++) { cx.fillStyle = `rgba(0,0,0,${Math.random() * 0.03})`; cx.fillRect(Math.random() * 1024, Math.random() * 768, 2, 2); }
+        cx.fillStyle = '#1f3fb0'; cx.textAlign = 'center'; let fs = 120; const words = txt.split(' '); let lines = [];
+        do { cx.font = `${fs}px "Permanent Marker", cursive`; lines = []; let cur = ''; words.forEach((w) => { const t = cur ? cur + ' ' + w : w; if (cx.measureText(t).width > 880) { lines.push(cur); cur = w; } else cur = t; }); lines.push(cur); fs -= 6; } while (lines.length * fs * 1.15 > 640 && fs > 40);
+        lines.forEach((l, i) => cx.fillText(l, 512, 384 - ((lines.length - 1) * fs * 1.15) / 2 + i * fs * 1.15 + fs * 0.35)); tex.needsUpdate = true; };
+      const edge = new THREE.MeshPhysicalMaterial({ color: '#f4f2ea', roughness: 0.7 }), face = new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.75 });
+      const board = mesh(new THREE.BoxGeometry(3.2, 2.4, 0.08), [edge, edge, edge, edge, face, edge]); g.add(board);
+      const back = mesh(new THREE.PlaneGeometry(3.15, 2.35), new THREE.MeshStandardMaterial({ color: '#d9d4c6', roughness: 0.9 })); back.rotation.y = Math.PI; back.position.z = -0.041; g.add(back);
+      const skin = new THREE.MeshPhysicalMaterial({ color: '#b07a55', roughness: 0.55, sheen: 0.4, sheenColor: new THREE.Color('#ffcfb0') });
+      [-1, 1].forEach((s) => { const hand = new THREE.Group(); const palm = mesh(new THREE.SphereGeometry(0.24, 32, 24), skin); palm.scale.set(1, 1.25, 0.55); hand.add(palm);
+        for (let f = 0; f < 4; f++) { const fg = mesh(new THREE.CapsuleGeometry(0.055, 0.22, 8, 16), skin); fg.position.set(s * 0.1, 0.22 - f * 0.12, 0.13); fg.rotation.z = s * 1.45; hand.add(fg); }
+        const th = mesh(new THREE.CapsuleGeometry(0.06, 0.18, 8, 16), skin); th.position.set(-s * 0.05, 0.05, -0.14); th.rotation.z = s * 0.6; hand.add(th);
+        const nailM = new THREE.MeshPhysicalMaterial({ color: '#c41e3a', roughness: 0.15, clearcoat: 1 }); for (let f = 0; f < 4; f++) { const n = mesh(new THREE.SphereGeometry(0.04, 12, 8), nailM); n.scale.set(1, 0.7, 0.4); n.position.set(s * 0.26, 0.22 - f * 0.12, 0.16); hand.add(n); }
+        hand.position.set(s * 1.62, 0.25, -0.12); g.add(hand); });
+      g.userData.draw = draw; g.userData.flip = 0; draw('YOUR CONTENT NEEDS TO TELL A STORY');
+      g.userData.update = (t) => { g.userData.flip *= 0.92; g.rotation.y = Math.sin(t * 0.7) * 0.18 + g.userData.flip * Math.PI * 2; g.rotation.x = -0.25 + Math.sin(t * 1.1) * 0.04; g.position.y = 0.2 + Math.sin(t * 1.4) * 0.08; };
+      return g;
     },
     typewriter() {
       const g = new THREE.Group(), maroon = new THREE.MeshPhysicalMaterial({ color: '#3a040b', roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 0.5 });
@@ -182,7 +243,7 @@
     const bd = new THREE.Mesh(new THREE.SphereGeometry(40, 48, 32), new THREE.ShaderMaterial({ side: THREE.BackSide, uniforms: U, depthWrite: false,
       vertexShader: 'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
       fragmentShader: 'uniform vec3 c1,c2,glow;varying vec3 vP;void main(){float y=vP.y*.5+.5;vec3 c=mix(c2,c1,smoothstep(.3,.9,y))*.62;float g=pow(max(0.,dot(vP,normalize(vec3(.25,.05,-1.)))),6.);c+=glow*g*.9;gl_FragColor=vec4(c,1.);}' }));
-    if (!opts.transparent) sc.add(bd); else r.setClearColor(0x000000, 0);
+    if (!opts.transparent) sc.add(bd); else { r.setClearColor(0x000000, 0); sc.add(new THREE.HemisphereLight('#ffffff', '#806050', 0.9)); }
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.35 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -1.8; ground.receiveShadow = true; sc.add(ground);
     const key = new THREE.SpotLight(0xffffff, 2.2, 30, 0.6, 0.8); key.position.set(3, 7, 5); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.radius = 6; key.shadow.bias = -0.0005; sc.add(key);
     const rim = new THREE.PointLight(0xffffff, 3, 20); rim.position.set(-4, 2, -3); sc.add(rim);
@@ -190,7 +251,7 @@
     const items = opts.items || []; let cur = null, curI = -1, target = { c1: new THREE.Color(), c2: new THREE.Color(), glow: new THREE.Color(), rim: new THREE.Color() };
     const mouse = { x: 0, y: 0, tx: 0, ty: 0 }; canvas.addEventListener('pointermove', (e) => { const b = canvas.getBoundingClientRect(); mouse.tx = (e.clientX - b.left) / b.width - 0.5; mouse.ty = (e.clientY - b.top) / b.height - 0.5; });
     let swap = null;
-    function build(i) { const it = items[i]; const g = B[it.obj](...(it.args || [])); g.traverse((o) => { if (o.isMesh) o.castShadow = true; }); const w = new THREE.Group(); w.add(g); w.userData.inner = g; return w; }
+    function build(i) { const it = items[i]; const g = B[it.obj](...(it.args || [])); g.traverse((o) => { if (o.isMesh) { o.castShadow = true; if (opts.transparent) [].concat(o.material).forEach((m) => { if (!(m.metalness > 0.5)) m.envMapIntensity = (m.envMapIntensity ?? 1) * 0.5; }); } }); const w = new THREE.Group(); w.add(g); w.userData.inner = g; return w; }
     function set(i, instant) { if (i === curI) return; curI = i; const it = items[i]; target.c1.set(it.bg[0]); target.c2.set(it.bg[1]); target.glow.set(it.glow || it.bg[0]); target.rim.set(it.rim || '#ffffff');
       const next = build(i); if (instant || !cur) { if (cur) holder.remove(cur); cur = next; holder.add(cur); cur.scale.setScalar(instant ? 1 : 0.001); swap = instant ? null : { t: 0, out: null };
         if (instant) { U.c1.value.copy(target.c1); U.c2.value.copy(target.c2); U.glow.value.copy(target.glow); rim.color.copy(target.rim); } return; }
@@ -206,7 +267,7 @@
       if (swap) { swap.t += dt; if (swap.out) { const k = Math.min(1, swap.t / 0.45); swap.out.scale.setScalar(Math.max(0.001, 1 - k * k)); swap.out.rotation.y += 0.15; if (k >= 1) { holder.remove(swap.out); swap.out = null; swap.t = 0; } }
         else { const k = Math.min(1, swap.t / 0.9), e = 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2); cur.scale.setScalar(Math.max(0.001, k >= 1 ? 1 : e)); if (k >= 1) swap = null; } }
       mouse.x += (mouse.tx - mouse.x) * 0.05; mouse.y += (mouse.ty - mouse.y) * 0.05;
-      holder.children.forEach((w) => { const g = w.userData.inner; g.userData.update && g.userData.update(t); w.rotation.y = mouse.x * 0.8; w.rotation.x = mouse.y * 0.4; });
+      holder.children.forEach((w) => { const g = w.userData.inner; g.userData.update && g.userData.update(t); w.rotation.y = opts.spinFn ? opts.spinFn() : mouse.x * 0.8; w.rotation.x = opts.spinFn ? 0 : mouse.y * 0.4; });
       r.render(sc, cam); }
     (function loop() { requestAnimationFrame(loop); if (visible && !opts.manual) render(); })();
     return { set, render, resize, renderer: r, canvas, inner: () => cur && cur.userData.inner };
