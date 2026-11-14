@@ -4,6 +4,7 @@
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, t) => a + (b - a) * t, ease = (t) => t * t * (3 - 2 * t);
   const prog = (el) => { const r = el.getBoundingClientRect(); return clamp(-r.top / Math.max(1, r.height - innerHeight)); };
   const vis = (el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
+  const introActive = () => !!document.getElementById('intro');
   const R = Math.random, TAU = Math.PI * 2;
   if (window.THREE && THREE.ColorManagement) { THREE.ColorManagement.legacyMode = false; THREE.ColorManagement.enabled = true; }
 
@@ -47,62 +48,81 @@
     let seen = false; try { seen = sessionStorage.getItem('nova_seen') === '1'; } catch (e) {}
     if (seen || !window.THREE) { el.remove(); done(); return; }
     const cv = $('#introGL'), led = $('#led'), lx = led.getContext('2d'), boot = $('#boot');
-    const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.5)); r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.1;
-    const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(50, 1, 0.1, 900); sc.fog = new THREE.FogExp2('#05070d', 0.006);
+    const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.5)); r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.15;
+    const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(42, 1, 0.05, 900); sc.fog = new THREE.FogExp2('#05070d', 0.03);
     if (window.RoomEnvironment) { const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; }
-    // sky: storm → nebula
+    // sky: dark forge-ambient → storm → nebula
     const U = { uT: { value: 0 }, uFlash: { value: 0 }, uMix: { value: 0 } };
     sc.add(new THREE.Mesh(new THREE.SphereGeometry(600, 48, 32), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false, uniforms: U,
       vertexShader: 'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
       fragmentShader: 'uniform float uT,uFlash,uMix;varying vec3 vP;' + FBM + 'void main(){vec2 p=vec2(atan(vP.z,vP.x)*1.6,vP.y*3.);float f=fbm(p*1.5+vec2(uT*.05,0.));float g=fbm(p*3.+f*2.-uT*.03);' +
-        'vec3 storm=mix(vec3(.02,.025,.04),vec3(.18,.2,.26),smoothstep(.3,.8,f*g*1.6));' +
+        'vec3 storm=mix(vec3(.01,.012,.018),vec3(.1,.11,.15),smoothstep(.3,.8,f*g*1.6));' +
         'float fil=pow(smoothstep(.45,.9,g),2.);vec3 neb=mix(vec3(.01,.015,.04),vec3(.08,.18,.42),smoothstep(.2,.8,f));neb+=vec3(.9,.25,.06)*fil*smoothstep(-.1,.5,vP.y);neb+=vec3(.6,.75,1.)*pow(max(0.,1.-abs(vP.y)*6.),6.)*.8;' +
         'float st=pow(h1(floor(p*260.)),90.)*smoothstep(0.,.3,vP.y);vec3 c=mix(storm,neb,uMix)+st*uMix+uFlash*vec3(.55,.65,1.)*(.4+f);gl_FragColor=vec4(c,1.);}' })));
-    // ground + city
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshStandardMaterial({ color: '#07090d', roughness: 0.95 })); ground.rotation.x = -Math.PI / 2; sc.add(ground);
+    // scorched ground + city (city fades in only once we rise)
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshStandardMaterial({ color: '#030404', roughness: 0.96 })); ground.rotation.x = -Math.PI / 2; sc.add(ground);
+    const ash = canvasTex(1024, 1024, (x, w, h) => { x.fillStyle = '#060504'; x.fillRect(0, 0, w, h); for (let i = 0; i < 30000; i++) { const v = R() * 0.1; x.fillStyle = `rgba(${40 + v * 255 | 0},${30 + v * 180 | 0},${20 + v * 60 | 0},${0.05 + R() * 0.12})`; x.fillRect(R() * w, R() * h, 1.4, 1.4); } });
+    ash.wrapS = ash.wrapT = THREE.RepeatWrapping; ash.repeat.set(16, 16); ground.material.map = ash; ground.material.needsUpdate = true;
     const crack = canvasTex(1024, 1024, (x, w, h) => { x.clearRect(0, 0, w, h); x.strokeStyle = '#ff6a1c'; x.shadowColor = '#ff4a1c'; x.shadowBlur = 18; x.lineCap = 'round';
       const branch = (px, py, a, len, wdt, d) => { if (d > 4 || len < 8) return; let X = px, Y = py; x.lineWidth = wdt; x.beginPath(); x.moveTo(X, Y); for (let i = 0; i < 8; i++) { a += (R() - 0.5) * 0.7; X += Math.cos(a) * len / 8; Y += Math.sin(a) * len / 8; x.lineTo(X, Y); } x.stroke();
         branch(X, Y, a + (R() - 0.5) * 1.2, len * 0.65, wdt * 0.7, d + 1); if (R() < 0.6) branch(X, Y, a + (R() - 0.5) * 1.6, len * 0.5, wdt * 0.6, d + 1); };
       for (let i = 0; i < 14; i++) branch(512, 512, (i / 14) * TAU + R() * 0.3, 260 + R() * 120, 9, 0); x.fillStyle = '#ffb347'; x.beginPath(); x.arc(512, 512, 40, 0, TAU); x.fill(); });
     const crackM = new THREE.MeshBasicMaterial({ map: crack, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
-    const crackP = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), crackM); crackP.rotation.x = -Math.PI / 2; crackP.position.y = 0.02; sc.add(crackP);
+    const crackP = new THREE.Mesh(new THREE.PlaneGeometry(10, 10), crackM); crackP.rotation.x = -Math.PI / 2; crackP.position.y = 0.015; sc.add(crackP);
     const win = canvasTex(64, 128, (x) => { x.fillStyle = '#000'; x.fillRect(0, 0, 64, 128); for (let yy = 4; yy < 128; yy += 8) for (let xx = 4; xx < 64; xx += 8) if (R() < 0.35) { x.fillStyle = R() < 0.85 ? '#ffcf8a' : '#8fd8ff'; x.fillRect(xx, yy, 4, 4); } });
     win.wrapS = win.wrapT = THREE.RepeatWrapping;
     const bM = new THREE.MeshStandardMaterial({ color: '#0c1018', roughness: 0.7, metalness: 0.3, emissive: '#ffffff', emissiveMap: win, emissiveIntensity: 1.1 });
     const N = 2600, city = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), bM, N), m4 = new THREE.Matrix4(), q = new THREE.Quaternion();
     for (let i = 0; i < N; i++) { const a = R() * TAU, d = 14 + Math.pow(R(), 0.7) * 230, hgt = (2 + Math.pow(R(), 3) * 40) * (d < 70 ? 1.6 : 1) * (1 - d / 330), w = 2 + R() * 4;
       m4.compose(new THREE.Vector3(Math.cos(a) * d, hgt / 2, Math.sin(a) * d - 20), q, new THREE.Vector3(w, hgt, w * (0.7 + R() * 0.6))); city.setMatrixAt(i, m4); }
-    sc.add(city);
-    // the hammer (original rune design)
-    const runes = canvasTex(512, 512, (x, w, h) => { const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#5b6270'); g.addColorStop(1, '#2a2e36'); x.fillStyle = g; x.fillRect(0, 0, w, h);
-      for (let i = 0; i < 2500; i++) { x.fillStyle = `rgba(255,255,255,${R() * 0.05})`; x.fillRect(R() * w, R() * h, 2, 1); } x.strokeStyle = '#1a1d22'; x.lineWidth = 10; x.strokeRect(24, 24, w - 48, h - 48); });
-    const glyph = canvasTex(512, 512, (x, w, h) => { x.fillStyle = '#000'; x.fillRect(0, 0, w, h); x.strokeStyle = '#fff'; x.lineWidth = 7; x.lineCap = 'round';
-      x.beginPath(); x.arc(256, 256, 150, 0, TAU); x.stroke(); x.beginPath(); x.arc(256, 256, 110, 0, TAU); x.stroke();
-      for (let i = 0; i < 3; i++) { x.save(); x.translate(256, 256); x.rotate(i * TAU / 3); x.beginPath(); x.moveTo(0, -110); x.bezierCurveTo(90, -60, 90, 60, 0, 110); x.stroke(); x.restore(); }
-      const rr = ['ᚾ', 'ᚨ', 'ᚢ', 'ᛃ', 'ᚨ']; x.font = '44px serif'; x.fillStyle = '#fff'; x.textAlign = 'center'; rr.forEach((c, i) => { const a = -Math.PI / 2 + (i - 2) * 0.42; x.fillText(c, 256 + Math.cos(a) * 205, 268 + Math.sin(a) * 205); });
-      [[60, 60], [452, 60], [60, 452], [452, 452]].forEach(([px, py]) => { x.beginPath(); x.moveTo(px - 20, py); x.lineTo(px, py - 20); x.lineTo(px + 20, py); x.lineTo(px, py + 20); x.closePath(); x.stroke(); }); });
-    const steel = new THREE.MeshStandardMaterial({ map: runes, metalness: 0.92, roughness: 0.32, emissive: '#3df5ff', emissiveMap: glyph, emissiveIntensity: 0 });
+    city.visible = false; sc.add(city); // hidden until the rise reveals it — keeps the close-up/crack/beam beats pure darkness, no skyline bleeding through
+    // the hammer — original design, no Thor, resting on ash, reforging
+    const runes = canvasTex(1024, 1024, (x, w, h) => { const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#565d69'); g.addColorStop(0.5, '#3a3f49'); g.addColorStop(1, '#23262d'); x.fillStyle = g; x.fillRect(0, 0, w, h);
+      for (let i = 0; i < 9000; i++) { x.fillStyle = `rgba(255,255,255,${R() * 0.06})`; x.fillRect(R() * w, R() * h, 2, 1); }
+      x.strokeStyle = '#15171c'; x.lineWidth = 16; x.strokeRect(36, 36, w - 72, h - 72); x.lineWidth = 3; x.strokeStyle = '#6b7480';
+      for (let i = 0; i < 70; i++) { x.beginPath(); const px = R() * w, py = R() * h, l = 10 + R() * 40, a = R() * TAU; x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); } });
+    // crack/glow map: baked rune sigil + fine branching cracks radiating outward (this is what "ignites" during reforging)
+    const crackBranch = (x, px, py, a, len, wdt, d, maxd) => { if (d > maxd || len < 6) return; let X = px, Y = py; x.lineWidth = wdt; x.beginPath(); x.moveTo(X, Y); const steps = 7;
+      for (let i = 0; i < steps; i++) { a += (R() - 0.5) * 0.65; X += Math.cos(a) * len / steps; Y += Math.sin(a) * len / steps; x.lineTo(X, Y); } x.stroke();
+      crackBranch(x, X, Y, a + (R() - 0.5) * 1.1, len * 0.62, wdt * 0.68, d + 1, maxd); if (R() < 0.55) crackBranch(x, X, Y, a + (R() - 0.5) * 1.5, len * 0.45, wdt * 0.55, d + 1, maxd); };
+    const glyph = canvasTex(1024, 1024, (x, w, h) => { x.fillStyle = '#000'; x.fillRect(0, 0, w, h); x.strokeStyle = '#fff'; x.lineWidth = 11; x.lineCap = 'round';
+      x.beginPath(); x.arc(512, 512, 300, 0, TAU); x.stroke(); x.beginPath(); x.arc(512, 512, 220, 0, TAU); x.stroke();
+      for (let i = 0; i < 3; i++) { x.save(); x.translate(512, 512); x.rotate(i * TAU / 3); x.beginPath(); x.moveTo(0, -220); x.bezierCurveTo(180, -120, 180, 120, 0, 220); x.stroke(); x.restore(); }
+      const rr = ['ᚾ', 'ᚨ', 'ᚢ', 'ᛃ', 'ᚨ']; x.font = '88px serif'; x.fillStyle = '#fff'; x.textAlign = 'center'; rr.forEach((c, i) => { const a = -Math.PI / 2 + (i - 2) * 0.42; x.fillText(c, 512 + Math.cos(a) * 410, 536 + Math.sin(a) * 410); });
+      [[120, 120], [904, 120], [120, 904], [904, 904]].forEach(([px, py]) => { x.beginPath(); x.moveTo(px - 40, py); x.lineTo(px, py - 40); x.lineTo(px + 40, py); x.lineTo(px, py + 40); x.closePath(); x.stroke(); });
+      x.lineWidth = 4; for (let i = 0; i < 10; i++) crackBranch(x, 512, 512, (i / 10) * TAU + R() * 0.3, 190 + R() * 160, 7, 0, 3); });
+    const steel = new THREE.MeshStandardMaterial({ map: runes, metalness: 0.92, roughness: 0.3, emissive: '#ff6a1c', emissiveMap: glyph, emissiveIntensity: 0 });
     const hammer = new THREE.Group(), head = rbox(2.1, 1.25, 1.25, 0.16, steel); head.position.y = 0.62; hammer.add(head);
     [-1, 1].forEach((s) => { const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.06, 48), steel); cap.rotation.z = Math.PI / 2; cap.position.set(s * 1.08, 0.62, 0); hammer.add(cap); });
     const leather = canvasTex(64, 256, (x, w, h) => { x.fillStyle = '#3a2416'; x.fillRect(0, 0, w, h); for (let yy = -64; yy < h + 64; yy += 14) { x.strokeStyle = '#1c110a'; x.lineWidth = 3; x.beginPath(); x.moveTo(0, yy); x.lineTo(w, yy + 20); x.stroke(); x.strokeStyle = '#5a3a24'; x.lineWidth = 1; x.beginPath(); x.moveTo(0, yy + 4); x.lineTo(w, yy + 24); x.stroke(); } });
     leather.wrapT = THREE.RepeatWrapping; leather.repeat.set(1, 3);
-    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 2.4, 32), new THREE.MeshStandardMaterial({ map: leather, roughness: 0.75 })); handle.position.y = 2.45; hammer.add(handle);
-    const pommel = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.17, 0.25, 32), steel); pommel.position.y = 3.7; hammer.add(pommel);
-    const strap = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.035, 12, 32), new THREE.MeshStandardMaterial({ color: '#2a1a10', roughness: 0.8 })); strap.position.set(0, 3.95, 0); strap.rotation.x = 0.3; hammer.add(strap);
-    hammer.position.y = 14; sc.add(hammer);
-    sc.add(new THREE.AmbientLight('#203050', 0.4)); const moon = new THREE.DirectionalLight('#9fb8ff', 0.9); moon.position.set(-5, 10, 6); sc.add(moon);
-    const fire = new THREE.PointLight('#ff6a1c', 0, 30); fire.position.set(0, 1.5, 1); sc.add(fire); const bolt = new THREE.PointLight('#9fd8ff', 0, 40); bolt.position.set(0, 8, 2); sc.add(bolt);
-    // sparks
-    const SN = 1800, sp = new Float32Array(SN * 3), sv = []; for (let i = 0; i < SN; i++) sv.push(new THREE.Vector3());
-    const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
-    const sm = new THREE.PointsMaterial({ size: 0.07, color: '#ffb347', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }); const sparks = new THREE.Points(sg, sm); sc.add(sparks);
-    const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 1, 96), new THREE.MeshBasicMaterial({ color: '#ffb347', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; sc.add(ring);
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 2.4, 32), new THREE.MeshStandardMaterial({ map: leather, roughness: 0.75 })); handle.position.y = 1.82; hammer.add(handle);
+    const pommel = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.17, 0.25, 32), steel); pommel.position.y = 3.07; hammer.add(pommel);
+    const strap = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.035, 12, 32), new THREE.MeshStandardMaterial({ color: '#2a1a10', roughness: 0.8 })); strap.position.set(0, 3.32, 0); strap.rotation.x = 0.3; hammer.add(strap);
+    hammer.rotation.z = 0.06; sc.add(hammer); // upright: glyph face on the head looks straight at the camera (local +Z = world +Z, no distorting rotation); haft rises up and out of frame
+    sc.add(new THREE.AmbientLight('#1a1420', 0.25)); const moon = new THREE.DirectionalLight('#5a4838', 0.35); moon.position.set(-5, 10, 6); sc.add(moon);
+    const forge = new THREE.PointLight('#ff6a1c', 0.6, 8); forge.position.set(0, 0.9, 1.1); sc.add(forge);
+    const bolt = new THREE.PointLight('#9fd8ff', 0, 60); bolt.position.set(0, 8, 2); sc.add(bolt);
+    // beam of light (two-part: broad soft column + bright core), anchored at the hammer head
+    const beamTex = canvasTex(32, 512, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.08, 'rgba(210,235,255,.9)'); g.addColorStop(0.55, 'rgba(140,200,255,.5)'); g.addColorStop(1, 'rgba(140,200,255,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h); });
+    const mkBeam = (rad, op) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad * 1.4, 1, 24, 1, true), new THREE.MeshBasicMaterial({ map: beamTex, transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending, opacity: op })); m.position.set(0, 0.62, 0.5); return m; };
+    const beamOuter = mkBeam(0.55, 0); const beamInner = mkBeam(0.18, 0); beamOuter.scale.y = 0.001; beamInner.scale.y = 0.001; sc.add(beamOuter, beamInner);
+    const beamLight = new THREE.PointLight('#aee0ff', 0, 30); beamLight.position.set(0, 2, 0); sc.add(beamLight);
+    // embers / sparks — ambient drift from t=0, bursts outward when the beam erupts
+    const SN = 1100, sp = new Float32Array(SN * 3), sv = [], home0 = new Float32Array(SN * 3);
+    for (let i = 0; i < SN; i++) { sv.push(new THREE.Vector3()); const a = R() * TAU, rr = R() * 1.3; home0.set([Math.cos(a) * rr, R() * 0.3 - 0.1, Math.sin(a) * rr * 0.6 + 0.3], i * 3); }
+    sp.set(home0); const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
+    const sm = new THREE.PointsMaterial({ size: 0.045, color: '#ffb347', transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false }); const sparks = new THREE.Points(sg, sm); sc.add(sparks);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.85, 1, 96), new THREE.MeshBasicMaterial({ color: '#aee0ff', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05; sc.add(ring);
     const size = () => { r.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); led.width = innerWidth; led.height = innerHeight; }; size(); addEventListener('resize', size);
     // LED "WAKE UP" dots
     const ledDots = (() => { const o = document.createElement('canvas'), W = 900, H = 200; o.width = W; o.height = H; const x = o.getContext('2d'); x.fillStyle = '#fff'; x.font = '900 150px Orbitron, sans-serif'; x.textBaseline = 'middle'; x.fillText('WAKE UP', 10, 105);
       const d = x.getImageData(0, 0, W, H).data, pts = []; for (let yy = 0; yy < H; yy += 9) for (let xx = 0; xx < W; xx += 9) if (d[(yy * W + xx) * 4 + 3] > 120) pts.push([xx, yy, R()]); return pts; })();
     const codeLines = Array.from({ length: 22 }, () => Array.from({ length: 6 + (R() * 8 | 0) }, () => ['navya', 'chai()', 'model.fit', 'grad_cam', 'ship', '0x7f', 'bio', 'hook=1.5s', 'deploy', 'atgc', 'vitb', 'nova.init'][R() * 12 | 0]).join(' '));
-    let t0 = performance.now(), impacted = false, ended = false, bolts = [], boltT = 0, typed = false;
+    const dbgAt = +(new URLSearchParams(location.search).get('introAt') || 0); // ?introAt=3.6 jumps straight to that second, for previewing a beat
+    let t0 = performance.now() - dbgAt * 1000, erupted = dbgAt > 3.6, ended = false, bolts = [], boltT = 0, typed = false;
+    // timeline (seconds)
+    const T_CLOSE0 = 0, T_CLOSE1 = 2.1, T_PULL = 3.2, T_ERUPT = 3.55, T_RISE0 = 3.8, T_RISE1 = 6.6, T_WAKE = 7.0, T_BOOT = 8.0, T_END = 15.5;
     const end = () => { if (ended) return; ended = true; try { sessionStorage.setItem('nova_seen', '1'); } catch (e) {} el.classList.add('out'); done(); setTimeout(() => { r.dispose(); r.forceContextLoss && r.forceContextLoss(); el.remove(); }, 1300); };
     $('#skip').onclick = end; addEventListener('keydown', (e) => { if (e.key === 'Escape') end(); }, { once: true });
     const project = (v) => { const p = v.clone().project(cam); return [(p.x * 0.5 + 0.5) * innerWidth, (-p.y * 0.5 + 0.5) * innerHeight]; };
@@ -111,31 +131,43 @@
       if (depth < 1) for (let i = 0; i < 3; i++) { const s = pts[(R() * pts.length * 0.7) | 0]; out.push(...makeBolt(s[0], s[1], s[0] + (R() - 0.5) * 300, s[1] + 80 + R() * 200, depth + 1)); } return out; }
     (function frame(now) { if (ended && el.classList.contains('out') && !el.isConnected) return; requestAnimationFrame(frame); const t = (now - t0) / 1000; U.uT.value = t;
       lx.clearRect(0, 0, led.width, led.height);
-      // camera path
-      const rise = ease(clamp((t - 3.1) / 2.4)); cam.position.set(Math.sin(t * 0.2) * 0.4 * (1 - rise), lerp(1.6, 62, rise), lerp(8.5, 44, rise)); cam.lookAt(0, lerp(1.2, 0, rise), lerp(0, -40, rise));
-      U.uMix.value = rise; sc.fog.density = lerp(0.03, 0.0045, rise);
-      // hammer fall
-      const k = clamp(t / 1.25); if (t < 1.25) { hammer.position.y = lerp(14, 0, k * k); hammer.rotation.set((1 - k) * TAU * 1.5, 0, (1 - k) * 0.6); } else { hammer.position.y = 0; hammer.rotation.set(0, Math.sin(t * 0.6) * 0.15, 0); }
-      if (t >= 1.25 && !impacted) { impacted = true; for (let i = 0; i < SN; i++) { const a = R() * TAU, up = 0.2 + R() * 1.2, s = 3 + R() * 9; sv[i].set(Math.cos(a) * s, up * s * 0.8, Math.sin(a) * s); sp[i * 3] = 0; sp[i * 3 + 1] = 0.2; sp[i * 3 + 2] = 0; } sm.opacity = 1; }
-      if (impacted) { const dt = 1 / 60; for (let i = 0; i < SN; i++) { sv[i].y -= 9.8 * dt; sv[i].multiplyScalar(0.985); sp[i * 3] += sv[i].x * dt; sp[i * 3 + 1] = Math.max(0.02, sp[i * 3 + 1] + sv[i].y * dt); sp[i * 3 + 2] += sv[i].z * dt; }
-        sg.attributes.position.needsUpdate = true; const it = t - 1.25; sm.opacity = clamp(1.4 - it * 0.5); ring.scale.setScalar(1 + it * 16); ring.material.opacity = clamp(1 - it * 1.2);
-        crackM.opacity = clamp(1 - Math.max(0, it - 1.5) * 0.3); fire.intensity = Math.max(0, 9 * Math.exp(-it * 1.8)) + 1.5; const shake = Math.exp(-it * 4) * 0.35; cam.position.x += (R() - 0.5) * shake; cam.position.y += (R() - 0.5) * shake;
-        steel.emissiveIntensity = clamp((t - 2.0) / 1.0) * 2.6 * (0.85 + Math.sin(t * 8) * 0.15); }
-      // lightning
+      // --- camera: macro orbit on the carved head → pull back → rise over the city ---
+      if (t < T_CLOSE1) { const k = ease(clamp(t / T_CLOSE1)); const ang = -0.5 + k * 0.9, dist = lerp(1.35, 0.95, k);
+        cam.position.set(Math.sin(ang) * dist, 0.68 + Math.sin(t * 0.4) * 0.02, 0.5 + Math.cos(ang) * dist * 0.4); cam.lookAt(0, 0.62, 0); }
+      else if (t < T_PULL) { const k = ease(clamp((t - T_CLOSE1) / (T_PULL - T_CLOSE1))); cam.position.set(lerp(Math.sin(0.4) * 0.95, 0, k), lerp(0.68, 1.35, k), lerp(0.5 + Math.cos(0.4) * 0.38, 3.6, k)); cam.lookAt(0, 0.5, 0); }
+      else if (t < T_RISE0) { const sh = Math.sin(t * 40) * 0.05 * clamp((t - T_ERUPT) * 6); cam.position.set(sh, 1.35 + Math.abs(sh), 3.6 - sh); cam.lookAt(0, 0.5, 0); }
+      else { city.visible = true; const rise = ease(clamp((t - T_RISE0) / (T_RISE1 - T_RISE0))); cam.position.set(Math.sin(t * 0.2) * 0.4 * (1 - rise), lerp(1.35, 62, rise), lerp(3.6, 44, rise)); cam.lookAt(0, lerp(0.5, 0, rise), lerp(0, -40, rise));
+        U.uMix.value = rise; sc.fog.density = lerp(0.03, 0.0045, rise); }
+      // --- the hammer: cracks ignite and spread across the carved metal ---
+      const crackK = clamp((t - 1.0) / (T_ERUPT - 1.0)); steel.emissiveIntensity = t < T_ERUPT ? crackK * crackK * 2.2 : lerp(2.2, 0.35, clamp((t - T_ERUPT) / 1.4));
+      crackM.opacity = t < T_ERUPT ? crackK * 0.7 : lerp(0.7, 0.12, clamp((t - T_ERUPT) / 2));
+      forge.intensity = 0.4 + crackK * 1.2 + (t < T_ERUPT ? 0 : Math.max(0, 6 * Math.exp(-(t - T_ERUPT) * 2)));
+      // --- embers: ambient drift, then eruption burst when the beam fires ---
+      if (!erupted && t >= T_ERUPT) { erupted = true; for (let i = 0; i < SN; i++) { const a = R() * TAU, up = 0.5 + R() * 1.3, s = 1.5 + R() * 5; sv[i].set(Math.cos(a) * s, up * s, Math.sin(a) * s * 0.7); } sm.size = 0.08; sm.opacity = 1; ring.material.opacity = 0.9; }
+      if (!erupted) { const dt = 1 / 60; for (let i = 0; i < SN; i++) { const j = i * 3; sp[j + 1] += dt * 0.08; if (sp[j + 1] > home0[j + 1] + 0.7) { sp[j] = home0[j]; sp[j + 1] = home0[j + 1]; sp[j + 2] = home0[j + 2]; } sp[j] += Math.sin(t * 2 + i) * 0.0015; } sg.attributes.position.needsUpdate = true; sm.opacity = 0.35 + crackK * 0.3; }
+      else { const dt = 1 / 60; for (let i = 0; i < SN; i++) { const j = i * 3; sv[i].y -= 3.2 * dt; sv[i].multiplyScalar(0.99); sp[j] += sv[i].x * dt; sp[j + 1] += sv[i].y * dt; sp[j + 2] += sv[i].z * dt; } sg.attributes.position.needsUpdate = true;
+        const it = t - T_ERUPT; sm.opacity = clamp(1.3 - it * 0.22); ring.scale.setScalar(1 + it * 10); ring.material.opacity = clamp(0.9 - it * 0.7); }
+      // --- the vertical beam of light ---
+      const beamK = ease(clamp((t - T_ERUPT) / 0.35)) * clamp(1.4 - Math.max(0, t - T_ERUPT - 1.6) * 0.8); const flicker = 0.85 + 0.15 * Math.sin(t * 50);
+      beamOuter.scale.y = Math.max(0.001, beamK * 420 * flicker); beamOuter.material.opacity = beamK * 0.55; beamOuter.position.y = 0.62 + beamOuter.scale.y / 2;
+      beamInner.scale.y = Math.max(0.001, beamK * 480 * flicker); beamInner.material.opacity = beamK * 0.85; beamInner.position.y = 0.62 + beamInner.scale.y / 2;
+      beamLight.intensity = beamK * 14;
+      // --- lightning (ties the eruption to the storm as camera rises) ---
       U.uFlash.value *= 0.85; bolt.intensity *= 0.8;
-      if (t > 1.1 && t < 3.4) { boltT -= 1 / 60; if (boltT <= 0) { const [hx, hy] = project(new THREE.Vector3(0, 3.8, 0)); bolts = makeBolt(hx + (R() - 0.5) * 500, -20, hx, hy); boltT = 0.08 + R() * 0.18; U.uFlash.value = 1; bolt.intensity = 25; } }
+      if (t > T_ERUPT + 0.2 && t < T_RISE1 - 0.4) { boltT -= 1 / 60; if (boltT <= 0) { const [hx, hy] = project(new THREE.Vector3(0, 2.4, 0)); bolts = makeBolt(hx + (R() - 0.5) * 500, -20, hx, hy); boltT = 0.1 + R() * 0.2; U.uFlash.value = 1; bolt.intensity = 22; } }
       else bolts = [];
       if (bolts.length && boltT > 0.05) { lx.save(); lx.globalCompositeOperation = 'lighter'; bolts.forEach((b, i) => { lx.strokeStyle = i ? 'rgba(160,210,255,.6)' : '#e8f6ff'; lx.lineWidth = i ? 1.5 : 3; lx.shadowColor = '#7fc8ff'; lx.shadowBlur = 25; lx.beginPath(); b.forEach(([x, y], j) => j ? lx.lineTo(x, y) : lx.moveTo(x, y)); lx.stroke(); }); lx.restore(); }
       // WAKE UP dot matrix
-      if (t > 4.6) { const a = clamp((t - 4.6) * 1.5) * (Math.random() < 0.04 ? 0.4 : 1), s = Math.min(innerWidth / 1100, 1.1); lx.save(); lx.translate(innerWidth * 0.1, innerHeight * 0.52); lx.transform(1, -0.08, -0.25, 0.9, 0, 0); lx.scale(s, s);
+      if (t > T_WAKE) { const a = clamp((t - T_WAKE) * 1.5) * (Math.random() < 0.04 ? 0.4 : 1), s = Math.min(innerWidth / 1100, 1.1); lx.save(); lx.translate(innerWidth * 0.1, innerHeight * 0.52); lx.transform(1, -0.08, -0.25, 0.9, 0, 0); lx.scale(s, s);
         lx.shadowColor = '#ff2a1a'; lx.shadowBlur = 14; ledDots.forEach(([x, y, rr]) => { const fl = 0.6 + 0.4 * Math.sin(t * 9 + rr * 30); lx.fillStyle = `rgba(255,${50 + rr * 40 | 0},30,${a * fl})`; lx.beginPath(); lx.arc(x, y, 3.2, 0, TAU); lx.fill(); });
         lx.shadowBlur = 6; lx.font = '18px "Share Tech Mono"'; lx.fillStyle = `rgba(255,70,40,${a * 0.9})`; ['navya.exe loaded. 3 domains detected.', 'bio // tech // marketing : online', 'chai reserves critical. proceed anyway.'].forEach((l, i) => lx.fillText(l, 10, 240 + i * 26));
-        lx.fillStyle = `rgba(120,200,255,${a * 0.6})`; lx.shadowColor = '#3db8ff'; codeLines.forEach((l, i) => lx.fillText(l, 40 + (i % 3) * 230, 340 + Math.floor(i / 3) * 26 - ((t - 4.6) * 20 % 26))); lx.restore(); }
-      if (t > 5.6 && !typed) { typed = true; (async () => { const L = ['N.O.V.A. v4.2 · Navya\'s Operational Virtual Assistant', '> initialising neural cores .............. OK', '> calibrating chai reserves ............. 87%', '> loading modules: TECH · BIO · MARKETING .. OK', '<b>> welcome back, Navya. the lab is yours.</b>'];
+        lx.fillStyle = `rgba(120,200,255,${a * 0.6})`; lx.shadowColor = '#3db8ff'; codeLines.forEach((l, i) => lx.fillText(l, 40 + (i % 3) * 230, 340 + Math.floor(i / 3) * 26 - ((t - T_WAKE) * 20 % 26))); lx.restore(); }
+      if (t > T_BOOT && !typed) { typed = true; (async () => { const L = ['N.O.V.A. v4.2 · Navya\'s Operational Virtual Assistant', '> initialising neural cores .............. OK', '> calibrating chai reserves ............. 87%', '> loading modules: TECH · BIO · MARKETING .. OK', '<b>> welcome back, Navya. the lab is yours.</b>'];
         for (const l of L) { const d = document.createElement('div'); boot.appendChild(d); if (l.startsWith('<b>')) { d.innerHTML = l; await new Promise((r2) => setTimeout(r2, 300)); } else await typeInto(d, l, 14); } setTimeout(end, 1300); })(); }
-      if (t > 12) end();
+      if (t > T_END) end();
       r.render(sc, cam); })(t0);
   }
+
 
   /* ===================== HERO: the student, Da Vinci blueprint ===================== */
   function hero() {
@@ -181,7 +213,7 @@
     function makeBolt(x1, y1, x2, y2, d = 0) { const pts = [[x1, y1], [x2, y2]]; for (let k = 0; k < 6; k++) for (let i = pts.length - 1; i > 0; i--) { const a = pts[i - 1], b = pts[i], o = Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.22; pts.splice(i, 0, [(a[0] + b[0]) / 2 + (R() - 0.5) * o, (a[1] + b[1]) / 2 + (R() - 0.5) * o * 0.3]); }
       const out = [pts]; if (d < 1) for (let i = 0; i < 4; i++) { const s = pts[(R() * pts.length * 0.8) | 0]; out.push(...makeBolt(s[0], s[1], s[0] + (R() - 0.5) * 220, s[1] + 60 + R() * 140, d + 1)); } return out; }
     let lt = performance.now();
-    (function f(now) { requestAnimationFrame(f); if (!vis(sec)) return; const t = now / 1000, dt = Math.min(0.05, (now - lt) / 1000); lt = now;
+    (function f(now) { requestAnimationFrame(f); if (!vis(sec) || introActive()) return; const t = now / 1000, dt = Math.min(0.05, (now - lt) / 1000); lt = now;
       x.clearRect(0, 0, W, H); x.drawImage(bg, -pmx * 10, -pmy * 6, W, H);
       x.globalAlpha = 0.9; x.drawImage(clouds, -((t * 6) % (W * 0.5)) - pmx * 30, -pmy * 14, W * 1.5, H * 0.7); x.globalAlpha = 1;
       // sketches (rotating schematics)
