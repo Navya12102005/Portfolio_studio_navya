@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useProjectModalStore, type ProjectId } from "@/lib/projectModalStore";
 import { PROJECTS, PROJECT_ORDER } from "@/data/projects";
+import { useSwipe } from "@/hooks/useSwipe";
+import { usePinchZoom } from "@/hooks/usePinchZoom";
 
 const DOMAIN_LABEL: Record<"tech" | "bio" | "ops", string> = {
   tech: "TECH",
@@ -44,6 +46,27 @@ export default function ProjectModal() {
   const irisFrom = `circle(0px at ${origin.x}px ${origin.y}px)`;
   const irisTo = `circle(150% at ${origin.x}px ${origin.y}px)`;
 
+  // swipe left/right cycles through the project tabs (the clearest
+  // existing "domain switcher" surface — 3 of the 5 tabs map directly
+  // to tech/bio/ops)
+  const cycleTab = (dir: 1 | -1) => {
+    if (!tab) return;
+    const i = PROJECT_ORDER.indexOf(tab);
+    const next = PROJECT_ORDER[(i + dir + PROJECT_ORDER.length) % PROJECT_ORDER.length];
+    setTab(next);
+  };
+  const swipeRef = useSwipe<HTMLDivElement>({
+    onSwipeLeft: () => cycleTab(1),
+    onSwipeRight: () => cycleTab(-1),
+  });
+
+  // two-finger pinch-to-zoom on the case-study content area
+  const { ref: pinchRef, scale, reset: resetZoom } = usePinchZoom<HTMLDivElement>();
+  useEffect(() => {
+    resetZoom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
   return (
     <AnimatePresence>
       {open && active && (
@@ -70,9 +93,10 @@ export default function ProjectModal() {
 
           {/* the drawer */}
           <motion.div
+            ref={swipeRef}
             role="dialog"
             aria-modal="true"
-            className="fixed top-0 right-0 z-[500] h-full w-full md:w-[600px] sn-glass border-l border-[#00F0FF]/30 flex flex-col overflow-hidden"
+            className="fixed top-0 right-0 z-[500] h-full w-full md:w-[600px] sn-glass border-l border-[#00F0FF]/30 flex flex-col overflow-hidden touch-pan-y"
             initial={{ x: "100%", opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: "100%", opacity: 0 }}
@@ -116,8 +140,8 @@ export default function ProjectModal() {
               })}
             </div>
 
-            {/* content */}
-            <div className="flex-1 overflow-y-auto px-6 py-6">
+            {/* content — pinch to zoom (2-finger), scale resets per tab */}
+            <div ref={pinchRef} className="flex-1 overflow-y-auto px-6 py-6">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active.id}
@@ -126,6 +150,11 @@ export default function ProjectModal() {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.25 }}
                 >
+                {/* plain (non-motion) wrapper for the pinch scale — framer-motion
+                    owns `transform` for its own y-animation above, so the live
+                    pinch scale is applied on a separate nested element to avoid
+                    the two fighting over the same CSS property */}
+                <div style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}>
                   <p className="text-sm text-[#b9c6e8] leading-relaxed">{active.tagline}</p>
 
                   <p className="sn-hud-text text-[10px] text-[var(--sn-cyan)]/70 mt-8 mb-3 tracking-widest">
@@ -182,6 +211,7 @@ export default function ProjectModal() {
                       </span>
                     )}
                   </div>
+                </div>
                 </motion.div>
               </AnimatePresence>
             </div>

@@ -4,9 +4,11 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/lib/useLenis";
+import { useDevicePerformance } from "@/hooks/useDevicePerformance";
 import Cursor from "./hud/Cursor";
 import PerimeterHUD from "./hud/PerimeterHUD";
 import SceneRoot from "./scenes/SceneRoot";
+import LightweightFallback from "./scenes/LightweightFallback";
 import WakeUpText from "./scenes/WakeUpText";
 import JarvisAssistant from "./JarvisAssistant";
 import ProjectModal from "./ProjectModal";
@@ -15,6 +17,7 @@ if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
 export default function AppShell() {
   const { velocity } = useLenis();
+  const perf = useDevicePerformance();
   const pitch = useRef(0);
   const bootRef = useRef<HTMLDivElement>(null);
   const wakeRef = useRef<HTMLDivElement>(null);
@@ -57,7 +60,11 @@ export default function AppShell() {
 
   return (
     <>
-      <SceneRoot scrollVelocity={velocity} pitch={pitch} />
+      {/* Gate the heavy WebGL canvas behind device-performance detection.
+          `determined` stays false until the client-side GPU/width check
+          has actually run, so the full scene is never even briefly
+          mounted on a low-power device while that check is pending. */}
+      {perf.determined && (perf.tier === "low" ? <LightweightFallback /> : <SceneRoot scrollVelocity={velocity} pitch={pitch} />)}
       <Cursor />
       <PerimeterHUD />
 
