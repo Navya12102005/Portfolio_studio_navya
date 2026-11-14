@@ -10,6 +10,7 @@ import SchematicLayer from "./SchematicLayer";
 import BootHorizon from "./BootHorizon";
 import { BioEngineeringScene } from "./BioEngineeringScene";
 import { OperationsArenaScene } from "./OperationsArenaScene";
+import { TechScene } from "./TechScene";
 import CameraRig from "./CameraRig";
 
 /**
@@ -57,6 +58,7 @@ export default function SceneRoot({
           {/* Scene 2 centerpiece — mounted now for verification; proper
               scroll-triggered scene choreography/domain switching is the
               next milestone, so camera framing here is provisional. */}
+          <TechScene />
           <BioEngineeringScene />
           <OperationsArenaScene />
         </Suspense>
