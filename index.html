@@ -118,7 +118,7 @@ section{position:relative;min-height:100svh}
 @media(max-width:860px){.holo-info{top:auto;bottom:calc(6vh + 270px)}.holo-hint{display:none}}
 
 /* ---------- BIO: blueprint human ---------- */
-#bio{height:360vh;background:#120604}
+#bio{height:360vh;background:#04060c}
 #bioCv{position:absolute;inset:0;width:100%;height:100%}
 .callout{position:absolute;z-index:4;max-width:230px;font:13px/1.35 var(--ui);color:#ffe9c9;opacity:0;transform:translateY(10px);transition:opacity .6s,transform .6s;pointer-events:none}
 .callout.on{opacity:1;transform:none}
@@ -131,6 +131,20 @@ section{position:relative;min-height:100svh}
 .bio-defn.on{opacity:1}
 .bio-defn b{font-family:var(--hud);color:var(--gold);letter-spacing:.1em}.bio-defn i{color:#d9b48a}.bio-defn p{margin-top:6px;color:#ffe9c9;line-height:1.4}
 
+/* ---------- BRAIN ---------- */
+#brain{height:360vh;background:radial-gradient(60% 50% at 55% 50%,#140a24,var(--bg) 75%)}
+#brainGL{position:absolute;inset:0;width:100%;height:100%}
+.br-title{position:absolute;z-index:4;left:5vw;bottom:12vh;max-width:430px}
+.br-title h2{font-size:clamp(2.4rem,5.6vw,4.6rem);color:#fff;text-shadow:0 0 24px #9b5cff88}
+.br-title p{color:#b9b0d8;margin-top:10px}
+.hud-l,.hud-r{position:absolute;z-index:4;width:210px;padding:14px;font:11px var(--mono);color:#b9c6e8}
+.hud-l{right:5vw;top:14vh}.hud-r{right:5vw;bottom:10vh}
+.hl-h{color:#ffb347;letter-spacing:.18em}
+#dnaBars{width:100%;height:70px;margin-top:6px}#ekg{width:100%;height:46px;margin-top:6px}
+.bpm b,.na b{font-family:var(--hud);font-size:1.4rem;color:var(--cyan)}
+.bases{display:grid;gap:4px;margin-top:6px}.bases span{border-left:2px solid #ffb347;padding-left:8px}
+.st{color:#c9a2ff;margin-top:4px}
+@media(max-width:860px){.hud-l,.hud-r{display:none}}
 /* ---------- MARKETING: mission control ---------- */
 #mkt{padding:120px 4vw;background:radial-gradient(70% 60% at 70% 40%,#1a0a14,var(--bg) 70%);overflow:hidden}
 .mk-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center;margin-top:40px}
@@ -181,7 +195,7 @@ footer{padding:26px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
 <div id="intro"><canvas id="introGL"></canvas><canvas id="led"></canvas><div id="boot"></div><button id="skip">SKIP INTRO ▸</button></div>
 
 <nav><a href="#hero" class="logo">N.O.V.A.</a>
-  <div class="links"><a href="#core">hub</a><a href="#tech">tech</a><a href="#bio">bio</a><a href="#mkt">marketing</a><a href="#suits">services</a><a href="#contact">contact</a></div>
+  <div class="links"><a href="#core">hub</a><a href="#tech">tech</a><a href="#bio">bio</a><a href="#brain">neuro</a><a href="#mkt">marketing</a><a href="#suits">services</a><a href="#contact">contact</a></div>
   <span class="stat"><i></i>online · <span id="clk">--:--</span> IST</span></nav>
 
 <!-- HERO: the student, Da Vinci blueprint -->
@@ -232,6 +246,16 @@ footer{padding:26px 4vw;display:flex;justify-content:space-between;flex-wrap:wra
     <div class="callout" data-k="dna"><b>BIOINFORMATICS</b>gene expression pipelines and volcano plots from public GEO data. <i>ATGC → AI</i></div>
     <div class="callout" data-k="hand"><b>BIONICS (THE DREAM)</b>prosthetics and wearables that make humans a little more super.</div>
     <div class="bio-defn" id="bioDefn"><b>BIOENGINEER</b> <i>(noun)</i><p>a person who uses fancy gadgets and computers to fix humans and turn them into bionic superheroes… and still can't fix her own sleep schedule.</p></div>
+  </div>
+</section>
+
+<!-- BRAIN: particle brain + DNA HUD -->
+<section id="brain">
+  <div class="stick">
+    <canvas id="brainGL"></canvas>
+    <div class="br-title"><p class="kick" style="color:#c9a2ff">module 02.5 // neuro</p><h2 class="h-hud" id="brTxt">unlock<br>collective<br>intelligence.</h2><p>86 billion neurons and one very stubborn idea: AI that understands the body as well as the body understands itself.</p></div>
+    <div class="hud-l panel"><div class="hl-h">DNA PROFILE</div><svg id="dnaBars" viewBox="0 0 180 90"></svg><div class="hl-h" style="margin-top:12px">HEARTBEAT</div><canvas id="ekg" width="360" height="90"></canvas><div class="bpm"><b id="bpm">65</b> bpm</div></div>
+    <div class="hud-r panel"><div class="hl-h">BASE PAIRS</div><div class="bases"><span>A · ADENINE</span><span>T · THYMINE</span><span>G · GUANINE</span><span>C · CYTOSINE</span></div><div class="hl-h" style="margin-top:12px">NEURAL ACTIVITY</div><div class="na"><b id="na">0</b>% firing</div><div class="hl-h" style="margin-top:12px">STATUS</div><div class="st" id="brSt">assembling…</div></div>
   </div>
 </section>
 

@@ -296,9 +296,10 @@
     function build() { D = Math.min(devicePixelRatio, 1.5); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * D; cv.height = H * D; x.setTransform(D, 0, 0, D, 0, 0);
       S = Math.min(H / 600, W / 700) * 0.95; CX = W > 900 ? W * 0.6 : W * 0.5; CY = H * 0.53;
       const mk = () => { const c = document.createElement('canvas'); c.width = W * D; c.height = H * D; const g = c.getContext('2d'); g.setTransform(D, 0, 0, D, 0, 0); return [c, g]; };
-      let g; [paper, g] = mk(); const gr = g.createRadialGradient(CX, CY, 0, CX, CY, W * 0.75); gr.addColorStop(0, '#6a2a12'); gr.addColorStop(0.5, '#3a160a'); gr.addColorStop(1, '#120604'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      let g; [paper, g] = mk(); const gr = g.createRadialGradient(CX, CY, 0, CX, CY, W * 0.75); gr.addColorStop(0, '#2a120a'); gr.addColorStop(0.5, '#120807'); gr.addColorStop(1, '#04060c'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
       for (let i = 0; i < 70; i++) { const px = R() * W, py = R() * H, rr = 40 + R() * 180, gg = g.createRadialGradient(px, py, 0, px, py, rr); gg.addColorStop(0, `rgba(${R() < 0.5 ? '20,6,2' : '140,70,30'},${R() * 0.18})`); gg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gg; g.fillRect(px - rr, py - rr, rr * 2, rr * 2); }
-      g.fillStyle = 'rgba(255,225,180,.22)'; const words = 'the heart pumps five litres a minute and the brain runs on twenty watts and every cell holds a copy of the code we are machines that dream and learn and heal and i want to build tools that help them heal faster'.split(' ');
+      g.strokeStyle = 'rgba(255,180,110,.06)'; for (let gx = 0; gx < W; gx += 40) { g.beginPath(); g.moveTo(gx, 0); g.lineTo(gx, H); g.stroke(); } for (let gy = 0; gy < H; gy += 40) { g.beginPath(); g.moveTo(0, gy); g.lineTo(W, gy); g.stroke(); }
+      g.fillStyle = 'rgba(255,225,180,.12)'; const words = 'the heart pumps five litres a minute and the brain runs on twenty watts and every cell holds a copy of the code we are machines that dream and learn and heal and i want to build tools that help them heal faster'.split(' ');
       for (let i = 0; i < 46; i++) { g.font = `${12 + R() * 8}px "La Belle Aurore", cursive`; let l = ''; for (let k = 0; k < 6 + R() * 6; k++) l += words[(R() * words.length) | 0] + ' '; const px = R() < 0.5 ? R() * W * 0.32 : W * 0.7 + R() * W * 0.3; g.fillText(l, px, R() * H); }
       g.strokeStyle = 'rgba(255,220,170,.18)'; g.lineWidth = 1; for (let i = 0; i < 8; i++) { const px = R() * W, py = R() * H, rr = 30 + R() * 70; g.beginPath(); g.arc(px, py, rr, 0, TAU); g.stroke(); g.beginPath(); g.moveTo(px - rr, py); g.lineTo(px + rr, py); g.moveTo(px, py - rr); g.lineTo(px, py + rr); g.stroke(); }
       // skeleton + outline sketch
@@ -347,10 +348,58 @@
     })(0);
   }
 
+
+  /* ===================== BRAIN: particle brain that assembles / disperses ===================== */
+  function brain() {
+    const sec = $('#brain'), cv = $('#brainGL'); if (!sec || !window.THREE) return;
+    const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+    const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(40, 1, 0.1, 100); cam.position.set(0, 0.2, 7.5);
+    const N = innerWidth < 700 ? 9000 : 16000, home = new Float32Array(N * 3), dust = new Float32Array(N * 3), pos = new Float32Array(N * 3), col = new Float32Array(N * 3), rnd = new Float32Array(N);
+    const gold = new THREE.Color('#ffb347'), purp = new THREE.Color('#8a5cff'), cyan = new THREE.Color('#3df5ff'), c = new THREE.Color();
+    for (let i = 0; i < N; i++) { let x, y, z; const k = R();
+      if (k < 0.84) { const side = R() < 0.5 ? -1 : 1, u = R() * TAU, v = Math.acos(2 * R() - 1); let rx = Math.sin(v) * Math.cos(u), ry = Math.cos(v), rz = Math.sin(v) * Math.sin(u);
+        if (rx * side < -0.15) rx = -rx * 0.2; const g = 1 + 0.07 * Math.sin(u * 9 + Math.sin(v * 7) * 2.5) * Math.sin(v * 11 + u * 3) + 0.03 * Math.sin(u * 23 + v * 17); const sh = 0.85 + R() * 0.15;
+        x = side * 0.06 + rx * 0.82 * g * sh + side * 0.02; y = ry * 0.78 * g * sh + 0.15; z = rz * 1.15 * g * sh; if (y < -0.25 && z < 0) y = -0.25 + (y + 0.25) * 0.3; }
+      else if (k < 0.95) { const u = R() * TAU, v = Math.acos(2 * R() - 1); x = Math.sin(v) * Math.cos(u) * 0.55; y = Math.cos(v) * 0.3 - 0.55; z = Math.sin(v) * Math.sin(u) * 0.38 - 0.75; const fol = 1 + 0.08 * Math.sin(y * 60); x *= fol; z *= fol; }
+      else { const tt = R(); x = (R() - 0.5) * 0.22; y = -0.4 - tt * 1.1; z = -0.35 + (R() - 0.5) * 0.22 - tt * 0.15; }
+      home.set([x * 1.7, y * 1.7, z * 1.7], i * 3); const rr = 5 + R() * 6, a = R() * TAU, b = Math.acos(2 * R() - 1); dust.set([Math.sin(b) * Math.cos(a) * rr, Math.cos(b) * rr * 0.6, Math.sin(b) * Math.sin(a) * rr], i * 3);
+      c.copy(gold).lerp(purp, clamp((z * 0.5 + 0.5) * 0.9 + (R() - 0.5) * 0.3)); if (R() < 0.04) c.copy(cyan); col.set([c.r, c.g, c.b], i * 3); rnd[i] = R(); }
+    pos.set(dust); const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.setAttribute('rnd', new THREE.BufferAttribute(rnd, 1));
+    const U = { uT: { value: 0 }, uFire: { value: 0 }, uPx: { value: r.getPixelRatio() } };
+    const mat = new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true,
+      vertexShader: 'attribute float rnd;uniform float uT,uFire,uPx;varying vec3 vC;varying float vA;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);float fire=step(.985,fract(rnd*91.+uT*.7))*uFire;vC=color+fire*vec3(1.,.9,.7);vA=.55+rnd*.45+fire;gl_PointSize=(1.4+rnd*2.2+fire*5.)*uPx*(7.5/-mv.z);gl_Position=projectionMatrix*mv;}',
+      fragmentShader: 'varying vec3 vC;varying float vA;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;gl_FragColor=vec4(vC,vA*smoothstep(.5,0.,d));}' });
+    const pts = new THREE.Points(geo, mat); sc.add(pts);
+    // neural sparks: connection lines that flicker between random nearby points
+    const LN = 260, lp = new Float32Array(LN * 6), lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.BufferAttribute(lp, 3));
+    const lines = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: '#ffd29a', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })); pts.add(lines);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(2.6, 2.62, 128), new THREE.MeshBasicMaterial({ color: '#8a5cff', transparent: true, opacity: 0.4, side: THREE.DoubleSide })); sc.add(ring);
+    const ring2 = new THREE.Mesh(new THREE.RingGeometry(2.9, 2.91, 128, 1, 0, 4.4), new THREE.MeshBasicMaterial({ color: '#ffb347', transparent: true, opacity: 0.5, side: THREE.DoubleSide })); sc.add(ring2);
+    const size = () => { const w = cv.clientWidth, h = cv.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); pts.position.x = ring.position.x = ring2.position.x = w > 900 ? 0.2 : 0; }; size(); addEventListener('resize', size);
+    let mx2 = 0, my2 = 0; sec.addEventListener('pointermove', (e) => { mx2 = e.clientX / innerWidth - 0.5; my2 = e.clientY / innerHeight - 0.5; });
+    // HUD widgets
+    const bars = $('#dnaBars'); let bh = ''; for (let i = 0; i < 46; i++) bh += `<rect x="${i * 3.9}" y="${R() * 30}" width="2.2" height="${20 + R() * 60}" fill="${R() < 0.15 ? '#ffb347' : '#3df5ff'}" opacity="${0.4 + R() * 0.6}"/>`; bars.innerHTML = bh;
+    const ekg = $('#ekg'), ex = ekg.getContext('2d'); let ekgX = 0; const ekgY = (k) => { const m = k % 1; return m < 0.1 ? 0 : m < 0.13 ? -30 * Math.sin((m - 0.1) / 0.03 * Math.PI) : m < 0.16 ? 34 * Math.sin((m - 0.13) / 0.03 * Math.PI) : m < 0.3 ? -6 * Math.sin((m - 0.16) / 0.14 * Math.PI) : 0; };
+    const st = $('#brSt'), na = $('#na'), txt = $('#brTxt'); let lastState = '';
+    (function f(now) { requestAnimationFrame(f); if (!vis(sec)) return; const t = now / 1000, p = prog(sec);
+      const asm = ease(clamp(p / 0.38)), dis = ease(clamp((p - 0.78) / 0.22)), k = asm * (1 - dis);
+      for (let i = 0; i < N; i++) { const ri = rnd[i], kk = clamp((k - ri * 0.25) / 0.75), j = i * 3, sw = (1 - kk) * 0.3;
+        pos[j] = dust[j] + (home[j] - dust[j]) * kk + Math.sin(t * 0.7 + ri * 40) * sw; pos[j + 1] = dust[j + 1] + (home[j + 1] - dust[j + 1]) * kk + Math.cos(t * 0.6 + ri * 30) * sw; pos[j + 2] = dust[j + 2] + (home[j + 2] - dust[j + 2]) * kk; }
+      geo.attributes.position.needsUpdate = true; U.uT.value = t; U.uFire.value = k;
+      if (k > 0.6) { for (let l = 0; l < LN; l++) { const a = (R() * N) | 0, b = Math.min(N - 1, a + 1 + ((R() * 40) | 0)); lp.set([pos[a * 3], pos[a * 3 + 1], pos[a * 3 + 2], pos[b * 3], pos[b * 3 + 1], pos[b * 3 + 2]], l * 6); } lg.attributes.position.needsUpdate = true; }
+      lines.material.opacity = clamp((k - 0.6) * 2.5) * (0.25 + 0.2 * Math.sin(t * 9));
+      pts.rotation.y = t * 0.18 + mx2 * 0.8; pts.rotation.x = 0.15 + my2 * 0.4; ring.rotation.set(1.3, 0, t * 0.2); ring2.rotation.set(1.1, 0.3, -t * 0.3); ring.material.opacity = ring2.material.opacity = 0.15 + k * 0.4;
+      const state = p < 0.38 ? 'assembling neurons…' : p < 0.78 ? 'online · thinking about chai' : 'dispersing → next module'; if (state !== lastState) { lastState = state; st.textContent = state; }
+      na.textContent = Math.round(k * 97 + Math.sin(t * 3) * 2 * k);
+      ex.fillStyle = 'rgba(6,10,20,.25)'; ex.fillRect(0, 0, 360, 90); const kx = t * 1.1; ex.strokeStyle = '#3df5ff'; ex.lineWidth = 2; ex.shadowColor = '#3df5ff'; ex.shadowBlur = 6; ex.beginPath(); for (let i = 0; i < 4; i++) { const xx = (ekgX + i) % 360; ex.moveTo(xx, 45 + ekgY(kx - (4 - i) * 0.003)); ex.lineTo(xx + 1, 45 + ekgY(kx)); } ex.stroke(); ekgX = (ekgX + 3) % 360;
+      $('#bpm').textContent = 64 + Math.round(Math.sin(t * 0.5) * 3);
+      r.render(sc, cam); })(0);
+  }
+
   /* ===================== MARKETING: reach globe ===================== */
   function globe() {
     const cv = $('#globeGL'); if (!cv || !window.THREE) return; const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.6));
-    const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(40, 1, 0.1, 100); cam.position.set(0, 0.6, 6.4); cam.lookAt(0, 0, 0); const G = new THREE.Group(); sc.add(G);
+    const sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(40, 1, 0.1, 100); cam.position.set(0, 0.5, 7.4); cam.lookAt(0, 0, 0); const G = new THREE.Group(); sc.add(G);
     const N = 3200, pos = new Float32Array(N * 3); for (let i = 0; i < N; i++) { const y = 1 - (i / (N - 1)) * 2, rr = Math.sqrt(1 - y * y), th = i * 2.399963; pos.set([Math.cos(th) * rr * 1.6, y * 1.6, Math.sin(th) * rr * 1.6], i * 3); }
     const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3)); G.add(new THREE.Points(pg, new THREE.PointsMaterial({ color: '#3d8fff', size: 0.022, transparent: true, opacity: 0.75 })));
     G.add(new THREE.Mesh(new THREE.SphereGeometry(1.58, 48, 32), new THREE.MeshBasicMaterial({ color: '#030814' })));
@@ -373,6 +422,6 @@
 
   /* ===================== boot order ===================== */
   const afterIntro = () => { setTimeout(() => typeInto($('#greet'), 'N.O.V.A. › wake up, navya. the world needs your code.', 30), 600); };
-  const start = () => { [hero, core, tech, bio, globe].forEach((fn) => { try { fn(); } catch (e) { console.error('nova init failed:', fn.name, e); } }); try { intro(afterIntro); } catch (e) { console.error(e); const i = $('#intro'); i && i.remove(); afterIntro(); } };
+  const start = () => { [hero, core, tech, bio, brain, globe].forEach((fn) => { try { fn(); } catch (e) { console.error('nova init failed:', fn.name, e); } }); try { intro(afterIntro); } catch (e) { console.error(e); const i = $('#intro'); i && i.remove(); afterIntro(); } };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start); else start();
 })();
