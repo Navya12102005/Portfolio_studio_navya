@@ -401,6 +401,13 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
 .tl .base{width:80px;height:14px;border-radius:8px;background:#444}
 .tl .sign{margin-top:14px;font-family:var(--pixel);font-size:.7rem;background:var(--lime);color:#000;padding:6px 12px;border-radius:999px;transform:rotate(-3deg);white-space:nowrap}
 @media(max-width:860px){.contact{grid-template-columns:1fr!important;justify-items:center}}
+/* ===== V7: INFLATABLE NAME ===== */
+#inflate{position:relative;z-index:2;height:100svh;min-height:600px;background:#0a0a0a;overflow:hidden;padding:0;cursor:grab}
+#infl{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.if-big{position:absolute;left:0;right:0;bottom:-2vw;z-index:1;text-align:center;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:clamp(4rem,17vw,17rem);letter-spacing:-.06em;line-height:.8;color:#f2f0ea;white-space:nowrap;pointer-events:none}
+.if-top{position:absolute;z-index:3;top:90px;left:4vw;right:4vw;display:flex;justify-content:space-between;align-items:flex-start;font-size:.85rem;line-height:1.4;pointer-events:none}
+.if-top p{opacity:.8;max-width:300px}
+.if-tag{font-family:var(--pixel);font-size:.7rem;background:var(--pink);color:#000;padding:6px 12px;border-radius:999px;transform:rotate(3deg)}
 /* label cursor */
 .lc{position:fixed;left:0;top:0;z-index:2500;pointer-events:none;width:14px;height:14px;border-radius:50%;background:#fff;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:width .35s cubic-bezier(.34,1.56,.64,1),height .35s cubic-bezier(.34,1.56,.64,1);display:grid;place-items:center}
 .lc span{font-family:var(--pixel);font-size:.65rem;color:#000;opacity:0;transition:opacity .2s}
@@ -443,6 +450,13 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
 <div class="ticker"><div class="track" id="tk">
   <span>✦ python</span><span>✦ vibe coding</span><span>✦ prompt engineering</span><span>✦ bioinformatics</span><span>✦ ai × medtech</span><span>✦ digital marketing</span><span>✦ excel ops</span><span>✦ executive assistant</span>
 </div></div>
+
+<!-- ===== V7: INFLATABLE NAME ===== -->
+<section id="inflate">
+  <div class="if-top"><p>bioengineer · coder · storyteller<br>based in bhopal, building for the world</p><span class="if-tag">✦ shove them · click to bounce</span></div>
+  <canvas id="infl"></canvas>
+  <h2 class="if-big">navya gupta</h2>
+</section>
 
 <!-- ===== V6: VIBE BOARD (keyboard) ===== -->
 <section id="vibe">
@@ -638,6 +652,8 @@ body>section:not(.scene),body>header,.ticker,footer{position:relative;z-index:2}
 <div class="hud" id="hud"><span id="hudName">prologue</span><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
 
 <script src="vendor/three.min.js"></script>
+<script src="vendor/RoomEnvironment.js"></script>
+<script src="vendor/helvetiker_bold.js"></script>
 <script>
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1152,6 +1168,49 @@ const io2=new IntersectionObserver(es=>{if(es[0].isIntersecting){show(k);io2.dis
   const set=n=>{L.forEach((l,j)=>l.classList.toggle('on',j===n));$('#tlSign').textContent=msg[n]};
   L.forEach(l=>{l.addEventListener('pointerenter',()=>paused=true);l.addEventListener('pointerleave',()=>paused=false)});
   set(0);setInterval(()=>{if(paused)return;i=(i+1)%3;set(i);if(i===2){paused=true;setTimeout(()=>paused=false,4000)}},1400);
+})();
+
+/* =================== V7: INFLATABLE NAME =================== */
+(()=>{if(!window.THREE||!window.HELV_BOLD)return;const sec=$('#inflate'),cv=$('#infl');
+  const r=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});r.setPixelRatio(Math.min(devicePixelRatio,2));r.toneMapping=THREE.NoToneMapping;
+  const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,100);cam.position.set(0,1.2,14);cam.lookAt(0,0,0);
+  const pm=new THREE.PMREMGenerator(r);sc.environment=pm.fromScene(new THREE.RoomEnvironment(),.04).texture;
+  const key=new THREE.DirectionalLight(0xffffff,1.6);key.position.set(3,6,5);sc.add(key);
+  const font=new THREE.Font(window.HELV_BOLD);
+  const mats=[{c:'#c6ff2e'},{c:'#ff4fb8'},{c:'#2f4bff'},{c:'#b8b8c8',m:1,ro:.12},{c:'#8a5cff'},{c:'#3df5c6'},{c:'#ff8a2a'},{c:'#e0e0ea',m:1,ro:.08}]
+    .map(o=>new THREE.MeshPhysicalMaterial({color:o.c,metalness:o.m||0,roughness:o.ro??.22,clearcoat:1,clearcoatRoughness:.08,envMapIntensity:o.m?1:.45}));
+  const chars='NAVYAGUPTA★♥'.split('');const B=[];const geoCache={};
+  const shapeGeo=ch=>{if(ch==='★'||ch==='♥'){const s=new THREE.Shape();if(ch==='★'){for(let i=0;i<10;i++){const a=i/10*Math.PI*2-Math.PI/2,rr=i%2?.45:1.05;i?s.lineTo(Math.cos(a)*rr,-Math.sin(a)*rr):s.moveTo(Math.cos(a)*rr,-Math.sin(a)*rr)}}
+      else{s.moveTo(0,-.6);s.bezierCurveTo(-.9,-.1,-.6,.7,0,.3);s.bezierCurveTo(.6,.7,.9,-.1,0,-.6)}
+      return new THREE.ExtrudeGeometry(s,{depth:.35,bevelEnabled:true,bevelThickness:.22,bevelSize:.14,bevelSegments:8,curveSegments:16})}
+    return new THREE.TextGeometry(ch,{font,size:1.7,height:.55,curveSegments:10,bevelEnabled:true,bevelThickness:.26,bevelSize:.11,bevelSegments:8})};
+  chars.forEach((ch,i)=>{const g=geoCache[ch]||(geoCache[ch]=shapeGeo(ch));g.center();const m=new THREE.Mesh(g,mats[i%mats.length]);sc.add(m);
+    B.push({m,p:new THREE.Vector3(),v:new THREE.Vector3(),rad:1.05,av:new THREE.Vector3(),q:m.quaternion})});
+  let W=8,floor=-3.1;function drop(){B.forEach((b,i)=>{b.p.set((Math.random()-.5)*W*1.4,6+i*.9,(Math.random()-.5)*1.5);b.v.set((Math.random()-.5)*2,0,0);b.av.set(Math.random()-.5,Math.random()-.5,Math.random()-.5).multiplyScalar(3);
+    b.m.rotation.set((Math.random()-.5)*.6,(Math.random()-.5)*.8,(Math.random()-.5)*1.2)})}
+  function size(){const w=sec.clientWidth,h=sec.clientHeight;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();const vh=2*Math.tan(cam.fov*Math.PI/360)*cam.position.z;W=vh*cam.aspect/2-.8;floor=-vh/2+1.1}
+  size();addEventListener('resize',size);drop();
+  const ray=new THREE.Raycaster(),mp=new THREE.Vector2(9,9),plane=new THREE.Plane(new THREE.Vector3(0,0,1),0),hit=new THREE.Vector3(),last=new THREE.Vector3();let mv=new THREE.Vector3(),hasHit=false;
+  sec.addEventListener('pointermove',e=>{const b=cv.getBoundingClientRect();mp.set((e.clientX-b.left)/b.width*2-1,-((e.clientY-b.top)/b.height*2-1))});
+  sec.addEventListener('pointerleave',()=>{mp.set(9,9);hasHit=false});
+  sec.addEventListener('click',()=>{B.forEach(b=>{b.v.y+=6+Math.random()*5;b.v.x+=(Math.random()-.5)*6;b.av.multiplyScalar(0).set(Math.random()-.5,Math.random()-.5,Math.random()-.5).multiplyScalar(10)});toast('boing! 🎈')});
+  const io=new IntersectionObserver(es=>{if(es[0].isIntersecting)drop()},{threshold:.35});io.observe(sec);
+  const tmpQ=new THREE.Quaternion(),ax=new THREE.Vector3();let lt=0;
+  function frame(t){requestAnimationFrame(frame);const bb=sec.getBoundingClientRect();if(bb.bottom<0||bb.top>innerHeight){lt=t;return}
+    const dt=Math.min(.033,(t-lt)/1000||.016);lt=t;
+    ray.setFromCamera(mp,cam);if(mp.x<5&&ray.ray.intersectPlane(plane,hit)){mv.copy(hit).sub(last).divideScalar(dt);last.copy(hit);hasHit=true}
+    for(const b of B){b.v.y-=18*dt;
+      if(hasHit){const d=b.p.distanceTo(hit);if(d<1.6){const n=b.p.clone().sub(hit).normalize();b.v.addScaledVector(n,(1.6-d)*28*dt).addScaledVector(mv,.04*dt*10);b.av.x+=n.y*4*dt*10;b.av.z-=n.x*4*dt*10}}
+      b.p.addScaledVector(b.v,dt);b.v.z-=b.p.z*2*dt;
+      if(b.p.y<floor){b.p.y=floor;if(b.v.y<0)b.v.y*=-.45;b.v.x*=.94;b.av.multiplyScalar(.9)}
+      if(b.p.x<-W){b.p.x=-W;b.v.x=Math.abs(b.v.x)*.6}if(b.p.x>W){b.p.x=W;b.v.x=-Math.abs(b.v.x)*.6}}
+    for(let i=0;i<B.length;i++)for(let j=i+1;j<B.length;j++){const a=B[i],c=B[j],d=a.p.distanceTo(c.p),md=a.rad+c.rad;if(d<md&&d>1e-4){const n=a.p.clone().sub(c.p).divideScalar(d),o=(md-d)/2;a.p.addScaledVector(n,o);c.p.addScaledVector(n,-o);
+      const rv=a.v.clone().sub(c.v).dot(n);if(rv<0){a.v.addScaledVector(n,-rv*.8);c.v.addScaledVector(n,rv*.8)}}}
+    for(const b of B){b.m.position.copy(b.p);const w=b.av.length();if(w>1e-3){ax.copy(b.av).divideScalar(w);tmpQ.setFromAxisAngle(ax,w*dt);b.q.premultiply(tmpQ)}b.av.multiplyScalar(.985);
+      // gently right letters when resting
+      if(b.p.y<=floor+.01){b.q.slerp(new THREE.Quaternion(),.02)}}
+    r.render(sc,cam)}
+  requestAnimationFrame(frame);
 })();
 setInterval(()=>$('#clock').textContent=new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'})+' IST · bhopal',1000);
 </script>
