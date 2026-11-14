@@ -1,14 +1,20 @@
 import { NextResponse } from "next/server";
+import { runJarvisTurn, isGeminiConfigured, GeminiError } from "@/lib/gemini";
 
 /**
- * J.A.R.V.I.S. backend — local, keyword-based intent router.
+ * J.A.R.V.I.S. backend.
  *
- * This is deliberately NOT wired to a real LLM (Gemini) or to any real
- * backend action (Gmail, Google Calendar, CRM/Sheets) yet. Per the agreed
- * scope: build the agent UI + routing now, wire real sending later once
- * actual credentials/webhook URLs are provided. Every "action" intent below
- * says plainly that it's not live yet instead of pretending to have sent
- * something — never fabricate a successful send/booking.
+ * Primary path: real Gemini function-calling (lib/gemini.ts) with tools
+ * wired to n8n (lib/n8n.ts) — scopeAndLogLead / checkAvailabilityAndBook /
+ * dispatchServiceDossier. Used automatically once GEMINI_API_KEY is set.
+ *
+ * Fallback path: the local keyword router below. Used whenever Gemini
+ * isn't configured, or the Gemini call fails for any reason (network,
+ * bad response, timeout) — so a visitor never sees a raw error, and a
+ * missing n8n webhook URL inside a tool call surfaces as an honest
+ * "that part isn't connected yet" rather than a fabricated success, at
+ * both layers (n8n.ts returns ok:false rather than throwing; Gemini then
+ * reports that back truthfully per its system instruction).
  */
 
 type Domain = "tech" | "bio" | "ops" | null;
@@ -68,6 +74,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ response: "Say something, and I'll route it." });
   }
 
+  if (isGeminiConfigured()) {
+    try {
+      const response = await runJarvisTurn(prompt);
+      return NextResponse.json({ response, engine: "gemini" });
+    } catch (e) {
+      // fall through to the local router below; log server-side for debugging
+      console.error("Gemini turn failed, falling back to local router:", e instanceof GeminiError ? e.message : e);
+    }
+  }
+
   const action = detectAction(prompt);
   const domain = detectDomain(prompt);
 
@@ -84,5 +100,5 @@ export async function POST(req: Request) {
       "I didn't catch a domain in that — try mentioning tech/AI, bioengineering, or operations/marketing, or just say 'hire' to start a project scope. (Routing here is local keyword-matching right now, not a live LLM — Gemini isn't connected yet.)";
   }
 
-  return NextResponse.json({ response });
+  return NextResponse.json({ response, engine: "local" });
 }
