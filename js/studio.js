@@ -121,7 +121,7 @@
       g.scale.setScalar(0.85); return g;
     },
     typewriter() {
-      const g = new THREE.Group(), maroon = new THREE.MeshPhysicalMaterial({ color: '#6e0f1a', roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.08 });
+      const g = new THREE.Group(), maroon = new THREE.MeshPhysicalMaterial({ color: '#3a040b', roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 0.5 });
       const base = mesh(new THREE.BoxGeometry(3.2, 0.7, 2.2), maroon); base.position.y = -0.6; g.add(base);
       const hood = mesh(new THREE.BoxGeometry(3.0, 0.55, 0.9), maroon); hood.position.set(0, -0.05, -0.55); hood.rotation.x = -0.15; g.add(hood);
       const roller = mesh(new THREE.CylinderGeometry(0.16, 0.16, 3.2, 32), new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughness: 0.6 })); roller.rotation.z = Math.PI / 2; roller.position.set(0, 0.32, -0.75); g.add(roller);

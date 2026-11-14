@@ -13,7 +13,7 @@
     if (opt.shadows) { r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; } return r;
   }
   function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); draw(x, w, h); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; t.userData = { c, x, draw }; return t; }
-  const std = (c, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.6, metalness: 0 }, o));
+  const std = (c, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.6, metalness: 0, envMapIntensity: 0.18 }, o));
   const box = (w, h, d, m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.castShadow = o.receiveShadow = true; return o; };
   function camPath(keys, p) { let i = 0; while (i < keys.length - 2 && p > keys[i + 1].p) i++; const a = keys[i], b = keys[i + 1], t = ss(a.p, b.p, p);
     return { pos: new THREE.Vector3().lerpVectors(a.pos, b.pos, t), look: new THREE.Vector3().lerpVectors(a.look, b.look, t) }; }
@@ -24,17 +24,17 @@
   /* ======================= ERA 01 · TECH ROOM ======================= */
   function techRoom() {
     const sec = $('#techroom'), cv = $('#roomGL'); if (!sec || !cv) return;
-    const r = renderer(cv, { shadows: true, exp: 1.15 }), sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(50, 1, 0.05, 50);
+    const r = renderer(cv, { shadows: true, exp: 0.85 }), sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(50, 1, 0.05, 50);
     sc.fog = new THREE.Fog('#1a1030', 6, 14); sc.background = new THREE.Color('#140c24');
     const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
-    sc.add(new THREE.AmbientLight('#4a3070', 0.55)); sc.add(new THREE.HemisphereLight('#7a5cff', '#ff7a3d', 0.35));
+    sc.add(new THREE.AmbientLight('#3a2060', 0.18)); sc.add(new THREE.HemisphereLight('#7a5cff', '#ff7a3d', 0.08));
     // room shell
     const carpet = canvasTex(512, 512, (x, w, h) => { x.fillStyle = '#261a40'; x.fillRect(0, 0, w, h); const cs = ['#ff4fb8', '#3df5ff', '#ffd23f', '#9b5cff', '#ff7a3d'];
       for (let i = 0; i < 160; i++) { x.strokeStyle = cs[i % 5]; x.globalAlpha = 0.55; x.lineWidth = 3; x.beginPath(); const px = Math.random() * w, py = Math.random() * h, s = 8 + Math.random() * 14;
         if (i % 3 === 0) { x.moveTo(px, py - s); x.lineTo(px + s, py + s); x.lineTo(px - s, py + s); x.closePath(); } else if (i % 3 === 1) { x.moveTo(px - s, py); x.quadraticCurveTo(px, py - s, px + s, py); } else { x.arc(px, py, s / 3, 0, 7); } x.stroke(); } });
     carpet.wrapS = carpet.wrapT = THREE.RepeatWrapping; carpet.repeat.set(3, 3);
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), std('#ffffff', { map: carpet, roughness: 0.95 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; sc.add(floor);
-    const wallM = std('#2e2148', { roughness: 0.9 });
+    const wallM = std('#1e1530', { roughness: 0.9 });
     const back = new THREE.Mesh(new THREE.PlaneGeometry(8, 3.4), wallM); back.position.set(0, 1.7, -3); back.receiveShadow = true; sc.add(back);
     const left = back.clone(); left.rotation.y = Math.PI / 2; left.position.set(-3.5, 1.7, 0); sc.add(left);
     const right = back.clone(); right.rotation.y = -Math.PI / 2; right.position.set(3.5, 1.7, 0); sc.add(right);
@@ -138,7 +138,7 @@ navya.build("something people need")
     const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.45, 12), std('#888', { metalness: 1, roughness: 0.3 })); pole.position.y = 0.25; chair.add(pole); chair.position.set(0.05, 0, -1.35); sc.add(chair);
     // desk lamp
     const lamp = new THREE.SpotLight('#ffcf8a', 2.2, 4, 0.7, 0.6); lamp.position.set(-1.0, 1.9, -2.0); lamp.target.position.set(-0.4, 0.8, -2.3); lamp.castShadow = true; lamp.shadow.mapSize.set(1024, 1024); sc.add(lamp, lamp.target);
-    const keys3 = [K(0, [0, 1.75, 3.0], [0, 1.25, -2]), K(0.3, [-1.5, 1.55, 0.7], [0.1, 1.2, -2.4]), K(0.58, [1.0, 1.45, -0.85], [0, 1.25, -2.3]), K(0.86, [0, 1.3, -1.56], [0, 1.3, -2.1]), K(1, [0, 1.3, -1.62], [0, 1.3, -2.1])];
+    const keys3 = [K(0, [0, 1.75, 3.0], [0, 1.25, -2]), K(0.3, [-1.5, 1.55, 0.7], [0.1, 1.2, -2.4]), K(0.58, [1.0, 1.45, -0.85], [0, 1.25, -2.3]), K(0.86, [0, 1.3, -1.42], [0, 1.3, -2.1]), K(1, [0, 1.3, -1.48], [0, 1.3, -2.1])];
     const mouse = { x: 0, y: 0 }; sec.addEventListener('pointermove', (e) => { mouse.x = e.clientX / innerWidth - 0.5; mouse.y = e.clientY / innerHeight - 0.5; });
     const size = () => { const w = cv.clientWidth, h = cv.clientHeight; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }; size(); addEventListener('resize', size);
     document.fonts && document.fonts.ready.then(() => { notes.forEach((t) => { t.userData.draw(t.userData.x, 256, 256); t.needsUpdate = true; }); lastN = -1; });
@@ -155,10 +155,10 @@ navya.build("something people need")
   /* ======================= ERA 02 · BIO LAB ======================= */
   function bioLab() {
     const sec = $('#labroom'), cv = $('#labGL'); if (!sec || !cv) return;
-    const r = renderer(cv, { shadows: true, exp: 1.2 }), sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(42, 1, 0.05, 40);
+    const r = renderer(cv, { shadows: true, exp: 0.85 }), sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(42, 1, 0.05, 40);
     sc.background = new THREE.Color('#071226'); sc.fog = new THREE.Fog('#071226', 5, 12);
     const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
-    sc.add(new THREE.AmbientLight('#2a4a8a', 0.6)); const key = new THREE.DirectionalLight('#9fd0ff', 1.6); key.position.set(-2, 5, 4); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+    sc.add(new THREE.AmbientLight('#1a3a7a', 0.15)); const key = new THREE.DirectionalLight('#9fd0ff', 0.9); key.position.set(-2, 5, 4); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
     Object.assign(key.shadow.camera, { left: -4, right: 4, top: 3, bottom: -2 }); sc.add(key);
     const steel = std('#9aa7b5', { metalness: 0.75, roughness: 0.28 });
     const bench = box(7, 0.1, 1.5, steel); bench.position.set(0, 0.9, 0); sc.add(bench); const cab = box(7, 0.85, 1.4, std('#0f2a4a', { roughness: 0.6 })); cab.position.set(0, 0.425, 0.02); sc.add(cab);
@@ -222,7 +222,7 @@ navya.build("something people need")
 
   /* ======================= EXPLODING ERA TRANSITIONS ======================= */
   function transitions() {
-    const secs = [...$$('.tx')], cv = $('#txGL'); if (!secs.length || !cv || !window.Font) return;
+    const secs = [...$$('section.tx')], cv = $('#txGL'); if (!secs.length || !cv || !window.Font) return;
     const r = renderer(cv, { exp: 1.2 }), sc = new THREE.Scene(), cam = new THREE.PerspectiveCamera(45, 1, 0.1, 100); cam.position.set(0, 0, 12);
     const pm = new THREE.PMREMGenerator(r); sc.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; const font = new Font(window.HELV_BOLD);
     function shatter(text, col) { let g = new TextGeometry(text, { font, size: 1.5, height: 0.5, curveSegments: 5, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.05, bevelSegments: 2 }); g.center(); g = g.toNonIndexed(); g.computeBoundingBox();
