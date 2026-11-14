@@ -8,6 +8,7 @@ import * as THREE from "three";
 import DustField from "./DustField";
 import SchematicLayer from "./SchematicLayer";
 import BootHorizon from "./BootHorizon";
+import { BioEngineeringScene } from "./BioEngineeringScene";
 
 /**
  * The single persistent R3F canvas behind the whole page. Scene 0 (boot
@@ -42,6 +43,10 @@ export default function SceneRoot({
           <SchematicLayer />
           <BootHorizon pitch={pitch} />
           <DustField velocity={scrollVelocity} />
+          {/* Scene 2 centerpiece — mounted now for verification; proper
+              scroll-triggered scene choreography/domain switching is the
+              next milestone, so camera framing here is provisional. */}
+          <BioEngineeringScene />
         </Suspense>
 
         <EffectComposer>
