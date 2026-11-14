@@ -9,6 +9,7 @@ import PerimeterHUD from "./hud/PerimeterHUD";
 import SceneRoot from "./scenes/SceneRoot";
 import WakeUpText from "./scenes/WakeUpText";
 import JarvisAssistant from "./JarvisAssistant";
+import ProjectModal from "./ProjectModal";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
@@ -60,7 +61,10 @@ export default function AppShell() {
       <Cursor />
       <PerimeterHUD />
 
-      <main className="relative z-10">
+      {/* pointer-events-none: lets clicks reach the 3D canvas (domain nodes)
+          beneath. Nothing inside <main> is currently interactive; if that
+          changes, re-enable pointer-events on that specific element. */}
+      <main className="relative z-10 pointer-events-none">
         <section ref={bootRef} className="relative h-[220vh]">
           <div className="sticky top-0 h-screen flex flex-col items-start justify-center px-8 md:px-16">
             <div ref={wakeRef}>
@@ -86,6 +90,7 @@ export default function AppShell() {
       </main>
 
       <JarvisAssistant />
+      <ProjectModal />
     </>
   );
 }

@@ -1,12 +1,16 @@
 "use client";
 
 import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
+import { useProjectModalStore, type ProjectId } from "@/lib/projectModalStore";
+
+const PANEL_PROJECTS: ProjectId[] = ["ops-mailchimp", "ops-excel"];
 
 /** Scene 3 centerpiece: 360° curved cylindrical command arena. */
 export function OperationsArenaScene() {
   const arenaRef = useRef<THREE.Group>(null);
+  const openProject = useProjectModalStore((s) => s.openProject);
 
   useFrame((state) => {
     if (arenaRef.current) {
@@ -23,8 +27,14 @@ export function OperationsArenaScene() {
         const x = Math.cos(angle) * radius;
         const z = Math.sin(angle) * radius;
 
+        const projectId = PANEL_PROJECTS[i % PANEL_PROJECTS.length];
+        const handleClick = (e: ThreeEvent<MouseEvent>) => {
+          e.stopPropagation();
+          openProject(projectId, { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY });
+        };
+
         return (
-          <mesh key={i} position={[x, 0, z]} rotation={[0, -angle + Math.PI / 2, 0]}>
+          <mesh key={i} position={[x, 0, z]} rotation={[0, -angle + Math.PI / 2, 0]} onClick={handleClick}>
             <planeGeometry args={[1.4, 0.9]} />
             <meshStandardMaterial
               color="#030508"

@@ -1,12 +1,19 @@
 "use client";
 
 import { useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
+import { useProjectModalStore } from "@/lib/projectModalStore";
 
 /** Scene 2 centerpiece: procedural double-helix DNA strand. */
 export function BioEngineeringScene() {
   const helixRef = useRef<THREE.Group>(null);
+  const openProject = useProjectModalStore((s) => s.openProject);
+
+  const handleNodeClick = (id: "bio-biosensor" | "bio-docking") => (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    openProject(id, { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY });
+  };
 
   useFrame((state) => {
     if (helixRef.current) {
@@ -35,12 +42,12 @@ export function BioEngineeringScene() {
       {/* Double Helix Simulation Backbone */}
       {rungs.map(({ i, y, x1, z1, x2, z2, positions }) => (
         <group key={i}>
-          {/* Strand Nodes */}
-          <mesh position={[x1, y, z1]}>
+          {/* Strand Nodes — each is a clickable domain node opening its case study */}
+          <mesh position={[x1, y, z1]} onClick={handleNodeClick("bio-biosensor")}>
             <sphereGeometry args={[0.08, 16, 16]} />
             <meshStandardMaterial color="#00F0FF" roughness={0.2} metalness={0.8} emissive="#00F0FF" emissiveIntensity={0.5} />
           </mesh>
-          <mesh position={[x2, y, z2]}>
+          <mesh position={[x2, y, z2]} onClick={handleNodeClick("bio-docking")}>
             <sphereGeometry args={[0.08, 16, 16]} />
             <meshStandardMaterial color="#FF5E00" roughness={0.2} metalness={0.8} emissive="#FF5E00" emissiveIntensity={0.8} />
           </mesh>

@@ -39,7 +39,7 @@ export default function PerimeterHUD() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[400] sn-hud-text text-[10px] text-[var(--sn-cyan)]/70 select-none">
+    <div className="pointer-events-none fixed inset-0 z-[600] sn-hud-text text-[10px] text-[var(--sn-cyan)]/70 select-none">
       {/* top ruler */}
       <div className="hidden md:flex absolute top-3 left-1/2 -translate-x-1/2 gap-3 opacity-60">
         {RULER_MARKS.map((m) => (

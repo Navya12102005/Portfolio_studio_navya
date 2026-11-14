@@ -29,7 +29,15 @@ export default function SceneRoot({
   pitch: React.MutableRefObject<number>;
 }) {
   return (
-    <div className="fixed inset-0 -z-10">
+    // NOTE: z-index intentionally NOT negative. A negative z-index ancestor
+    // around a WebGL2 canvas breaks real pointer-event hit-testing in this
+    // sandbox's headless/software-GL Chromium (confirmed in isolation — see
+    // build notes); elementFromPoint still finds the canvas, but actual
+    // input routing resolves to <body> instead, silently eating every
+    // click. z-0 + DOM order (this mounts first) keeps it visually behind
+    // every other layer (all of which use explicit z-index >= 50) without
+    // triggering that bug — safe and correct on a real browser either way.
+    <div className="fixed inset-0 z-0">
       <Canvas
         dpr={[1, 2]}
         gl={{ antialias: true, powerPreference: "high-performance", preserveDrawingBuffer: true }}
