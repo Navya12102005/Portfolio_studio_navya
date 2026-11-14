@@ -11,14 +11,15 @@
  * the local keyword router, so a visitor never sees a raw error.
  *
  * Auth: the API key is a network-level credential injected by this
- * environment's outbound proxy into the `x-goog-api-key` header on
+ * environment's outbound proxy into the `Authorization: Bearer` header on
  * requests to generativelanguage.googleapis.com — this code never reads
  * or holds the key itself. It sends a placeholder header value; the
  * proxy overwrites it with the real key in flight. (Gemini's REST API
- * supports this header as a documented alternative to the `?key=` query
- * param — used here specifically because a header can be proxy-injected,
- * a query string generally can't.) Set GEMINI_DISABLE=1 to force the
- * local router even when a credential may be present.
+ * accepts the key via `Authorization: Bearer` as well as `x-goog-api-key`
+ * or `?key=`; Bearer is used here because it's the only one of the three
+ * this sandbox's credential-injection system supports.) Set
+ * GEMINI_DISABLE=1 to force the local router even when a credential may
+ * be present.
  */
 import { scopeAndLogLead, checkAvailabilityAndBook, dispatchServiceDossier } from "./n8n";
 
@@ -118,7 +119,7 @@ async function callGemini(contents: GContent[]): Promise<{ parts: GPart[] }> {
         // Placeholder — this environment's outbound proxy overwrites this
         // header with the real credential for this host. Never put a real
         // key here.
-        "x-goog-api-key": "proxy-injected",
+        Authorization: "Bearer proxy-injected",
       },
       signal: controller.signal,
       body: JSON.stringify({
