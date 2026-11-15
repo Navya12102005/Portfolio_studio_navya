@@ -8,9 +8,9 @@ const orbitron = Orbitron({ variable: "--font-orbitron", subsets: ["latin"], wei
 const jetbrains = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Studio Navya — R&D Command Center",
+  title: "Navya Gupta — Bioengineer, AI/ML builder, storyteller",
   description:
-    "Navya Gupta — Bioengineering, AI/Tech Systems, and Operations R&D. A cinema-grade interactive portfolio.",
+    "Navya Gupta is a bioengineering × AI builder who turns medical and biological data into products, stories and revenue. Tech, Bio and Ops services.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
