@@ -7,11 +7,12 @@ import { useServiceStore } from "@/lib/serviceStore";
 import { PILLARS, servicesFor, type Pillar } from "@/lib/services";
 import { soundFX } from "@/utils/soundManager";
 import { REPLAY_INTRO_EVENT } from "./IntroOverlay";
+import MagneticLines from "./MagneticLines";
 
 const ROLES = ["BIOENGINEER", "AI / ML BUILDER", "MEDTECH INNOVATOR", "STORYTELLER", "MARKETER", "FINANCE-MINDED", "NEGOTIATOR"];
 
 const SKIN: Record<Pillar, { bg: string; fg: string; accent: string; sub: string }> = {
-  tech: { bg: "#0A0A0A", fg: "#F2F2EE", accent: "#19E3F0", sub: "#9aa6a8" },
+  tech: { bg: "#0A0A0A", fg: "#F2F2EE", accent: "#FF5A14", sub: "#9aa6a8" },
   bio: { bg: "#F2F2EE", fg: "#0A0A0A", accent: "#FF5A14", sub: "#4a4f52" },
   ops: { bg: "#0A0A0A", fg: "#F2F2EE", accent: "#FF5A14", sub: "#9aa6a8" },
 };
@@ -79,13 +80,14 @@ function Hero() {
 function PillarBand({ pillar }: { pillar: Pillar }) {
   const k = SKIN[pillar], open = useServiceStore((s) => s.open), list = servicesFor(pillar);
   return (
-    <section id={pillar} className="relative px-5 md:px-[8vw] py-20 md:py-28 scroll-mt-12" style={{ background: k.bg, color: k.fg }}>
-      <div className="flex items-end justify-between gap-6 flex-wrap">
+    <section id={pillar} className="relative overflow-hidden px-5 md:px-[8vw] py-20 md:py-28 scroll-mt-12" style={{ background: k.bg, color: k.fg }}>
+      {pillar === "tech" && <MagneticLines className="z-0 opacity-80" />}
+      <div className="relative z-10 flex items-end justify-between gap-6 flex-wrap">
         <motion.h2 initial={{ x: -80, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="font-anton sn-outline text-[26vw] md:text-[18vw] leading-[0.85]" style={{ color: k.fg }}>{PILLARS[pillar].label}</motion.h2>
         <p className="sn-hud-text uppercase tracking-[0.14em] text-[12px] max-w-xs pb-4" style={{ color: k.accent }}>● {PILLARS[pillar].tagline}</p>
       </div>
-      <ul className="mt-10 md:mt-14 border-t" style={{ borderColor: k.fg + "33" }}>
+      <ul className="relative z-10 mt-10 md:mt-14 border-t" style={{ borderColor: k.fg + "33" }}>
         {list.map((s, i) => (
           <motion.li key={s.slug} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.6 }} transition={{ delay: i * 0.05, duration: 0.4 }}
             className="border-b" style={{ borderColor: k.fg + "33" }}>
@@ -144,7 +146,7 @@ export default function KineticHome() {
       <main>
         <Hero />
         <PillarBand pillar="tech" />
-        <Marquee items={["BIOMEDICAL INNOVATION", "MACHINE LEARNING", "HEALTHCARE AI", "DIAGNOSTICS", "GENOMICS"]} bg="#19E3F0" fg="#0A0A0A" />
+        <Marquee items={["BIOMEDICAL INNOVATION", "MACHINE LEARNING", "HEALTHCARE AI", "DIAGNOSTICS", "GENOMICS"]} bg="#FF5A14" fg="#0A0A0A" />
         <PillarBand pillar="bio" />
         <Marquee items={["BRAND STORYTELLING", "GO-TO-MARKET", "FINANCIAL MODELLING", "NEGOTIATION"]} bg="#0A0A0A" fg="#F2F2EE" rev />
         <PillarBand pillar="ops" />
