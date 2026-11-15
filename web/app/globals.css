@@ -71,3 +71,35 @@ body {
     transform: translateY(0);
   }
 }
+/* JarvisBootSequence — global (not component-scoped) since the typing
+   boot-line text and the arc-reactor core live in different subtrees but
+   share these animations. */
+.flicker-text {
+  animation: sn-flicker 2.4s linear infinite;
+}
+@keyframes sn-flicker {
+  0%, 92%, 100% { opacity: 1; }
+  93% { opacity: 0.4; }
+  95% { opacity: 1; }
+  96% { opacity: 0.6; }
+  97% { opacity: 1; }
+}
+
+.reactor-ring-1 {
+  animation: sn-spin-slow 8s linear infinite;
+}
+.reactor-ring-2 {
+  animation: sn-spin-slow 6s linear infinite reverse;
+}
+@keyframes sn-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.reactor-pulse {
+  animation: sn-pulse-glow 2.2s ease-in-out infinite;
+}
+@keyframes sn-pulse-glow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.15); }
+}
+

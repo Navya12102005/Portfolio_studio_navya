@@ -8,20 +8,42 @@
 <style>
   html,body{margin:0;height:100%;background:#000;overflow:hidden}
   canvas{display:block;width:100vw;height:100vh}
+  .ctl{position:fixed;z-index:5;font:600 12px ui-monospace,"JetBrains Mono",monospace;letter-spacing:.14em;color:#F2F2EE;background:rgba(10,10,10,.55);border:1px solid rgba(242,242,238,.35);padding:10px 16px;cursor:pointer;text-transform:uppercase}
+  .ctl:hover{background:#C6F600;color:#0A0A0A;border-color:#C6F600}
+  #skip{top:18px;right:18px}
+  #enter{bottom:26px;left:50%;transform:translateX(-50%);animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(198,246,0,.5)}50%{box-shadow:0 0 0 12px rgba(198,246,0,0)}}
+  .tile{position:fixed;z-index:5;background:transparent;border:0;cursor:pointer;display:none}
+  #bar{position:fixed;left:0;bottom:0;height:3px;background:#C6F600;width:0;z-index:5}
   .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 </style>
 </head>
 <body>
 <h1 class="sr-only">Navya Gupta — Bioengineer, AI/ML builder, storyteller</h1>
 <canvas id="stage"></canvas>
+<button class="ctl" id="skip" aria-label="Skip intro">Skip ▸</button>
+<button class="ctl" id="enter" aria-label="Enter site">Enter ▸</button>
+<div id="bar"></div>
+<div id="tiles"></div>
 <script src="util.js"></script>
 <script src="fx.js"></script>
 <script src="scenes.js"></script>
+<script src="scenes2.js"></script>
+<script src="scenes3.js"></script>
 <script>
 /* ===== CONFIG — edit words, colours and timing here; scene code never needs touching ===== */
 const CONFIG = {
   pal: { ink:"#0A0A0A", orange:"#FF5A14", lime:"#C6F600", bone:"#F2F2EE", amber:"#FFC800", steel:"#555A5E" },
-  words: { first:"NAVYA", surname:"GUPTA", name:"NAVYA GUPTA", devanagari:"नव्या", monogram:"NG" },
+  words: {
+    first:"NAVYA", surname:"GUPTA", name:"NAVYA GUPTA", devanagari:"नव्या", monogram:"NG", role1:"BIOENGINEER",
+    hud:["B.TECH BIOENGINEERING","VIT BHOPAL","BATCH 2028","MEDTECH × AI"],
+    caption:"BIOENGINEER · AI / ML BUILDER · STORYTELLER", lifestyle:"TRAVEL · FOOD · FASHION",
+    nav:["PROJECTS","RESEARCH","STORIES","NETWORK","CONTACT"],
+  },
+  tunnel: ["BIO","AI","MED","TECH","DATA","CODE","CARE","SCALE"],
+  domains: ["BIOMEDICAL INNOVATION","MACHINE LEARNING","HEALTHCARE AI","DIAGNOSTICS","WEARABLES","MEDICAL IMAGING","GENOMICS","BRAND STORYTELLING","GO-TO-MARKET","FINANCIAL MODELLING","NEGOTIATION","PERSUASION"],
+  projects: ["[PROJECT 1]","[PROJECT 2]","[PROJECT 3]"],
+  tagline: "ENGINEERING THE FUTURE OF CARE. SELLING IT LIKE A STORY.",
   // scene start times in seconds (14 scenes + loop wipe); last value is the loop length
   starts: [0,3.2,6.4,9.6,12.6,15.8,18.6,21.8,24.8,28.0,31.0,34.2,37.4,40.2,42.6,44.0],
   audioSrc: null,
@@ -29,6 +51,7 @@ const CONFIG = {
 
 (function () {
   const U = window.U, FX = window.FX, C = CONFIG;
+  let clock = 0, last = null;
   const OS = 0.006;                                // slight overscan so RGB-split edge gaps never show
   const LW = 1920, LH = 436;                       // fixed logical band space (~4.4:1)
   const stage = document.getElementById("stage"), sg = stage.getContext("2d");
@@ -94,22 +117,46 @@ const CONFIG = {
     sg.fillStyle = gr; sg.fillRect(0, bot, W, bandH);
     // live band
     sg.drawImage(post, -OS * W, top, W * (1 + 2 * OS), bandH);
+    updateTiles(sceneIdx, u, top, bandH, W);
   };
 
+  // clickable project tiles overlaid on the S14 canvas tiles
+  const tilesEl = document.getElementById("tiles"), tileBtns = C.projects.map((label, i) => {
+    const b = document.createElement("button"); b.className = "tile"; b.setAttribute("aria-label", label); b.onclick = () => done(); tilesEl.appendChild(b); return b;
+  });
+  function updateTiles(sceneIdx, u, top, bandH, W) {
+    const on = sceneIdx === 13 && u > 1.8, k = (W / LW) * (innerWidth / stage.width) , cssTop = top * (innerHeight / stage.height), cssH = bandH * (innerHeight / stage.height);
+    tileBtns.forEach((b, i) => {
+      b.style.display = on ? "block" : "none"; if (!on) return;
+      const sc = innerWidth / LW; b.style.left = (320 + i * 456) * sc + "px"; b.style.width = 430 * sc + "px"; b.style.top = cssTop + (380 / LH) * cssH + "px"; b.style.height = (46 / LH) * cssH + "px";
+    });
+  }
+
+  const embedded = window.parent !== window || /[?&]embed\b/.test(location.search);
+  let finished = false;
+  function done() { if (finished) return; finished = true; if (embedded) parent.postMessage({ type: "navya-intro-done" }, "*"); else { clock = 0; finished = false; } }
+  document.getElementById("skip").onclick = done; document.getElementById("enter").onclick = done;
+  addEventListener("keydown", (e) => { if (e.key === "Escape" || e.key === "Enter") done(); });
+
   // runtime loop: fixed timeline clock, paused while the tab is hidden
-  let clock = 0, last = null;
+  
   function tick(now) {
     requestAnimationFrame(tick);
     if (document.hidden) { last = null; return; }
     if (last !== null) clock += (now - last) / 1000;
     last = now;
+    const total = C.starts[C.starts.length - 1];
+    document.getElementById("bar").style.width = Math.min(100, (clock / total) * 100) + "%";
+    if (clock >= total) { done(); if (embedded) return; }
     window.renderFrame(clock);
   }
   window.__introReady = document.fonts.ready.then(() => Promise.all([
     document.fonts.load('400 40px "Anton"'), document.fonts.load('400 40px "Archivo Black"'), document.fonts.load('900 40px "Noto Devanagari"', "नव्या"),
   ])).then(() => {
     window.__ready = true;
-    if (!/[?&]still\b/.test(location.search)) requestAnimationFrame(tick);
+    if (/[?&]still\b/.test(location.search)) return;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) { window.renderFrame(41.8); clock = 41.8; document.getElementById("bar").style.width = "95%"; return; }
+    requestAnimationFrame(tick);
   });
 })();
 </script>

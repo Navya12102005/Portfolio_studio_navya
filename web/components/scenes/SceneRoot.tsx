@@ -8,7 +8,6 @@ import { BioEngineeringScene } from "./BioEngineeringScene";
 import { OperationsArenaScene } from "./OperationsArenaScene";
 import { TechScene } from "./TechScene";
 import CameraRig from "./CameraRig";
-import HeroSummon from "./HeroSummon";
 
 /**
  * The single persistent R3F canvas behind the whole page.
@@ -50,7 +49,6 @@ export default function SceneRoot() {
 
         <Suspense fallback={null}>
           <SchematicLayer />
-          <HeroSummon />
 
           {/* rim lights, one per centerpiece, positioned behind and above
               each object (farther from the camera than the object itself)

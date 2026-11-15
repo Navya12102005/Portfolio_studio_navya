@@ -16,6 +16,8 @@ import ProjectModal from "./ProjectModal";
 import SecondBrainView from "./SecondBrainView";
 import DossierModal from "./DossierModal";
 import EasterEggOverlay from "./EasterEggOverlay";
+import JarvisBootSequence from "./JarvisBootSequence";
+import IntroOverlay, { REPLAY_INTRO_EVENT } from "./IntroOverlay";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
@@ -73,10 +75,18 @@ export default function AppShell() {
         <div className={`fixed bottom-8 left-8 max-w-xs ${perf.tier === "low" ? "hidden" : ""}`}>
           <p className="sn-hud-text text-[10px] text-[var(--sn-cyan)]/50 tracking-widest">NAVYA GUPTA</p>
           <p className="text-sm text-[#c9d3ee]/70 mt-1">Bioengineering × AI — Tech, Bio & Ops, explored in 3D.</p>
+          <button
+            onClick={() => window.dispatchEvent(new Event(REPLAY_INTRO_EVENT))}
+            className="pointer-events-auto mt-2 sn-hud-text text-[10px] text-[var(--sn-cyan)]/60 hover:text-[var(--sn-cyan)] cursor-pointer tracking-widest"
+          >
+            REPLAY INTRO ▸
+          </button>
         </div>
       </main>
 
       <JarvisAssistant />
+      <IntroOverlay />
+      <JarvisBootSequence />
       <ProjectModal />
       <SecondBrainView />
     </motion.div>
