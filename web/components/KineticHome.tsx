@@ -7,7 +7,6 @@ import { useServiceStore } from "@/lib/serviceStore";
 import { PILLARS, servicesFor, type Pillar } from "@/lib/services";
 import { soundFX } from "@/utils/soundManager";
 import { REPLAY_INTRO_EVENT } from "./IntroOverlay";
-import ScrollTiltTransition from "./ScrollTiltTransition";
 import MagneticLines from "./MagneticLines";
 
 const ROLES = ["BIOENGINEER", "AI / ML BUILDER", "MEDTECH INNOVATOR", "STORYTELLER", "MARKETER", "FINANCE-MINDED", "NEGOTIATOR"];
@@ -146,14 +145,6 @@ export default function KineticHome() {
       <Header />
       <main>
         <Hero />
-        <ScrollTiltTransition>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 p-4 md:p-6 text-[#F2F2EE] font-anton text-3xl md:text-5xl tracking-wide">
-            <div className="p-6 md:p-8 rounded-2xl bg-[#0A0A0A] border border-[#FF4500]">NAVYA GUPTA</div>
-            <div className="p-6 md:p-8 rounded-2xl bg-[#0A0A0A] border border-cyan-500">TECH R&amp;D</div>
-            <div className="p-6 md:p-8 rounded-2xl bg-[#0A0A0A] border border-emerald-500">BIOENGINEERING</div>
-            <div className="p-6 md:p-8 rounded-2xl bg-[#0A0A0A] border border-amber-500">OPERATIONS</div>
-          </div>
-        </ScrollTiltTransition>
         <PillarBand pillar="tech" />
         <Marquee items={["BIOMEDICAL INNOVATION", "MACHINE LEARNING", "HEALTHCARE AI", "DIAGNOSTICS", "GENOMICS"]} bg="#FF5A14" fg="#0A0A0A" />
         <PillarBand pillar="bio" />
