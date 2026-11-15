@@ -1,0 +1,80 @@
+{
+  "_readme": "Edit content here, never in components. Fields marked placeholder:true or containing [BRACKETS] are things only Navya can fill in (real prices, results, availability); the UI shows them as placeholders and the AI assistant must never state them as fact. complete:false = listed in the station rail but the dossier is not written yet.",
+  "pillars": {
+    "tech": { "label": "TECH", "tagline": "AI & software for health and business", "accent": "#19E3F0" },
+    "bio": { "label": "BIO", "tagline": "Biology you can ship", "accent": "#FF5E00" },
+    "ops": { "label": "OPS", "tagline": "The business layer", "accent": "#F2F2EE" }
+  },
+  "services": [
+    {
+      "code": "TECH-01", "slug": "ai-ml-model-development", "pillar": "tech", "complete": true,
+      "title": "AI / ML model development",
+      "tagline": "Classification, prediction and imaging models for biomedical datasets.",
+      "status": "OPEN FOR PROJECTS",
+      "motif": "neural",
+      "problem": "Clinics, labs and health startups sit on data they cannot turn into decisions: images nobody has time to screen, measurements nobody has modelled. Generic ML tooling ignores how biological data is really collected, noisy, small and biased, so models look great in a demo and fail on the next batch.",
+      "steps": [
+        { "name": "SCOPE", "text": "Pin down the decision the model must support, the data you hold and what \"good enough\" means." },
+        { "name": "AUDIT DATA", "text": "Check quality, leakage, class balance and labelling before any model is trained." },
+        { "name": "BASELINE", "text": "Start with simple, explainable models so every later gain is measured against something honest." },
+        { "name": "TRAIN & VALIDATE", "text": "Cross-validated training with a held-out test set that the model never sees until the end." },
+        { "name": "EXPLAIN", "text": "Error analysis and plain-language reporting: where it works, where it does not, and why." },
+        { "name": "HAND OVER", "text": "Reproducible notebook, evaluation report and a small API so your team can run it without me." }
+      ],
+      "deliverables": ["Trained model with saved weights", "Evaluation report (metrics, error analysis, limits)", "Reproducible notebook with fixed seeds", "Small inference API and usage notes"],
+      "stack": ["Python", "PyTorch", "scikit-learn", "TensorFlow", "SQL", "AWS"],
+      "timeline": { "duration": "[EDIT: e.g. 3–6 weeks]", "revisions": "[EDIT: e.g. 2 rounds]", "style": "Weekly check-ins, shared notebook from day one" },
+      "price": { "model": "custom", "label": "Custom quote", "from": null, "note": "[EDIT: add a starting price or hourly rate when you are ready to publish one]", "placeholder": true },
+      "proof": [
+        { "title": "[CASE STUDY 1]", "result": "[RESULT, e.g. 92% accuracy on X dataset]", "placeholder": true },
+        { "title": "NoviCord health platform", "result": "[ADD A MEASURABLE OUTCOME]", "placeholder": true }
+      ],
+      "faq": [
+        { "q": "Do I need a lot of data?", "a": "Not always. Biomedical datasets are often small, so I choose methods that suit that, and I will tell you early if the data is not enough to support the question." },
+        { "q": "Will I understand the results?", "a": "Yes. Every project includes a plain-language report, not just numbers, covering what the model can and cannot be trusted for." },
+        { "q": "Can you work with sensitive data?", "a": "[EDIT: state your data-handling terms, e.g. NDA, local-only processing, anonymised data only.]" },
+        { "q": "Is this a medical device or diagnosis?", "a": "No. This is research and decision-support analysis, not a certified medical device or clinical advice." }
+      ]
+    },
+    {
+      "code": "BIO-01", "slug": "bioinformatics-genomics-analysis", "pillar": "bio", "complete": true,
+      "title": "Bioinformatics & genomics analysis",
+      "tagline": "Sequence and expression data analysis, visualisation and clear summaries.",
+      "status": "LIMITED SLOTS",
+      "motif": "helix",
+      "problem": "Sequencing and expression data arrive as huge tables that are hard to read and easy to misinterpret. Teams without a dedicated bioinformatician either wait weeks for results or draw conclusions the data does not support.",
+      "steps": [
+        { "name": "QUESTION", "text": "Turn the biological question into a testable analysis plan." },
+        { "name": "QC", "text": "Quality control and normalisation so differences you see are biology, not artefacts." },
+        { "name": "ANALYSE", "text": "Differential expression, variant or sequence analysis suited to the question." },
+        { "name": "INTERPRET", "text": "Pathway and annotation context, with the statistics stated honestly." },
+        { "name": "VISUALISE", "text": "Publication-style figures plus interactive views you can explore." },
+        { "name": "REPORT", "text": "A written summary, the code and the figures, so the work can be repeated and checked." }
+      ],
+      "deliverables": ["Cleaned and documented dataset", "Analysis code (reproducible)", "Figures ready for slides or papers", "Written interpretation with limitations"],
+      "stack": ["Python", "Jupyter", "SQL", "Excel"],
+      "timeline": { "duration": "[EDIT: e.g. 2–4 weeks]", "revisions": "[EDIT: e.g. 2 rounds]", "style": "Short written updates at each stage" },
+      "price": { "model": "custom", "label": "Custom quote", "from": null, "note": "[EDIT: add a starting price or hourly rate when you are ready to publish one]", "placeholder": true },
+      "proof": [
+        { "title": "Molecular docking vs Pseudomonas aeruginosa (PDB: 5O7)", "result": "[ADD A MEASURABLE OUTCOME]", "placeholder": true },
+        { "title": "[CASE STUDY 2]", "result": "[RESULT]", "placeholder": true }
+      ],
+      "faq": [
+        { "q": "Which data types do you handle?", "a": "[EDIT: list exactly what you are comfortable with, e.g. RNA-seq counts, protein structures, sequence alignments.]" },
+        { "q": "Can you help me write it up?", "a": "Yes. Methods and results text, and figure captions, are part of the deliverables." },
+        { "q": "How do you handle statistics?", "a": "Methods and multiple-testing handling are stated in the report, so a reviewer can follow every step." },
+        { "q": "Is this for clinical decisions?", "a": "No. It is research analysis support, not clinical advice." }
+      ]
+    },
+    { "code": "TECH-02", "slug": "healthcare-data-dashboards", "pillar": "tech", "complete": false, "title": "Healthcare data dashboards", "tagline": "Interactive analytics for clinics, labs and startups.", "status": "OPEN FOR PROJECTS", "motif": "bars" },
+    { "code": "TECH-03", "slug": "automation-ai-agents", "pillar": "tech", "complete": false, "title": "Automation & AI agents", "tagline": "Workflow automation, chatbots and report generators.", "status": "OPEN FOR PROJECTS", "motif": "neural" },
+    { "code": "TECH-04", "slug": "websites-interactive-3d", "pillar": "tech", "complete": false, "title": "Websites & interactive 3D experiences", "tagline": "Portfolio and product sites like this one.", "status": "OPEN FOR PROJECTS", "motif": "cube" },
+    { "code": "BIO-02", "slug": "biomedical-research-support", "pillar": "bio", "complete": false, "title": "Biomedical research support", "tagline": "Literature reviews, data interpretation and technical writing.", "status": "OPEN FOR PROJECTS", "motif": "helix" },
+    { "code": "BIO-03", "slug": "medtech-product-ideation", "pillar": "bio", "complete": false, "title": "MedTech product ideation", "tagline": "Wearable and diagnostic concepts, feasibility and regulatory-aware roadmaps.", "status": "OPEN FOR PROJECTS", "motif": "cube" },
+    { "code": "BIO-04", "slug": "scientific-visualisation", "pillar": "bio", "complete": false, "title": "Scientific visualisation & explainers", "tagline": "Animated molecules, pathways and patient-friendly graphics.", "status": "LIMITED SLOTS", "motif": "helix" },
+    { "code": "OPS-01", "slug": "marketing-brand-storytelling", "pillar": "ops", "complete": false, "title": "Marketing & brand storytelling", "tagline": "Positioning, content engines and launch narratives for health and tech brands.", "status": "OPEN FOR PROJECTS", "motif": "wave" },
+    { "code": "OPS-02", "slug": "go-to-market-growth", "pillar": "ops", "complete": false, "title": "Go-to-market & growth strategy", "tagline": "Audience research, funnels and campaign plans.", "status": "OPEN FOR PROJECTS", "motif": "bars" },
+    { "code": "OPS-03", "slug": "financial-modelling", "pillar": "ops", "complete": false, "title": "Financial modelling & unit economics", "tagline": "Pricing, forecasting and pitch-ready models.", "status": "OPEN FOR PROJECTS", "motif": "bars" },
+    { "code": "OPS-04", "slug": "negotiation-partnerships", "pillar": "ops", "complete": false, "title": "Negotiation, partnerships & outreach", "tagline": "Pitch decks, partner packs and networking playbooks.", "status": "OPEN FOR PROJECTS", "motif": "wave" }
+  ]
+}

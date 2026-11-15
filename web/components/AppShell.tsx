@@ -16,6 +16,8 @@ import ProjectModal from "./ProjectModal";
 import SecondBrainView from "./SecondBrainView";
 import DossierModal from "./DossierModal";
 import EasterEggOverlay from "./EasterEggOverlay";
+import ServiceRail from "./services/ServiceRail";
+import ServiceDossier from "./services/ServiceDossier";
 import JarvisBootSequence from "./JarvisBootSequence";
 import IntroOverlay, { REPLAY_INTRO_EVENT } from "./IntroOverlay";
 
@@ -84,6 +86,8 @@ export default function AppShell() {
         </div>
       </main>
 
+      <ServiceRail />
+      <ServiceDossier />
       <JarvisAssistant />
       <IntroOverlay />
       <JarvisBootSequence />
