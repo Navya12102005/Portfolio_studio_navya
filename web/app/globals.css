@@ -62,38 +62,12 @@ body {
     transform: translateY(0);
   }
 }
-/* JarvisBootSequence — global (not component-scoped) since the typing
-   boot-line text and the arc-reactor core live in different subtrees but
-   share these animations. */
-.flicker-text {
-  animation: sn-flicker 2.4s linear infinite;
-}
-@keyframes sn-flicker {
-  0%, 92%, 100% { opacity: 1; }
-  93% { opacity: 0.4; }
-  95% { opacity: 1; }
-  96% { opacity: 0.6; }
-  97% { opacity: 1; }
-}
-
-.reactor-ring-1 {
-  animation: sn-spin-slow 8s linear infinite;
-}
-.reactor-ring-2 {
-  animation: sn-spin-slow 6s linear infinite reverse;
-}
-@keyframes sn-spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.reactor-pulse {
-  animation: sn-pulse-glow 2.2s ease-in-out infinite;
-}
-@keyframes sn-pulse-glow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.15); }
-}
-
+/* J.A.R.V.I.S. boot: equalizer bars + eye scan line (CSS keyframes, so no per-render randomness) */
+.sn-eq { height: var(--h, 50%); animation: sn-eq 0.6s ease-in-out infinite alternate; }
+@keyframes sn-eq { from { height: 20%; } to { height: var(--h, 80%); } }
+.sn-scan { top: 0; animation: sn-scan 2.2s linear infinite; opacity: .6; }
+@keyframes sn-scan { from { top: 0; } to { top: 100%; } }
+@media (prefers-reduced-motion: reduce) { .sn-eq, .sn-scan { animation: none; } }
 
 /* Kinetic site type (same faces as the intro reel), self-hosted so there are no extra requests to third parties */
 @font-face { font-family: "Anton"; src: url("/fonts/anton.woff2") format("woff2"); font-weight: 400; font-display: swap; }

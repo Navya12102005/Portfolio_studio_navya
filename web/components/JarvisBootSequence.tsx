@@ -1,207 +1,115 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCameraRigStore, type CameraDomain } from "@/lib/cameraRigStore";
-import { useSecondBrainStore } from "@/lib/secondBrainStore";
+import { useCameraRigStore } from "@/lib/cameraRigStore";
 import { soundFX } from "@/utils/soundManager";
 import { START_KINETIC_EVENT } from "./IntroOverlay";
 
-const BOOT_LINE = "INITIALIZING STUDIO NAVYA OS v4.0...";
-const GREETING =
-  "Welcome, visitor. All bio-telemetry and tech systems are online. I am J.A.R.V.I.S., Navya Gupta's operational intelligence. Would you like to inspect Bioengineering R&D, Tech architectures, or Growth Operations?";
-
-const PILLS: { label: string; domain: CameraDomain }[] = [
-  { label: "Bioengineering R&D", domain: "bio" },
-  { label: "Tech Architectures", domain: "tech" },
-  { label: "Growth Operations", domain: "ops" },
-];
-
 const SESSION_KEY = "studio-navya-booted";
+const AUTO_MS = 3500;
+const ORANGE = "#FF5A14";
+const W = 24;
 
-type Phase = "boot-line" | "greeting";
+/** Builds one row of the ASCII eye at an exact fixed width, so the box can never drift out of alignment. */
+const mk = (core: string, edge: number) => {
+  const s = core.padStart(Math.floor((W + core.length) / 2), "░").padEnd(W, "░");
+  return "▒".repeat(edge) + s.slice(edge, W - edge) + "▒".repeat(edge);
+};
+const EYE = [
+  `┌${"─".repeat(W)}┐`,
+  `│${"▒".repeat(5)}${"░".repeat(W - 10)}${"▒".repeat(5)}│`,
+  `│${mk("[  O  ]", 2)}│`,
+  `│${mk("█████████", 1)}│`,
+  `│${mk("███▓▓▓███", 0)}│`,
+  `│${mk("█████████", 1)}│`,
+  `│${mk("[  .  ]", 2)}│`,
+  `│${"▒".repeat(5)}${"░".repeat(W - 10)}${"▒".repeat(5)}│`,
+  `└${"─".repeat(W)}┘`,
+].join("\n");
 
-/** Simple char-by-char typing effect, cancellable on unmount. */
-function useTypewriter(text: string, active: boolean, speedMs = 18) {
-  const [out, setOut] = useState("");
-  const [done, setDone] = useState(false);
+const BARS = [40, 70, 30, 90, 50, 80, 60, 100, 45, 75];
 
-  useEffect(() => {
-    if (!active) return;
-    // each hook instance here only ever flips inactive -> active once in
-    // practice (boot-line types on mount, greeting types once the previous
-    // phase finishes), so there's no stale previous run to reset first —
-    // the interval's own first tick establishes the starting text/done state.
-    let i = 0;
-    const id = setInterval(() => {
-      i += 1;
-      setOut(text.slice(0, i));
-      if (i >= text.length) {
-        setDone(true);
-        clearInterval(id);
-      }
-    }, speedMs);
-    return () => clearInterval(id);
-  }, [text, active, speedMs]);
-
-  return { out, done };
-}
-
+/**
+ * First screen of the site: a short J.A.R.V.I.S. boot (ASCII eye + equalizer) that continues on its
+ * own after 3.5s, or on SKIP / Esc / Enter. It then hands off to the kinetic title sequence
+ * (IntroOverlay), which hands off to the site. Plays once per session.
+ */
 export default function JarvisBootSequence() {
-  const [mountGate, setMountGate] = useState<"checking" | "show" | "hide">("checking");
-  const [phase, setPhase] = useState<Phase>("boot-line");
+  const [gate, setGate] = useState<"checking" | "show" | "hide">("checking");
   const [exiting, setExiting] = useState(false);
   const focusCamera = useCameraRigStore((s) => s.focus);
-  const focusCluster = useSecondBrainStore((s) => s.focusCluster);
 
-  // returning-visitor skip: only decided client-side, after mount, to avoid
-  // an SSR/CSR mismatch — sessionStorage doesn't exist on the server, so
-  // this intentionally can't be a lazy useState initializer (that would
-  // run during the client's hydration render itself and mismatch the null
-  // the server rendered); it must happen in a post-mount effect instead.
+  // sessionStorage only exists in the browser, so this has to be decided after mount (a lazy initializer
+  // would run during hydration and mismatch the server's empty render).
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     try {
-      setMountGate(sessionStorage.getItem(SESSION_KEY) === "1" ? "hide" : "show");
+      setGate(sessionStorage.getItem(SESSION_KEY) === "1" ? "hide" : "show");
     } catch {
-      setMountGate("show");
+      setGate("show");
     }
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  const bootLine = useTypewriter(BOOT_LINE, mountGate === "show", 22);
-  const greeting = useTypewriter(GREETING, phase === "greeting", 16);
-
-  useEffect(() => {
-    if (mountGate !== "show") return;
-    if (phase === "boot-line" && bootLine.done) {
-      const t = setTimeout(() => setPhase("greeting"), 300);
-      return () => clearTimeout(t);
-    }
-  }, [mountGate, phase, bootLine.done]);
-
-  // "ready" (pills visible) is just "greeting typed out" — derived during
-  // render instead of mirrored into its own state + effect.
-  const ready = phase === "greeting" && greeting.done;
-
-  const dismiss = (domain?: CameraDomain) => {
+  const dismiss = useCallback(() => {
     soundFX.playClickLock();
-    try {
-      sessionStorage.setItem(SESSION_KEY, "1");
-    } catch {
-      /* sessionStorage unavailable (private mode / disabled) — non-fatal, just replays next load */
-    }
-    // The camera glides to the chosen domain (home on a plain skip) while the
-    // kinetic title sequence plays over the top, so the site is already
-    // framed on that domain when the sequence slides away.
-    focusCamera(domain ?? "home");
-    if (domain === "bio" || domain === "tech" || domain === "ops") focusCluster(domain);
+    try { sessionStorage.setItem(SESSION_KEY, "1"); } catch { /* storage blocked: just replays next load */ }
+    focusCamera("home");
     window.dispatchEvent(new Event(START_KINETIC_EVENT));
     setExiting(true);
-  };
+  }, [focusCamera]);
 
   useEffect(() => {
-    if (mountGate !== "show") return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") dismiss();
-    };
+    if (gate !== "show" || exiting) return;
+    const t = setTimeout(dismiss, AUTO_MS);
+    const onKey = (e: KeyboardEvent) => (e.key === "Escape" || e.key === "Enter") && dismiss();
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mountGate]);
+    return () => { clearTimeout(t); window.removeEventListener("keydown", onKey); };
+  }, [gate, exiting, dismiss]);
 
-  if (mountGate !== "show") return null;
+  if (gate !== "show") return null;
 
   return (
-    <AnimatePresence onExitComplete={() => setMountGate("hide")}>
+    <AnimatePresence onExitComplete={() => setGate("hide")}>
       {!exiting && (
         <motion.div
-          className="fixed inset-0 z-[900] bg-[#030508] flex flex-col items-center justify-center overflow-hidden"
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
+          role="status" aria-live="polite" aria-label="J.A.R.V.I.S. initializing"
+          className="fixed inset-0 z-[900] bg-[#0A0A0A] text-white font-mono flex flex-col items-center justify-between p-6 md:p-8"
+          style={{ border: `1px solid ${ORANGE}4D` }}
+          exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.8, ease: "easeInOut" }}
         >
-          {/* scanline wipe on exit */}
-          <AnimatePresence>
-            {exiting && (
-              <motion.div
-                className="absolute inset-0 z-10 pointer-events-none"
-                initial={{ clipPath: "inset(0% 0% 100% 0%)" }}
-                animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-                transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
-                style={{
-                  background:
-                    "repeating-linear-gradient(0deg, rgba(0,240,255,0.08) 0px, rgba(0,240,255,0.08) 2px, transparent 2px, transparent 4px), #030508",
-                }}
-              />
-            )}
-          </AnimatePresence>
-
-          <button
-            onClick={() => dismiss()}
-            className="absolute top-6 right-6 sn-hud-text text-[10px] text-[var(--sn-cyan)]/60 border border-[var(--sn-cyan)]/30 rounded px-3 py-1.5 hover:text-[var(--sn-cyan)] hover:border-[var(--sn-cyan)]/60 cursor-pointer z-20"
-          >
-            SKIP INTRO [ESC]
-          </button>
-
-          <ArcReactorCore active />
-
-          <div className="relative z-10 mt-10 max-w-xl px-6 text-center min-h-[7rem]">
-            {phase === "boot-line" && (
-              <p className="sn-hud-text text-xs md:text-sm text-[var(--sn-cyan)] tracking-widest flicker-text">
-                {bootLine.out}
-                <Caret />
-              </p>
-            )}
-            {phase !== "boot-line" && (
-              <p className="font-mono text-sm md:text-base text-[#dfe9ff] leading-relaxed">
-                {greeting.out}
-                {phase === "greeting" && <Caret />}
-              </p>
-            )}
+          <div className="w-full flex justify-between gap-4 text-[10px] md:text-xs tracking-widest" style={{ color: ORANGE }}>
+            <span>CORE STABILITY // SYNC 99% TEMP 37C</span>
+            <span className="hidden sm:inline">J.A.R.V.I.S. v4.2 // NAVYA.AI</span>
           </div>
 
-          <AnimatePresence>
-            {ready && (
-              <motion.div
-                className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-3 px-6"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                {PILLS.map((p) => (
-                  <button
-                    key={p.domain}
-                    onClick={() => dismiss(p.domain)}
-                    onMouseEnter={() => soundFX.playHoverTick()}
-                    className="sn-hud-text text-[11px] md:text-xs px-4 py-2.5 rounded-full border border-[var(--sn-cyan)]/40 text-[var(--sn-cyan)] hover:bg-[var(--sn-cyan)]/10 hover:border-[var(--sn-cyan)] transition-colors cursor-pointer"
-                  >
-                    {p.label}
-                  </button>
+          <div className="flex flex-col items-center">
+            <div className="relative w-64 border bg-black/40 p-4 flex flex-col items-center overflow-hidden" style={{ borderColor: ORANGE + "80", boxShadow: `0 0 20px ${ORANGE}33` }}>
+              <pre aria-hidden className="text-[9px] leading-[10px] select-none tracking-tighter m-0" style={{ color: ORANGE }}>{EYE}</pre>
+              <span aria-hidden className="sn-scan absolute inset-x-0 h-px" style={{ background: ORANGE }} />
+              <div aria-hidden className="flex gap-1 items-end h-6 mt-3">
+                {BARS.map((h, i) => (
+                  <span key={i} className="sn-eq w-1" style={{ background: ORANGE, ["--h" as string]: `${h}%`, animationDelay: `${i * 0.05}s` }} />
                 ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </div>
+            <p className="mt-6 text-sm text-gray-300 leading-relaxed text-center max-w-lg">
+              Welcome, visitor. All bio-telemetry and tech systems are online. I am J.A.R.V.I.S., Navya Gupta&apos;s operational intelligence. Initializing main overview...
+            </p>
+          </div>
+
+          <div className="w-full flex justify-between items-end text-[10px] text-gray-500">
+            <div aria-hidden className="opacity-70 hidden sm:block">
+              0486.362.182.457.324 | 8034.688.048.740.122<br />
+              0782.238.284.615.158 | 0812.088.013.132.872
+            </div>
+            <button onClick={dismiss} className="ml-auto px-4 py-2 text-black font-bold text-xs hover:bg-white transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white" style={{ background: ORANGE }}>
+              [ SKIP INTRO ] &gt;&gt;
+            </button>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
-  );
-}
-
-function Caret() {
-  return <span className="inline-block w-[0.5em] h-[1em] bg-[var(--sn-cyan)] ml-1 align-middle animate-pulse" />;
-}
-
-/** CSS-only pulsing arc-reactor glyph — deliberately not a second WebGL
- * canvas: this overlay sits above the persistent 3D canvas, and running
- * two WebGL contexts at once is unnecessary cost and risk here. */
-function ArcReactorCore({ active }: { active: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
-  return (
-    <div ref={ref} className="relative z-10 w-40 h-40 md:w-52 md:h-52 flex items-center justify-center">
-      <div className={`absolute inset-0 rounded-full border-2 border-[var(--sn-cyan)]/50 ${active ? "reactor-ring-1" : ""}`} />
-      <div className={`absolute inset-4 rounded-full border border-[#FFB800]/40 ${active ? "reactor-ring-2" : ""}`} />
-      <div className={`absolute inset-10 rounded-full bg-[var(--sn-cyan)]/20 blur-xl ${active ? "reactor-pulse" : ""}`} />
-      <div className="relative w-10 h-10 rounded-full bg-[var(--sn-cyan)] shadow-[0_0_40px_10px_rgba(0,240,255,0.6)]" />
-    </div>
   );
 }
