@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Navya Gupta — intro</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+  html,body{margin:0;height:100%;background:#000;overflow:hidden}
+  canvas{display:block;width:100vw;height:100vh}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<h1 class="sr-only">Navya Gupta — Bioengineer, AI/ML builder, storyteller</h1>
+<canvas id="stage"></canvas>
+<script src="util.js"></script>
+<script src="fx.js"></script>
+<script src="scenes.js"></script>
+<script>
+/* ===== CONFIG — edit words, colours and timing here; scene code never needs touching ===== */
+const CONFIG = {
+  pal: { ink:"#0A0A0A", orange:"#FF5A14", lime:"#C6F600", bone:"#F2F2EE", amber:"#FFC800", steel:"#555A5E" },
+  words: { first:"NAVYA", surname:"GUPTA", name:"NAVYA GUPTA", devanagari:"नव्या", monogram:"NG" },
+  // scene start times in seconds (14 scenes + loop wipe); last value is the loop length
+  starts: [0,3.2,6.4,9.6,12.6,15.8,18.6,21.8,24.8,28.0,31.0,34.2,37.4,40.2,42.6,44.0],
+  audioSrc: null,
+};
+
+(function () {
+  const U = window.U, FX = window.FX, C = CONFIG;
+  const OS = 0.006;                                // slight overscan so RGB-split edge gaps never show
+  const LW = 1920, LH = 436;                       // fixed logical band space (~4.4:1)
+  const stage = document.getElementById("stage"), sg = stage.getContext("2d");
+  const band = document.createElement("canvas"), bg = band.getContext("2d");
+  const layers = {};
+  let size = null, rs = 1;                         // size: explicit render size from setRenderSize
+
+  function layout() {
+    let w, h;
+    if (size) { w = size.w; h = size.h; }
+    else { const dpr = Math.min(window.devicePixelRatio || 1, 3840 / innerWidth); w = Math.round(innerWidth * dpr); h = Math.round(innerHeight * dpr); }
+    if (stage.width !== w || stage.height !== h) { stage.width = w; stage.height = h; }
+    if (size) { stage.style.width = "100vw"; stage.style.height = "100vh"; }
+    rs = Math.min(2, w / LW);
+    const bw = Math.ceil(LW * rs), bh = Math.ceil(LH * rs);
+    if (band.width !== bw || band.height !== bh) { band.width = bw; band.height = bh; }
+  }
+  window.setRenderSize = (w, h) => { size = { w, h }; layout(); };
+
+  const layer = (name) => {
+    let l = layers[name];
+    if (!l || l.c.width !== band.width || l.c.height !== band.height) {
+      const c = document.createElement("canvas"); c.width = band.width; c.height = band.height;
+      l = layers[name] = { c, g: c.getContext("2d") };
+    }
+    l.g.setTransform(1, 0, 0, 1, 0, 0); l.g.clearRect(0, 0, l.c.width, l.c.height); l.g.setTransform(rs, 0, 0, rs, 0, 0);
+    return l;
+  };
+
+  window.renderFrame = function (t) {
+    layout();
+    const total = C.starts[C.starts.length - 1];
+    t = ((t % total) + total) % total;
+    let i = 0; while (i < C.starts.length - 2 && t >= C.starts[i + 1]) i++;
+    const sceneIdx = Math.min(i, window.SCENES.length - 1);
+    const u = t - C.starts[i], dur = C.starts[i + 1] - C.starts[i];
+    const T = { C, res: rs, dur, glitch: 0, layer, t };
+
+    // — the band, in logical coordinates —
+    bg.setTransform(1, 0, 0, 1, 0, 0); bg.fillStyle = C.pal.ink; bg.fillRect(0, 0, band.width, band.height);
+    bg.setTransform(rs, 0, 0, rs, 0, 0);
+    bg.save();
+    const [sx, sy] = FX.shake(u, i + 1); bg.translate(sx, sy);
+    window.SCENES[sceneIdx](bg, LW, LH, u, T);
+    bg.restore();
+    FX.shutter(bg, LW, LH, u);
+    const post = FX.post(band, t, { rs, glitch: T.glitch });
+
+    // — the stage: reflected bars above/below + the live band —
+    const W = stage.width, H = stage.height;
+    const bandH = Math.min(W / (LW / LH), H * 0.42), top = (H - bandH) / 2, bot = top + bandH;
+    sg.setTransform(1, 0, 0, 1, 0, 0); sg.fillStyle = "#000"; sg.fillRect(0, 0, W, H);
+    const blur = "filter" in sg ? `blur(${Math.round(8 + 6 * (W / 3840))}px) brightness(0.7)` : "none";
+    // above
+    sg.save(); sg.beginPath(); sg.rect(0, 0, W, top); sg.clip();
+    sg.globalAlpha = 0.18; sg.filter = blur; sg.translate(0, top); sg.scale(1, -1); sg.drawImage(post, -OS * W, 0, W * (1 + 2 * OS), bandH); sg.restore();
+    let gr = sg.createLinearGradient(0, top - bandH, 0, top); gr.addColorStop(0, "#000"); gr.addColorStop(1, "rgba(0,0,0,0)");
+    sg.fillStyle = gr; sg.fillRect(0, top - bandH, W, bandH);
+    // below
+    sg.save(); sg.beginPath(); sg.rect(0, bot, W, H - bot); sg.clip();
+    sg.globalAlpha = 0.18; sg.filter = blur; sg.translate(0, bot); sg.scale(1, -1); sg.drawImage(post, -OS * W, -bandH, W * (1 + 2 * OS), bandH); sg.restore();
+    gr = sg.createLinearGradient(0, bot, 0, bot + bandH); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "#000");
+    sg.fillStyle = gr; sg.fillRect(0, bot, W, bandH);
+    // live band
+    sg.drawImage(post, -OS * W, top, W * (1 + 2 * OS), bandH);
+  };
+
+  // runtime loop: fixed timeline clock, paused while the tab is hidden
+  let clock = 0, last = null;
+  function tick(now) {
+    requestAnimationFrame(tick);
+    if (document.hidden) { last = null; return; }
+    if (last !== null) clock += (now - last) / 1000;
+    last = now;
+    window.renderFrame(clock);
+  }
+  window.__introReady = document.fonts.ready.then(() => Promise.all([
+    document.fonts.load('400 40px "Anton"'), document.fonts.load('400 40px "Archivo Black"'), document.fonts.load('900 40px "Noto Devanagari"', "नव्या"),
+  ])).then(() => {
+    window.__ready = true;
+    if (!/[?&]still\b/.test(location.search)) requestAnimationFrame(tick);
+  });
+})();
+</script>
+</body>
+</html>
