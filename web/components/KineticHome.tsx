@@ -7,6 +7,7 @@ import { useServiceStore } from "@/lib/serviceStore";
 import { PILLARS, servicesFor, type Pillar } from "@/lib/services";
 import { soundFX } from "@/utils/soundManager";
 import { REPLAY_INTRO_EVENT } from "./IntroOverlay";
+import NavyaCharacter from "./character/NavyaCharacter";
 
 const ROLES = ["BIOENGINEER", "AI / ML BUILDER", "MEDTECH INNOVATOR", "STORYTELLER", "MARKETER", "FINANCE-MINDED", "NEGOTIATOR"];
 
@@ -51,6 +52,7 @@ function Hero() {
         <div key={side} aria-hidden className={`absolute top-0 bottom-0 w-[8vw] ${side ? "right-0" : "left-0"}`} style={{ background: "repeating-linear-gradient(115deg,#0A0A0A 0 10px,transparent 10px 26px)", opacity: 0.9 }} />
       ))}
       <p aria-hidden className="font-anton absolute -right-[4vw] top-[14vh] text-[34vw] leading-none opacity-[0.1] select-none">GUPTA</p>
+      <NavyaCharacter />
       <div className="relative px-[10vw] md:px-[12vw]">
         <p className="sn-hud-text text-[11px] uppercase tracking-[0.14em] opacity-80">SEQ 00 · B.TECH BIOENGINEERING // VIT BHOPAL // BATCH 2028</p>
         <h1 className="mt-4">
