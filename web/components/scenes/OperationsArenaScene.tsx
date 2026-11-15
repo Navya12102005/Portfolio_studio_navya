@@ -98,7 +98,7 @@ export function OperationsArenaScene() {
   });
 
   return (
-    <group ref={arenaRef} position={[0, -2, 0]}>
+    <group ref={arenaRef} position={[0, -3, -13]}>
       {/* Curved Cylindrical Data Panels */}
       {Array.from({ length: 6 }).map((_, i) => {
         const angle = (i / 6) * Math.PI * 2;

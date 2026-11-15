@@ -1,34 +1,31 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/lib/useLenis";
 import { useDevicePerformance } from "@/hooks/useDevicePerformance";
 import { useSecondBrainStore } from "@/lib/secondBrainStore";
 import Cursor from "./hud/Cursor";
-import PerimeterHUD from "./hud/PerimeterHUD";
+import TopStatusBar from "./hud/TopStatusBar";
 import SceneRoot from "./scenes/SceneRoot";
 import LightweightFallback from "./scenes/LightweightFallback";
-import WakeUpText from "./scenes/WakeUpText";
 import JarvisAssistant from "./JarvisAssistant";
-import JarvisBootSequence from "./JarvisBootSequence";
 import ProjectModal from "./ProjectModal";
 import SecondBrainView from "./SecondBrainView";
-import BioTelemetryWidget from "./BioTelemetryWidget";
 import DossierModal from "./DossierModal";
 import EasterEggOverlay from "./EasterEggOverlay";
-import LiveTicker from "./LiveTicker";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
 export default function AppShell() {
-  const { velocity } = useLenis();
+  // Keeps the Lenis smooth-scroll driver running; the main canvas no
+  // longer reacts to scroll velocity (the particle field it drove was
+  // removed), so the velocity ref itself isn't read here.
+  useLenis();
   const perf = useDevicePerformance();
   const secondBrainOpen = useSecondBrainStore((s) => s.open);
-  const pitch = useRef(0);
-  const bootRef = useRef<HTMLDivElement>(null);
-  const wakeRef = useRef<HTMLDivElement>(null);
 
   // Deferred-by-one-frame mirror of secondBrainOpen for gating the main
   // canvas. Both SceneRoot and SecondBrainView own an R3F <Canvas>, each
@@ -55,80 +52,33 @@ export default function AppShell() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!bootRef.current) return;
-    const ctx = gsap.context(() => {
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: bootRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 0.6,
-          onUpdate: (self) => {
-            pitch.current = self.progress;
-          },
-        },
-      });
-      gsap.to(wakeRef.current, {
-        opacity: 0,
-        y: -40,
-        scrollTrigger: {
-          trigger: bootRef.current,
-          start: "10% top",
-          end: "55% top",
-          scrub: 0.6,
-        },
-      });
-    });
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <>
+    // No intro/boot screen: the site loads straight into the portfolio with
+    // one soft fade-in.
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, ease: "easeOut" }}>
       {/* Gate the heavy WebGL canvas behind device-performance detection.
           `determined` stays false until the client-side GPU/width check
           has actually run, so the full scene is never even briefly
           mounted on a low-power device while that check is pending. */}
-      {perf.determined && !secondBrainOpenDeferred && (perf.tier === "low" ? <LightweightFallback /> : <SceneRoot scrollVelocity={velocity} pitch={pitch} />)}
+      {perf.determined && !secondBrainOpenDeferred && (perf.tier === "low" ? <LightweightFallback /> : <SceneRoot />)}
       <Cursor />
-      <PerimeterHUD />
-      <BioTelemetryWidget />
+      <TopStatusBar showNav={perf.determined && perf.tier === "high"} />
       <DossierModal />
       <EasterEggOverlay />
-      <LiveTicker />
 
       {/* pointer-events-none: lets clicks reach the 3D canvas (domain nodes)
           beneath. Nothing inside <main> is currently interactive; if that
           changes, re-enable pointer-events on that specific element. */}
-      <main className="relative z-10 pointer-events-none">
-        <section ref={bootRef} className="relative h-[220vh]">
-          <div className="sticky top-0 h-screen flex flex-col items-start justify-center px-8 md:px-16">
-            <div ref={wakeRef}>
-              <WakeUpText />
-            </div>
-          </div>
-        </section>
-
-        <section className="relative min-h-screen flex items-center justify-center px-8 md:px-16 text-center">
-          <div className="sn-glass rounded-2xl px-10 py-12 max-w-xl">
-            <p className="sn-hud-text text-xs text-[var(--sn-cyan)]/70 mb-3">
-              {"// SCENE 0 COMPLETE — COMMAND CENTER ONLINE"}
-            </p>
-            <h2 className="sn-title text-2xl md:text-3xl font-bold text-[#e6edfb]">
-              Tech · Bioengineering · Operations
-            </h2>
-            <p className="mt-4 text-sm text-[#b9c6e8]">
-              Scenes 1–3 centerpieces are mounted; full scroll-triggered
-              choreography/domain switching between them is still ahead.
-            </p>
-          </div>
-        </section>
+      <main className="relative z-10 pointer-events-none min-h-[160vh]">
+        <div className={`fixed bottom-8 left-8 max-w-xs ${perf.tier === "low" ? "hidden" : ""}`}>
+          <p className="sn-hud-text text-[10px] text-[var(--sn-cyan)]/50 tracking-widest">NAVYA GUPTA</p>
+          <p className="text-sm text-[#c9d3ee]/70 mt-1">Bioengineering × AI — Tech, Bio & Ops, explored in 3D.</p>
+        </div>
       </main>
 
       <JarvisAssistant />
       <ProjectModal />
       <SecondBrainView />
-      <JarvisBootSequence />
-    </>
+    </motion.div>
   );
 }

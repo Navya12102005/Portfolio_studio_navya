@@ -4,14 +4,15 @@ import { create } from "zustand";
 
 export type CameraDomain = "tech" | "bio" | "ops" | "home";
 
-// Real framing for each 3D centerpiece: TechScene at group position
-// [-3,0,0], BioEngineeringScene at [2,0,0], OperationsArenaScene at
-// [0,-2,0] with radius 2.5.
+// Real framing for each 3D centerpiece, spaced far apart in X/Y/Z so each
+// floats alone instead of reading as one cluttered cluster: TechScene at
+// group position [-9,0.5,-6], BioEngineeringScene at [8,0.5,-8],
+// OperationsArenaScene at [0,-3,-13] (radius 2.5 arena).
 export const CAMERA_TARGETS: Record<CameraDomain, { position: [number, number, number]; lookAt: [number, number, number] }> = {
-  home: { position: [0, 1.4, 9], lookAt: [0, 0, 0] },
-  tech: { position: [-3, 0.8, 4], lookAt: [-3, 0, 0] },
-  bio: { position: [2, 1.2, 4], lookAt: [2, 0, 0] },
-  ops: { position: [0, -0.5, 6], lookAt: [0, -2, 0] },
+  home: { position: [0, 1.4, 9], lookAt: [0, 0, -6] },
+  tech: { position: [-6.5, 1.2, -1.5], lookAt: [-9, 0.5, -6] },
+  bio: { position: [4.5, 0.5, 1], lookAt: [8, 0.5, -8] },
+  ops: { position: [0, -1.5, -7], lookAt: [0, -3, -13] },
 };
 
 type CameraRigState = {

@@ -6,11 +6,11 @@ import * as THREE from "three";
 import { BackgroundVertexShader, BackgroundFragmentShader } from "@/shaders/BackgroundShader";
 
 /**
- * Layer 1 — cursor-illuminated schematic/atmospheric background.
- * Clip-space full-screen quad (vertex shader bypasses camera matrices),
- * folded into the main SceneRoot canvas rather than a second Canvas/Lenis
- * instance, to avoid duplicate WebGL contexts and competing scroll
- * smoothing.
+ * Layer 1 — a pure carbon-obsidian void with one soft cursor-reactive
+ * glow (see shaders/BackgroundShader.ts). Clip-space full-screen quad
+ * (vertex shader bypasses camera matrices), folded into the main
+ * SceneRoot canvas rather than a second Canvas/Lenis instance, to avoid
+ * duplicate WebGL contexts and competing scroll smoothing.
  */
 export default function SchematicLayer() {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -29,22 +29,11 @@ export default function SchematicLayer() {
     uTime: { value: 0 },
     uResolution: { value: new THREE.Vector2(size.width, size.height) },
     uMouse: { value: new THREE.Vector2(0, 0) },
-    // cursor velocity in pixels/second, decayed each frame below — drives
-    // the grid's reactive glow and the starfield's speed-streak length.
-    uVelocity: { value: new THREE.Vector2(0, 0) },
   });
-  const lastMouse = useRef<{ x: number; y: number; t: number } | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       uniforms.current.uMouse.value.set(e.clientX, e.clientY);
-      const now = performance.now();
-      const last = lastMouse.current;
-      if (last) {
-        const dt = Math.max((now - last.t) / 1000, 1 / 240);
-        uniforms.current.uVelocity.value.set((e.clientX - last.x) / dt, (e.clientY - last.y) / dt);
-      }
-      lastMouse.current = { x: e.clientX, y: e.clientY, t: now };
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
@@ -53,9 +42,6 @@ export default function SchematicLayer() {
   useFrame((state) => {
     uniforms.current.uTime.value = state.clock.getElapsedTime();
     uniforms.current.uResolution.value.set(size.width, size.height);
-    // decay velocity toward zero between mousemove events, so the
-    // reactive effects settle instead of freezing at the last sampled speed
-    uniforms.current.uVelocity.value.multiplyScalar(0.9);
   });
 
   return (

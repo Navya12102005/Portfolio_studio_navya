@@ -35,10 +35,7 @@ const CONTENT: Record<"tech" | "bio" | "ops", string> = {
   ops: [TITLES.ops, ...LINES.ops.map((l) => `- ${l}`)].join("\n"),
 };
 
-/**
- * Positioned at top-20 (not top-6): PerimeterHUD's hex status grid already
- * occupies top-6 right-6, so this sits below it instead of overlapping.
- */
+/** Positioned at top-20, clear of the slim TopStatusBar along the very top edge. */
 export default function DossierModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"tech" | "bio" | "ops">("tech");

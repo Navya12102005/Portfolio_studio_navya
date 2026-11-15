@@ -56,7 +56,7 @@ export function TechScene() {
   };
 
   return (
-    <group ref={groupRef} position={[-3, 0, 0]}>
+    <group ref={groupRef} position={[-9, 0.5, -6]}>
       <mesh ref={ring1Ref}>
         <torusGeometry args={[1.1, 0.015, 8, 64]} />
         <meshStandardMaterial color="#00F0FF" emissive="#00F0FF" emissiveIntensity={0.5} roughness={0.3} metalness={0.7} />

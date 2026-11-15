@@ -18,9 +18,8 @@ const DOMAIN_LABEL: Record<"tech" | "bio" | "ops", string> = {
  * - Optical iris wipe (circular clip-path) expands from the exact click
  *   coordinate, via Framer Motion.
  * - High-contrast dark glassmorphism drawer with full project tabs.
- * - Lives at z-[500]; PerimeterHUD is bumped to z-[600] so the telemetry
- *   overlay (ruler, rotation dial, hex grid, XY, terminal) stays fully
- *   visible and functional on top of the drawer, per spec.
+ * - Lives at z-[500]; TopStatusBar sits at z-[600] so it stays visible
+ *   and functional on top of the drawer, per spec.
  */
 export default function ProjectModal() {
   const { activeProject, origin, close } = useProjectModalStore();

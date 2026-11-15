@@ -1,36 +1,31 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { EffectComposer, Bloom, ChromaticAberration, Vignette } from "@react-three/postprocessing";
-import { BlendFunction } from "postprocessing";
+import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import { Suspense } from "react";
-import * as THREE from "three";
-import DustField from "./DustField";
-import DataStreamField from "./DataStreamField";
 import SchematicLayer from "./SchematicLayer";
-import BootHorizon from "./BootHorizon";
 import { BioEngineeringScene } from "./BioEngineeringScene";
 import { OperationsArenaScene } from "./OperationsArenaScene";
 import { TechScene } from "./TechScene";
 import CameraRig from "./CameraRig";
 
 /**
- * The single persistent R3F canvas behind the whole page. Scene 0 (boot
- * horizon) lives here now; Scenes 1-3 mount into the same canvas as the
- * user scrolls past the boot sequence (next milestone).
+ * The single persistent R3F canvas behind the whole page.
+ *
+ * Deliberately minimal per the "Stark-Minimalist" direction: no grid
+ * floor, no particle fields — a pure carbon-obsidian void (set on
+ * SchematicLayer's own shader, which is now just a soft cursor glow +
+ * vignette, no grid/PCB/starfield), with the three domain centerpieces
+ * spaced far apart in X/Y/Z so each floats alone in its own space
+ * instead of reading as one cluttered cluster. A few off-axis point
+ * lights give each centerpiece a soft rim-lit edge against the void.
  *
  * NOTE: `preserveDrawingBuffer: true` is kept on intentionally — this sandbox's
  * headless/software-GL screenshot pipeline needs it to capture the canvas
  * reliably for automated visual testing (see AGENTS.md / build notes). It
  * has a negligible cost on a real GPU and is safe to leave in.
  */
-export default function SceneRoot({
-  scrollVelocity,
-  pitch,
-}: {
-  scrollVelocity: React.MutableRefObject<number>;
-  pitch: React.MutableRefObject<number>;
-}) {
+export default function SceneRoot() {
   return (
     // NOTE: z-index intentionally NOT negative. A negative z-index ancestor
     // around a WebGL2 canvas breaks real pointer-event hit-testing in this
@@ -47,28 +42,30 @@ export default function SceneRoot({
         camera={{ position: [0, 1.4, 9], fov: 50, near: 0.1, far: 200 }}
       >
         <color attach="background" args={["#030508"]} />
-        <fog attach="fog" args={["#030508", 10, 60]} />
-        <ambientLight intensity={0.25} />
-        <directionalLight position={[4, 8, 6]} intensity={0.6} color="#9fd8ff" />
+        <fog attach="fog" args={["#030508", 14, 70]} />
+        <ambientLight intensity={0.2} />
+        <directionalLight position={[4, 8, 6]} intensity={0.45} color="#9fd8ff" />
         <CameraRig />
 
         <Suspense fallback={null}>
           <SchematicLayer />
-          <BootHorizon pitch={pitch} />
-          <DustField velocity={scrollVelocity} />
-          <DataStreamField />
-          {/* Scene 2 centerpiece — mounted now for verification; proper
-              scroll-triggered scene choreography/domain switching is the
-              next milestone, so camera framing here is provisional. */}
+
+          {/* rim lights, one per centerpiece, positioned behind and above
+              each object (farther from the camera than the object itself)
+              so its far edge catches a soft glow against the void */}
+          <pointLight position={[-9, 2, -10]} intensity={2.4} distance={9} color="#00F0FF" />
           <TechScene />
+
+          <pointLight position={[8, 1.5, -12]} intensity={2.4} distance={9} color="#FF5E00" />
           <BioEngineeringScene />
+
+          <pointLight position={[0, -1, -17]} intensity={2.6} distance={10} color="#00F0FF" />
           <OperationsArenaScene />
         </Suspense>
 
         <EffectComposer>
-          <Bloom intensity={1.1} luminanceThreshold={0.08} luminanceSmoothing={0.4} mipmapBlur />
-          <ChromaticAberration offset={new THREE.Vector2(0.0008, 0.0008)} blendFunction={BlendFunction.NORMAL} />
-          <Vignette eskil={false} offset={0.25} darkness={0.65} />
+          <Bloom intensity={0.85} luminanceThreshold={0.12} luminanceSmoothing={0.45} mipmapBlur />
+          <Vignette eskil={false} offset={0.3} darkness={0.7} />
         </EffectComposer>
       </Canvas>
     </div>

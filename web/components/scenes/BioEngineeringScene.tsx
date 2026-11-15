@@ -135,7 +135,7 @@ export function BioEngineeringScene() {
   }, []);
 
   return (
-    <group ref={helixRef} position={[2, 0, 0]}>
+    <group ref={helixRef} position={[8, 0.5, -8]}>
       {/* Double Helix Simulation Backbone */}
       {rungs.map(({ i, y, x1, z1, x2, z2, positions }) => (
         <group key={i}>

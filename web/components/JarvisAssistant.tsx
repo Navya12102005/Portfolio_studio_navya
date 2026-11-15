@@ -107,10 +107,8 @@ export default function JarvisAssistant() {
     if (transcript) await send(transcript);
   };
 
-  // bottom-14, not bottom-6: LiveTicker now occupies the bottom-0 edge
-  // strip, so the orb trigger sits clear above it
   return (
-    <div className="fixed bottom-14 right-6 z-50 font-mono">
+    <div className="fixed bottom-6 right-6 z-50 font-mono">
       {/* Arc Reactor Trigger Orb */}
       <motion.button
         onClick={() => {
