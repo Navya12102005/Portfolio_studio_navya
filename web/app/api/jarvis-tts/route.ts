@@ -7,16 +7,16 @@ import { NextResponse } from "next/server";
  * Env: ELEVENLABS_API_KEY, ELEVENLABS_VOICE_ID (optional ELEVENLABS_MODEL, default eleven_flash_v2_5).
  */
 
-const MAX_CHARS = 500;
+const MAX_CHARS = 300; // credits are per character, so cap what one reply can cost
 const TIMEOUT_MS = 20000;
-// Models tried in order. v3 is the most expressive/human; multilingual_v2 is the dependable fallback if v3 is
-// rejected for this account or voice. Override the first with ELEVENLABS_MODEL (e.g. "eleven_flash_v2_5" for speed).
-const MODELS = [process.env.ELEVENLABS_MODEL || "eleven_v3", "eleven_multilingual_v2"].filter((m, i, a) => a.indexOf(m) === i);
+// Cheapest model by default: Flash costs half the credits per character of v3 / multilingual_v2, so a limited plan
+// lasts about twice as long. To trade credits for quality set ELEVENLABS_MODEL to "eleven_multilingual_v2" or "eleven_v3".
+const MODELS = [process.env.ELEVENLABS_MODEL || "eleven_flash_v2_5"];
 // Looser stability = more natural pitch and pacing; too high sounds flat and robotic. v3 snaps stability to 0 / 0.5 / 1.
 const settingsFor = (model: string) =>
   model === "eleven_v3"
     ? { stability: 0.5, similarity_boost: 0.8, style: 0.3, use_speaker_boost: true }
-    : { stability: 0.38, similarity_boost: 0.78, style: 0.3, use_speaker_boost: true };
+    : { stability: 0.4, similarity_boost: 0.78, style: 0.25, use_speaker_boost: true };
 
 /**
  * Text is respelled for the voice only (the on-screen text is untouched). Add a [pattern, spoken form] pair whenever
