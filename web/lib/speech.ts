@@ -70,23 +70,30 @@ export function listenOnce(): Promise<string | null> {
   });
 }
 
-let cachedVoice: SpeechSynthesisVoice | null = null;
-let cachedVoiceReady = false;
+/**
+ * Scores a voice for the J.A.R.V.I.S. persona. Neural ("Natural"/"Online") voices, which Edge and some Chrome
+ * installs ship for free, sound far more human than the default engine voices, so they win by a wide margin.
+ * Then accent: Indian English first (it matches Navya), then British, then other English.
+ */
+export function scoreVoice(v: { name: string; lang: string; localService?: boolean }): number {
+  const lang = v.lang.replace("_", "-").toLowerCase();
+  if (!lang.startsWith("en")) return -1000;
+  let score = 0;
+  if (/natural|neural|premium|enhanced/i.test(v.name)) score += 100;
+  if (/online/i.test(v.name)) score += 30;
+  if (/google/i.test(v.name)) score += 25; // Chrome's cloud voices are better than the OS defaults
+  if (lang === "en-in") score += 45; else if (lang === "en-gb") score += 40; else if (lang === "en-us") score += 20; else score += 10;
+  if (/espeak|compact/i.test(v.name)) score -= 80;
+  return score;
+}
+
+export function pickBestVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+  return [...voices].filter((v) => scoreVoice(v) > -500).sort((x, y) => scoreVoice(y) - scoreVoice(x))[0] ?? null;
+}
 
 function pickBritishVoice(): SpeechSynthesisVoice | null {
-  if (cachedVoiceReady) return cachedVoice;
   if (!isSpeechSynthesisSupported()) return null;
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null; // not loaded yet — caller may retry after the voiceschanged event
-  const preferredNames = ["Daniel", "Arthur", "Google UK English Male", "Google UK English Female"];
-  cachedVoice =
-    voices.find((v) => preferredNames.some((n) => v.name.includes(n))) ||
-    voices.find((v) => v.lang === "en-GB") ||
-    voices.find((v) => v.lang.startsWith("en-GB")) ||
-    voices.find((v) => v.lang.startsWith("en")) ||
-    null;
-  cachedVoiceReady = true;
-  return cachedVoice;
+  return pickBestVoice(window.speechSynthesis.getVoices()); // not cached: online voices can appear after the first load
 }
 
 export type SpeakHandlers = { onStart?: () => void; onEnd?: () => void };
@@ -105,11 +112,10 @@ export function speak(text: string, handlers: SpeakHandlers = {}): void {
   }
   const synth = window.speechSynthesis;
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "en-GB";
-  utter.pitch = 0.85;
-  utter.rate = 0.98;
+  utter.pitch = 1; // a lowered pitch is what makes browser voices sound robotic
+  utter.rate = 1;
   const voice = pickBritishVoice();
-  if (voice) utter.voice = voice;
+  if (voice) { utter.voice = voice; utter.lang = voice.lang; } else utter.lang = "en-GB";
 
   let started = false;
   let finished = false;

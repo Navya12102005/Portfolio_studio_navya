@@ -55,7 +55,8 @@ function limited(ip: string): boolean {
 
 export async function POST(req: Request) {
   const key = process.env.ELEVENLABS_API_KEY, voice = process.env.ELEVENLABS_VOICE_ID;
-  if (!key || !voice) return NextResponse.json({ error: "tts_not_configured" }, { status: 503 });
+  // ELEVENLABS_DISABLE=1 is a kill switch: no ElevenLabs call is ever made and the widget uses the free browser voice
+  if (process.env.ELEVENLABS_DISABLE === "1" || !key || !voice) return NextResponse.json({ error: "tts_not_configured" }, { status: 503 });
 
   // same-origin only (browsers send Origin on POST); blocks other sites from calling this endpoint
   const origin = req.headers.get("origin"), host = req.headers.get("host");
