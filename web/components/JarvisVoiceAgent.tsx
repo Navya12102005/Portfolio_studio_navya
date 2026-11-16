@@ -53,6 +53,7 @@ export default function JarvisVoiceAgent() {
   const levelRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const historyRef = useRef<Turn[]>([]);
+  const audioRef = useRef<{ el: HTMLAudioElement; url: string } | null>(null);
 
   const go = useCallback((s: JState) => { stateRef.current = s; setState(s); }, []);
 
@@ -67,6 +68,11 @@ export default function JarvisVoiceAgent() {
     return () => window.removeEventListener(START_KINETIC_EVENT, show);
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  const stopAudio = useCallback(() => {
+    const a = audioRef.current; audioRef.current = null;
+    if (a) { a.el.onended = null; a.el.onerror = null; a.el.pause(); URL.revokeObjectURL(a.url); }
+  }, []);
 
   const closeMeter = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -91,18 +97,36 @@ export default function JarvisVoiceAgent() {
     }
     historyRef.current = [...historyRef.current, { role: "user" as const, text }, { role: "model" as const, text: out }].slice(-8);
     setReply(out);
-    speak(out, { onStart: () => { if (stateRef.current === "PROCESSING") go("SPEAKING"); }, onEnd: () => { if (stateRef.current === "SPEAKING" || stateRef.current === "PROCESSING") go("IDLE"); } });
-  }, [go]);
+    const finish = () => { if (stateRef.current === "SPEAKING" || stateRef.current === "PROCESSING") go("IDLE"); };
+    const browserVoice = () => speak(out, { onStart: () => { if (stateRef.current === "PROCESSING") go("SPEAKING"); }, onEnd: finish });
+    // ElevenLabs voice via our server route; any failure drops back to the browser's built-in voice
+    try {
+      const tts = await fetch("/api/jarvis-tts", { method: "POST", headers: { "Content-Type": "application/json" }, signal: ctl.signal, body: JSON.stringify({ text: out }) });
+      if (!tts.ok) throw new Error("tts " + tts.status);
+      const blob = await tts.blob();
+      if (stateRef.current !== "PROCESSING") return; // cancelled while the audio was loading
+      const url = URL.createObjectURL(blob), el = new Audio(url);
+      stopAudio(); audioRef.current = { el, url };
+      el.onended = () => { stopAudio(); finish(); };
+      el.onerror = () => { stopAudio(); if (stateRef.current === "SPEAKING" || stateRef.current === "PROCESSING") browserVoice(); };
+      await el.play();
+      go("SPEAKING");
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
+      stopAudio();
+      if (stateRef.current === "PROCESSING") browserVoice();
+    }
+  }, [go, stopAudio]);
 
   const cancel = useCallback(() => {
     stateRef.current = "IDLE"; // set first so a recognizer's onend can't submit
     recRef.current?.abort(); recRef.current = null;
-    abortRef.current?.abort(); stopSpeaking(); closeMeter(); go("IDLE");
-  }, [closeMeter, go]);
+    abortRef.current?.abort(); stopSpeaking(); stopAudio(); closeMeter(); go("IDLE");
+  }, [closeMeter, go, stopAudio]);
 
   const startListening = useCallback(async () => {
     if (stateRef.current !== "IDLE") return;
-    stopSpeaking(); setOpen(true); setNotice(""); setHeard(""); setReply(""); finalRef.current = ""; heardErrRef.current = "";
+    stopSpeaking(); stopAudio(); setOpen(true); setNotice(""); setHeard(""); setReply(""); finalRef.current = ""; heardErrRef.current = "";
     const Ctor = (window as unknown as { SpeechRecognition?: RecognizerCtor; webkitSpeechRecognition?: RecognizerCtor });
     const SR = Ctor.SpeechRecognition || Ctor.webkitSpeechRecognition;
     if (!SR) { setNotice("Voice input isn't supported in this browser. Type below instead."); setTimeout(() => inputRef.current?.focus(), 0); return; }
@@ -130,7 +154,7 @@ export default function JarvisVoiceAgent() {
       ac.createMediaStreamSource(stream).connect(an);
       streamRef.current = stream; audioCtxRef.current = ac; analyserRef.current = an;
     } catch { /* simulated level */ }
-  }, [closeMeter, go, submit]);
+  }, [closeMeter, go, stopAudio, submit]);
 
   const toggle = useCallback(() => {
     const s = stateRef.current;
@@ -154,7 +178,7 @@ export default function JarvisVoiceAgent() {
     return () => window.removeEventListener("keydown", onKey);
   }, [ready, open, cancel, toggle]);
 
-  useEffect(() => () => { stateRef.current = "IDLE"; recRef.current?.abort(); abortRef.current?.abort(); stopSpeaking(); closeMeter(); }, [closeMeter]);
+  useEffect(() => () => { stateRef.current = "IDLE"; recRef.current?.abort(); abortRef.current?.abort(); stopSpeaking(); stopAudio(); closeMeter(); }, [closeMeter, stopAudio]);
 
   // the arc-reactor ring
   useEffect(() => {
