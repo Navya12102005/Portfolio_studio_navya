@@ -78,17 +78,13 @@ export default function JarvisBootSequence() {
           style={{ border: `1px solid ${ORANGE}4D` }}
           exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.8, ease: "easeInOut" }}
         >
-          <div className="w-full flex justify-between gap-4 text-[10px] md:text-xs tracking-widest" style={{ color: ORANGE }}>
-            <span>CORE STABILITY // SYNC 99% TEMP 37C</span>
-            <span className="hidden sm:inline">J.A.R.V.I.S. v4.2 // NAVYA.AI</span>
-          </div>
+          <span aria-hidden />
 
           <div className="flex flex-col items-center w-full max-w-4xl">
             <div className="relative w-full flex flex-col items-center justify-center py-2">
               <div className="p-2 border" style={{ borderColor: ORANGE + "80", boxShadow: `0 0 30px ${ORANGE}40`, background: "#000000" }}>
-                <MiniLoop size={224} />
+                <MiniLoop size={260} />
               </div>
-              <p className="mt-4 text-xs tracking-widest uppercase" style={{ color: ORANGE }}>[ J.A.R.V.I.S. BIO-TELEMETRY ACTIVE ]</p>
             </div>
 
             <p className="mt-4 min-h-[5.5rem] text-sm md:text-base text-gray-300 leading-relaxed text-center max-w-xl" aria-label={GREETING}>
@@ -100,10 +96,6 @@ export default function JarvisBootSequence() {
           </div>
 
           <div className="w-full flex justify-between items-end text-[10px] text-gray-500">
-            <div aria-hidden className="opacity-70 hidden sm:block">
-              0486.362.182.457.324 | 8034.688.048.740.122<br />
-              0782.238.284.615.158 | 0812.088.013.132.872
-            </div>
             <button onClick={dismiss} className="ml-auto px-4 py-2 text-black font-bold text-xs hover:bg-white transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white" style={{ background: ORANGE }}>
               [ SKIP INTRO ] &gt;&gt;
             </button>

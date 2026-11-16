@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { S, drawLoop, type Fonts } from "./mini";
 
-/** The boot's tiny animation: maroon hatched star <-> tan pixel eye, joined by a pixelate cut, looping forever. */
+/** The boot's tiny animation: star -> pixel eye -> pulse trace -> scrolling code, dissolving cell by cell into each other, looping forever. */
 export default function MiniLoop({ size = 240 }: { size?: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -17,6 +17,7 @@ export default function MiniLoop({ size = 240 }: { size?: number }) {
     canvas.width = canvas.height = Math.round(size * dpr);
     const scale = canvas.width / S;
     const scratch = document.createElement("canvas");
+    scratch.width = scratch.height = canvas.width;
     let raf = 0;
     const start = performance.now();
     const frame = (now: number) => {

@@ -4,9 +4,11 @@
  * Pure function of time, so it is deterministic and easy to test.
  */
 export const S = 240;
-export const PERIOD = 4.4;      // seconds per full loop
-export const HOLD = 1.8;        // seconds each scene is shown
-export const SWAP = 0.4;        // seconds each pixelate transition takes
+export const HOLD = 1.2;        // seconds each state holds
+export const DISS = 0.45;       // seconds each cell-by-cell dissolve to the next state takes
+export const STEP = HOLD + DISS;
+export const STATES = 4;        // star -> eye -> pulse -> code -> star ...
+export const PERIOD = STEP * STATES;
 export const BG = { star: "#251212", eye: "#BAB19F" };
 const INK = "#E9DDCB", MID = "#534C43", DARK = "#1C1A17";
 
@@ -25,6 +27,7 @@ function rng(seed: number) {
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const smooth = (v: number) => { v = clamp(v); return v * v * (3 - 2 * v); };
 
+const hashX = (a: number, b: number) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
 const N = 1100;
 const seed = (() => {
   const r = rng(7);
@@ -85,7 +88,7 @@ function hatch(c: Ctx, x: number, y: number, kind: number) {
 function drawEye(c: Ctx, t: number, ts: number) {
   c.fillStyle = BG.eye; c.fillRect(0, 0, S, S);
   const x0 = (S - GX * CELL) / 2, y0 = 40;
-  const blinkT = ts - 1.35, b = blinkT > 0 && blinkT < 0.3 ? Math.pow(Math.sin((blinkT / 0.3) * Math.PI), 1.5) : 0;
+  const blinkT = ts - 0.8, b = blinkT > 0 && blinkT < 0.3 ? Math.pow(Math.sin((blinkT / 0.3) * Math.PI), 1.5) : 0;
   const ex = 13.5, ey = 9, a = 12.5;
   const ix = ex + 5 * Math.sin((ts / HOLD) * Math.PI * 2 * 0.9 + 0.4), iy = ey;
   const sc = Math.round((1 - Math.abs(2 * ((ts / 1.2) % 1) - 1)) * (GX - 3)) + 1;
@@ -105,7 +108,7 @@ function drawEye(c: Ctx, t: number, ts: number) {
     else if (inEye && di < 4.2) hatch(c, x, y, (gx * 3 + gy) % 3);
   }
   // pulse line
-  const cols = 24, cw = (S - 44) / cols, head = Math.floor(clamp(ts / 1.5) * cols), blip = [0, -4, -16, 14, -6, 2, 0];
+  const cols = 24, cw = (S - 44) / cols, head = Math.floor(clamp(ts / 1.0) * cols), blip = [0, -4, -16, 14, -6, 2, 0];
   for (let i = 0; i <= Math.min(head, cols - 1); i++) {
     const bi = i - 8, off = bi >= 0 && bi < blip.length ? blip[bi] : 0;
     c.fillStyle = i === head ? DARK : MID; c.fillRect(22 + i * cw, 204 + off, cw - 1, 5);
@@ -113,24 +116,80 @@ function drawEye(c: Ctx, t: number, ts: number) {
   void t;
 }
 
-/** Draws one frame of the loop into `c` (already scaled to the 240 logical px) using scratch canvases for the pixelate cut. */
-export function drawLoop(c: Ctx, scratch: HTMLCanvasElement, t: number, f: Fonts, pixel: boolean) {
-  const p = t % PERIOD;
-  const showEye = p >= HOLD + SWAP / 2 && p < PERIOD - SWAP / 2;
-  const ts = showEye ? p - (HOLD + SWAP / 2) : 0;
-  const cut = p > HOLD - SWAP / 2 && p < HOLD + SWAP / 2 ? (p - (HOLD - SWAP / 2)) / SWAP
-    : p > PERIOD - SWAP / 2 ? (p - (PERIOD - SWAP / 2)) / SWAP
-    : p < SWAP / 2 ? (p + SWAP / 2) / SWAP : -1;
-  if (showEye) drawEye(c, t, ts); else drawStar(c, t, f);
-  if (!pixel || cut < 0) return;
-  // pixelate: block size swells to a peak at the middle of the cut, then relaxes
-  const block = 1 + 20 * Math.sin(cut * Math.PI);
-  if (block < 2) return;
-  const cw = c.canvas.width, ch = c.canvas.height;
-  const w = Math.max(2, Math.round(cw / (block * (cw / S)))), h = Math.max(2, Math.round(ch / (block * (ch / S))));
-  scratch.width = w; scratch.height = h;
-  const sc = scratch.getContext("2d")!;
-  sc.imageSmoothingEnabled = true; sc.drawImage(c.canvas, 0, 0, cw, ch, 0, 0, w, h);
-  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.imageSmoothingEnabled = false;
-  c.drawImage(scratch, 0, 0, w, h, 0, 0, cw, ch); c.restore();
+/* ---------- pulse trace + equalizer ---------- */
+function drawPulse(c: Ctx, t: number, ts: number) {
+  c.fillStyle = "#0A0A0A"; c.fillRect(0, 0, S, S);
+  c.strokeStyle = "#2a2a2a"; c.lineWidth = 1; c.beginPath();
+  for (let x = 0; x <= S; x += 20) { c.moveTo(x + 0.5, 0); c.lineTo(x + 0.5, S); }
+  for (let y = 0; y <= S; y += 20) { c.moveTo(0, y + 0.5); c.lineTo(S, y + 0.5); }
+  c.stroke();
+  const head = clamp(ts / 0.9 + 0.05) * S;
+  c.strokeStyle = "#FF5A14"; c.lineWidth = 2.2; c.lineJoin = "round"; c.beginPath();
+  for (let x = 0; x <= head; x += 2) {
+    const ph = ((x + t * 60) % 120) / 120;
+    const beat = ph < 0.1 ? 0 : ph < 0.16 ? -(ph - 0.1) * 900 : ph < 0.22 ? -54 + (ph - 0.16) * 2400 : ph < 0.28 ? 90 - (ph - 0.22) * 1500 : 0;
+    const y = 92 + beat * 0.8 + Math.sin(x * 0.2 + t * 4) * 1.5;
+    if (x === 0) c.moveTo(x, y); else c.lineTo(x, y);
+  }
+  c.stroke();
+  c.fillStyle = "#FF5A14"; c.beginPath(); c.arc(Math.min(head, S - 2), 92, 3.5, 0, Math.PI * 2); c.fill();
+  const q = Math.floor(t * 9);
+  for (let i = 0; i < 20; i++) {
+    const h = 6 + 52 * Math.pow(hashX(i, q), 0.8) * (0.5 + 0.5 * Math.sin(i * 0.7 + t * 3));
+    c.fillStyle = i % 5 === 0 ? "#19E3F0" : "#FF5A14"; c.fillRect(14 + i * 11, 214 - h, 7, h);
+  }
+}
+
+/* ---------- scrolling code ---------- */
+const GLY = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+function drawCode(c: Ctx, t: number, f: Fonts) {
+  c.fillStyle = BG.star; c.fillRect(0, 0, S, S);
+  c.font = `700 14px ${f.mono}`; c.textBaseline = "alphabetic"; c.fillStyle = INK;
+  const rows = 11, off = (t * 26) % 20;
+  for (let r = -1; r < rows; r++) {
+    const row = r + Math.floor((t * 26) / 20);
+    let line = "";
+    for (let k = 0; k < 15; k++) line += k % 4 === 3 ? "." : GLY[Math.floor(hashX(k + row * 7, Math.floor(t * 5 + row)) * GLY.length)];
+    c.globalAlpha = 0.35 + 0.65 * hashX(row, 3);
+    c.fillText(line, 14, 22 + r * 20 - off + 20);
+  }
+  c.globalAlpha = 1;
+  const col = Math.floor(t * 12) % 15;
+  c.fillStyle = "#FF5A14"; c.fillRect(14 + col * 14, 110, 9, 16);
+}
+
+function drawState(c: Ctx, i: number, t: number, ts: number, f: Fonts) {
+  if (i === 0) drawStar(c, t, f);
+  else if (i === 1) drawEye(c, t, ts);
+  else if (i === 2) drawPulse(c, t, ts);
+  else drawCode(c, t, f);
+}
+
+/**
+ * One frame of the "living machine": the current state is drawn, and while a dissolve is running the next state is
+ * drawn offscreen and revealed cell by cell (a diagonal wave with per-cell noise), so there is never a hard cut.
+ * A thin scan line sweeps the whole box the entire time.
+ */
+export function drawLoop(c: Ctx, off: HTMLCanvasElement, t: number, f: Fonts, animate: boolean) {
+  const p = t % PERIOD, idx = Math.floor(p / STEP), local = p - idx * STEP;
+  const ts = local;
+  drawState(c, idx, t, ts, f);
+  const prog = animate && local > HOLD ? (local - HOLD) / DISS : -1;
+  if (prog >= 0) {
+    const next = (idx + 1) % STATES, octx = off.getContext("2d")!;
+    const k = off.width / S;
+    octx.setTransform(k, 0, 0, k, 0, 0);
+    drawState(octx, next, t, 0, f);
+    const cells = 20, cs = S / cells;
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
+    for (let cy = 0; cy < cells; cy++) for (let cx = 0; cx < cells; cx++) {
+      const th = (cx + cy) / (2 * cells) * 0.55 + hashX(cx, cy) * 0.45;
+      if (prog * 1.02 > th) c.drawImage(off, cx * cs * k, cy * cs * k, cs * k, cs * k, cx * cs * k, cy * cs * k, cs * k, cs * k);
+    }
+    c.restore();
+  }
+  if (animate) {
+    const y = ((t * 0.9) % 1) * S;
+    c.fillStyle = "rgba(255,255,255,0.10)"; c.fillRect(0, y, S, 2);
+  }
 }
