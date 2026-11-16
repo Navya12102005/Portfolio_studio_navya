@@ -109,3 +109,6 @@ body {
 .sn-outline { -webkit-text-stroke: 2px currentColor; color: transparent; transition: color .25s; }
 .sn-outline:hover { color: currentColor; }
 @media (prefers-reduced-motion: reduce) { .sn-marquee { animation: none; } }
+
+/* orb gallery hint pill fades once the visitor drags */
+.orb-hint.gone { opacity: 0; transform: translateY(5px); }
