@@ -8,19 +8,18 @@ import { START_KINETIC_EVENT } from "./IntroOverlay";
 import MiniLoop from "./jarvis/MiniLoop";
 
 const SESSION_KEY = "studio-navya-booted";
-const WORD_MS = 130;        // one word at a time
+const WORD_MS = 175;        // one word at a time
 const HOLD_MS = 900;        // pause after the last word before continuing
 const MAX_MS = 9000;        // safety net: never hang here
 const GREETING =
   "Welcome, visitor. All bio-telemetry and tech systems are online. I am J.A.R.V.I.S., Navya Gupta's operational intelligence. Initializing main overview...";
 const WORDS = GREETING.split(" ");
 const ORANGE = "#FF5A14";
-
 /**
- * First screen of the site: a small J.A.R.V.I.S. card in the middle of the page (the page stays visible around it).
- * One tiny canvas animation loops a maroon hatched star -> pixelate -> tan pixel eye -> pixelate -> star while the
- * greeting types itself out word by word; it continues on its own when the typing finishes, or on SKIP / Esc / Enter. It then hands off to the
- * kinetic title sequence (IntroOverlay), which hands off to the site. Plays once per session.
+ * First screen of the site: a J.A.R.V.I.S. boot. The centre is one small looping canvas animation (a hatched star
+ * that pixelates into a pixel-grid eye and back) while the greeting types itself out word by word underneath;
+ * it continues on its own when the typing finishes, or on SKIP / Esc / Enter. It then hands off to the kinetic title sequence
+ * (IntroOverlay), which hands off to the site. Plays once per session.
  */
 export default function JarvisBootSequence() {
   const [gate, setGate] = useState<"checking" | "show" | "hide">("checking");
@@ -73,29 +72,43 @@ export default function JarvisBootSequence() {
   return (
     <AnimatePresence onExitComplete={() => setGate("hide")}>
       {!exiting && (
-        <div className="fixed inset-0 z-[900] flex items-center justify-center pointer-events-none">
-          <motion.div
-            role="status" aria-live="polite" aria-label="J.A.R.V.I.S. initializing"
-            className="pointer-events-auto w-[264px] bg-[#0A0A0A] text-white font-mono p-3 flex flex-col items-center gap-3 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
-            style={{ border: `1px solid ${ORANGE}80` }}
-            initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -24, scale: 0.97 }} transition={{ duration: 0.5, ease: "easeOut" }}
-          >
-            <MiniLoop size={240} />
-            <p className="min-h-[3.6rem] w-full text-[11px] leading-relaxed text-gray-300" aria-label={GREETING}>
+        <motion.div
+          role="status" aria-live="polite" aria-label="J.A.R.V.I.S. initializing"
+          className="fixed inset-0 z-[900] bg-[#0A0A0A] text-white font-mono flex flex-col items-center justify-between p-6 md:p-8"
+          style={{ border: `1px solid ${ORANGE}4D` }}
+          exit={{ opacity: 0, y: -50 }} transition={{ duration: 0.8, ease: "easeInOut" }}
+        >
+          <div className="w-full flex justify-between gap-4 text-[10px] md:text-xs tracking-widest" style={{ color: ORANGE }}>
+            <span>CORE STABILITY // SYNC 99% TEMP 37C</span>
+            <span className="hidden sm:inline">J.A.R.V.I.S. v4.2 // NAVYA.AI</span>
+          </div>
+
+          <div className="flex flex-col items-center w-full max-w-4xl">
+            <div className="relative w-full flex flex-col items-center justify-center py-2">
+              <div className="p-2 border" style={{ borderColor: ORANGE + "80", boxShadow: `0 0 30px ${ORANGE}40`, background: "#000000" }}>
+                <MiniLoop size={224} />
+              </div>
+              <p className="mt-4 text-xs tracking-widest uppercase" style={{ color: ORANGE }}>[ J.A.R.V.I.S. BIO-TELEMETRY ACTIVE ]</p>
+            </div>
+
+            <p className="mt-4 min-h-[5.5rem] text-sm md:text-base text-gray-300 leading-relaxed text-center max-w-xl" aria-label={GREETING}>
               <span aria-hidden>
                 {WORDS.slice(0, words).join(" ")}
                 <span className="inline-block w-[0.5em] h-[1em] ml-1 align-middle animate-pulse" style={{ background: ORANGE }} />
               </span>
             </p>
-            <div className="w-full flex items-center justify-between text-[9px] tracking-widest" style={{ color: ORANGE }}>
-              <span>J.A.R.V.I.S. v4.2</span>
-              <button onClick={dismiss} className="px-3 py-1.5 text-black font-bold text-[10px] hover:bg-white transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white" style={{ background: ORANGE }}>
-                SKIP [ESC] &gt;&gt;
-              </button>
+          </div>
+
+          <div className="w-full flex justify-between items-end text-[10px] text-gray-500">
+            <div aria-hidden className="opacity-70 hidden sm:block">
+              0486.362.182.457.324 | 8034.688.048.740.122<br />
+              0782.238.284.615.158 | 0812.088.013.132.872
             </div>
-          </motion.div>
-        </div>
+            <button onClick={dismiss} className="ml-auto px-4 py-2 text-black font-bold text-xs hover:bg-white transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white" style={{ background: ORANGE }}>
+              [ SKIP INTRO ] &gt;&gt;
+            </button>
+          </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
