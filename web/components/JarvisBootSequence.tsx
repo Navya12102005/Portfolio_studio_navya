@@ -9,8 +9,8 @@ import MiniLoop from "./jarvis/MiniLoop";
 
 const SESSION_KEY = "studio-navya-booted";
 const WORD_MS = 175;        // one word at a time
-const HOLD_MS = 900;        // pause after the last word before continuing
-const MAX_MS = 9000;        // safety net: never hang here
+const HOLD_MS = 5000;       // the finished line stays up this long so it can be read
+const MAX_MS = 14000;       // safety net: never hang here
 const GREETING =
   "Welcome, visitor. All bio-telemetry and tech systems are online. I am J.A.R.V.I.S., Navya Gupta's operational intelligence. Initializing main overview...";
 const WORDS = GREETING.split(" ");

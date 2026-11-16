@@ -4,8 +4,8 @@
  * Pure function of time, so it is deterministic and easy to test.
  */
 export const S = 240;
-export const HOLD = 1.2;        // seconds each state holds
-export const DISS = 0.45;       // seconds each cell-by-cell dissolve to the next state takes
+export const HOLD = 1.6;        // seconds each state holds
+export const DISS = 0.6;        // seconds each cell-by-cell dissolve to the next state takes
 export const STEP = HOLD + DISS;
 export const STATES = 4;        // star -> eye -> pulse -> code -> star ...
 export const PERIOD = STEP * STATES;
@@ -68,6 +68,12 @@ function drawStar(c: Ctx, t: number, f: Fonts) {
     c.stroke();
   }
   c.globalAlpha = 1;
+  // breathing ring + orbiting dots, so the star never feels static
+  c.strokeStyle = INK; c.lineWidth = 0.7; c.globalAlpha = 0.25 + 0.2 * Math.sin(t * 2.2);
+  c.beginPath(); c.arc(cx, cy, R * (1.04 + 0.04 * Math.sin(t * 1.6)), 0, Math.PI * 2); c.stroke();
+  c.globalAlpha = 0.9; c.fillStyle = INK;
+  for (let i = 0; i < 3; i++) { const a = t * 1.1 + (i * Math.PI * 2) / 3; c.beginPath(); c.arc(cx + Math.cos(a) * R * 1.04, cy + Math.sin(a) * R * 1.04, 1.8, 0, Math.PI * 2); c.fill(); }
+  c.globalAlpha = 1;
   const g = c.createRadialGradient(cx, cy, 0, cx, cy, R * 0.25);
   g.addColorStop(0, "rgba(233,221,203,0.9)"); g.addColorStop(0.7, "rgba(233,221,203,0.45)"); g.addColorStop(1, "rgba(233,221,203,0.05)");
   c.fillStyle = g; c.beginPath(); c.arc(cx, cy, R * 0.25, 0, Math.PI * 2); c.fill();
@@ -99,11 +105,11 @@ function drawEye(c: Ctx, t: number, ts: number) {
     const lid = Math.abs(gy - upperY) < 0.9 && Math.abs(dx) < a;
     const lid2 = Math.abs(gy - (upperY - 2.4 * lens * (1 - b * 0.7))) < 0.85 && Math.abs(dx) < a * 0.95;
     const lower = Math.abs(gy - (lowerY + 0.6)) < 0.55 && Math.abs(dx) < a * 0.9;
-    const di = Math.hypot(gx - ix, gy - iy);
+    const di = Math.hypot(gx - ix, gy - iy), pup = 1.9 + 0.45 * Math.sin(ts * 3.1);
     if (gx === sc && gy > 2 && gy < GY - 2) { c.fillStyle = DARK; c.fillRect(x + 0.5, y, CELL - 1, CELL); continue; }
     if (lid || lid2) hatch(c, x, y, (gx + gy) % 3);
     else if (lower) { c.strokeStyle = DARK; c.lineWidth = 0.8; c.strokeRect(x + 2, y + 2, CELL - 4, CELL - 4); }
-    else if (inEye && di < 1.9) { c.fillStyle = DARK; c.fillRect(x, y, CELL, CELL); }
+    else if (inEye && di < pup) { c.fillStyle = DARK; c.fillRect(x, y, CELL, CELL); if (gx === Math.round(ix - 1) && gy === Math.round(iy - 1)) { c.fillStyle = BG.eye; c.fillRect(x + 2, y + 2, 3, 3); } }
     else if (inEye && di < 3) { c.fillStyle = MID; c.fillRect(x + 0.5, y + 0.5, CELL - 1, CELL - 1); }
     else if (inEye && di < 4.2) hatch(c, x, y, (gx * 3 + gy) % 3);
   }
@@ -124,7 +130,7 @@ function drawPulse(c: Ctx, t: number, ts: number) {
   for (let y = 0; y <= S; y += 20) { c.moveTo(0, y + 0.5); c.lineTo(S, y + 0.5); }
   c.stroke();
   const head = clamp(ts / 0.9 + 0.05) * S;
-  c.strokeStyle = "#FF5A14"; c.lineWidth = 2.2; c.lineJoin = "round"; c.beginPath();
+  c.strokeStyle = "#FF5A14"; c.lineWidth = 2.2; c.lineJoin = "round"; c.shadowColor = "#FF5A14"; c.shadowBlur = 8; c.beginPath();
   for (let x = 0; x <= head; x += 2) {
     const ph = ((x + t * 60) % 120) / 120;
     const beat = ph < 0.1 ? 0 : ph < 0.16 ? -(ph - 0.1) * 900 : ph < 0.22 ? -54 + (ph - 0.16) * 2400 : ph < 0.28 ? 90 - (ph - 0.22) * 1500 : 0;
@@ -133,6 +139,7 @@ function drawPulse(c: Ctx, t: number, ts: number) {
   }
   c.stroke();
   c.fillStyle = "#FF5A14"; c.beginPath(); c.arc(Math.min(head, S - 2), 92, 3.5, 0, Math.PI * 2); c.fill();
+  c.shadowBlur = 0;
   const q = Math.floor(t * 9);
   for (let i = 0; i < 20; i++) {
     const h = 6 + 52 * Math.pow(hashX(i, q), 0.8) * (0.5 + 0.5 * Math.sin(i * 0.7 + t * 3));
@@ -150,8 +157,10 @@ function drawCode(c: Ctx, t: number, f: Fonts) {
     const row = r + Math.floor((t * 26) / 20);
     let line = "";
     for (let k = 0; k < 15; k++) line += k % 4 === 3 ? "." : GLY[Math.floor(hashX(k + row * 7, Math.floor(t * 5 + row)) * GLY.length)];
-    c.globalAlpha = 0.35 + 0.65 * hashX(row, 3);
-    c.fillText(line, 14, 22 + r * 20 - off + 20);
+    const yy = 22 + r * 20 - off + 20, hot = Math.abs(yy - 120) < 10;
+    c.globalAlpha = hot ? 1 : 0.35 + 0.65 * hashX(row, 3);
+    c.fillStyle = hot ? "#FF9A66" : INK;
+    c.fillText(line, 14, yy);
   }
   c.globalAlpha = 1;
   const col = Math.floor(t * 12) % 15;
@@ -184,11 +193,17 @@ export function drawLoop(c: Ctx, off: HTMLCanvasElement, t: number, f: Fonts, an
     c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
     for (let cy = 0; cy < cells; cy++) for (let cx = 0; cx < cells; cx++) {
       const th = (cx + cy) / (2 * cells) * 0.55 + hashX(cx, cy) * 0.45;
-      if (prog * 1.02 > th) c.drawImage(off, cx * cs * k, cy * cs * k, cs * k, cs * k, cx * cs * k, cy * cs * k, cs * k, cs * k);
+      const d = prog * 1.02 - th;
+      if (d > 0) c.drawImage(off, cx * cs * k, cy * cs * k, cs * k, cs * k, cx * cs * k, cy * cs * k, cs * k, cs * k);
+      if (d > -0.05 && d < 0.07) { c.strokeStyle = "rgba(255,90,20,0.9)"; c.lineWidth = Math.max(1, k * 0.8); c.strokeRect(cx * cs * k + 0.5, cy * cs * k + 0.5, cs * k - 1, cs * k - 1); }
     }
     c.restore();
   }
   if (animate) {
+    const v = c.createRadialGradient(S / 2, S / 2, S * 0.45, S / 2, S / 2, S * 0.75);
+    v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, "rgba(0,0,0,0.38)");
+    c.fillStyle = v; c.fillRect(0, 0, S, S);
+    c.fillStyle = `rgba(255,255,255,${0.012 + 0.02 * hashX(Math.floor(t * 24), 1)})`; c.fillRect(0, 0, S, S);
     const y = ((t * 0.9) % 1) * S;
     c.fillStyle = "rgba(255,255,255,0.10)"; c.fillRect(0, y, S, 2);
   }
