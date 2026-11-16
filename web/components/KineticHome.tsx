@@ -8,6 +8,7 @@ import { PILLARS, servicesFor, type Pillar } from "@/lib/services";
 import { soundFX } from "@/utils/soundManager";
 import { REPLAY_INTRO_EVENT } from "./IntroOverlay";
 import MagneticLines from "./MagneticLines";
+import PixelTechRoom from "./pixeltech/PixelTechRoom";
 import WorkOrbSection from "./orb/WorkOrbSection";
 
 const ROLES = ["BIOENGINEER", "AI / ML BUILDER", "MEDTECH INNOVATOR", "STORYTELLER", "MARKETER", "FINANCE-MINDED", "NEGOTIATOR"];
@@ -90,6 +91,7 @@ function PillarBand({ pillar }: { pillar: Pillar }) {
           className="font-anton sn-outline text-[26vw] md:text-[18vw] leading-[0.85]" style={{ color: k.fg }}>{PILLARS[pillar].label}</motion.h2>
         <p className="sn-hud-text uppercase tracking-[0.14em] text-[12px] max-w-xs pb-4" style={{ color: k.accent }}>● {PILLARS[pillar].tagline}</p>
       </div>
+      {pillar === "tech" && <PixelTechRoom className="relative z-10 mt-8 md:mt-10 border-4 border-[#1b2147] bg-black shadow-[8px_8px_0_#FF5A14]" />}
       <ul className="relative z-10 mt-10 md:mt-14 border-t" style={{ borderColor: k.fg + "33" }}>
         {list.map((s, i) => (
           <motion.li key={s.slug} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.6 }} transition={{ delay: i * 0.05, duration: 0.4 }}

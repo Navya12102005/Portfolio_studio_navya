@@ -86,3 +86,14 @@ body {
 
 /* orb gallery hint pill fades once the visitor drags */
 .orb-hint.gone { opacity: 0; transform: translateY(5px); }
+
+/* pixel tech room */
+.pt-tw { animation: pt-tw 3s steps(2) infinite; }
+@keyframes pt-tw { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+.pt-led { animation: pt-led 1.6s steps(1) infinite; }
+@keyframes pt-led { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0.25; } }
+.pt-steam { animation: pt-steam 1.6s steps(2) infinite; }
+@keyframes pt-steam { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-2px); opacity: 0.2; } }
+.pt-hot { outline: none; }
+.pt-hot:focus-visible { outline: 1px solid #FF5A14; outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .pt-tw, .pt-led, .pt-steam { animation: none; } }
