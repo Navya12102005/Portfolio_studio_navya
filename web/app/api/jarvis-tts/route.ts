@@ -19,6 +19,7 @@ const MODEL = process.env.ELEVENLABS_MODEL || "eleven_multilingual_v2";
  */
 const SAY: [RegExp, string][] = [
   [/J\.A\.R\.V\.I\.S\.?/g, "Jarvis"],
+  [/\bNavya\b/g, "Nuv-yah"],
   [/\bVIT\b/g, "V I T"],
   [/\bAWS\b/g, "A W S"],
   [/\bB\.?Tech\b/g, "B Tech"],
