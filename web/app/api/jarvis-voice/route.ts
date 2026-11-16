@@ -12,7 +12,7 @@ import { SERVICES } from "@/lib/services";
 
 const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const API = "https://generativelanguage.googleapis.com/v1beta";
-const TIMEOUT_MS = 12000;
+const TIMEOUT_MS = 15000;
 const MAX_TEXT = 600;
 const MAX_TURNS = 8;
 const CONTACT = "hello.studionavya@gmail.com";
@@ -88,8 +88,9 @@ async function discoverModel(): Promise<string | null> {
   return best ? best.name.replace(/^models\//, "") : null;
 }
 
-async function callGemini(m: string, text: string, history: Turn[], signal: AbortSignal): Promise<Response> {
+async function callGemini(m: string, text: string, history: Turn[], signal: AbortSignal, noThinkingConfig = false): Promise<Response> {
   const is25 = m.includes("2.5");
+  const newer = !is25 && /gemini-([3-9]|\d{2,})/.test(m); // 3.x and later: thinking is set by level, not budget
   return fetch(`${API}/models/${m}:generateContent`, {
     method: "POST",
     headers: authHeaders(),
@@ -99,28 +100,32 @@ async function callGemini(m: string, text: string, history: Turn[], signal: Abor
       contents: [...history, { role: "user" as const, text }].map((t) => ({ role: t.role, parts: [{ text: t.text }] })),
       // 2.5 models spend output tokens on hidden "thinking" unless told not to, which can leave a short reply empty;
       // other generations get a larger cap instead because their thinking settings differ
-      generationConfig: { maxOutputTokens: is25 ? 200 : 600, temperature: 0.6, ...(is25 ? { thinkingConfig: { thinkingBudget: 0 } } : {}) },
+      generationConfig: { maxOutputTokens: is25 ? 200 : 600, temperature: 0.6, ...(is25 ? { thinkingConfig: { thinkingBudget: 0 } } : newer && !noThinkingConfig ? { thinkingConfig: { thinkingLevel: "minimal" } } : {}) },
     }),
   });
 }
 
 async function askGemini(text: string, history: Turn[]): Promise<string> {
-  const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
-  try {
-    let res = await callGemini(model, text, history, ctl.signal);
-    if (res.status === 404 && process.env.GEMINI_API_KEY) {
-      const found = await discoverModel();
-      if (found && found !== model) { console.warn(`jarvis-voice: ${model} not found, switching to ${found}`); model = found; res = await callGemini(model, text, history, ctl.signal); }
-    }
-    if (!res.ok) throw new Error(`Gemini ${res.status}`);
-    const json = await res.json();
-    const out = (json?.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? "").join(" ").trim();
-    if (!out) throw new Error("empty reply");
-    return out;
-  } finally {
-    clearTimeout(timer);
+  // each network step gets its own timeout, so a slow model-discovery can't eat the time the answer needs
+  const withTimeout = async <T,>(fn: (signal: AbortSignal) => Promise<T>): Promise<T> => {
+    const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
+    try { return await fn(ctl.signal); } finally { clearTimeout(timer); }
+  };
+  let res = await withTimeout((sig) => callGemini(model, text, history, sig));
+  if (res.status === 404 && process.env.GEMINI_API_KEY) {
+    const found = await withTimeout(() => discoverModel());
+    if (found && found !== model) { console.warn(`jarvis-voice: ${model} not found, switching to ${found}`); model = found; res = await withTimeout((sig) => callGemini(model, text, history, sig)); }
   }
+  if (res.status === 400) { // thinking settings differ between model generations; retry once without them
+    const body = await res.text().catch(() => "");
+    console.warn("jarvis-voice: Gemini 400, retrying without thinking config:", body.replace(/\s+/g, " ").slice(0, 200));
+    res = await withTimeout((sig) => callGemini(model, text, history, sig, true));
+  }
+  if (!res.ok) throw new Error(`Gemini ${res.status}`);
+  const json = await res.json();
+  const out = (json?.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? "").join(" ").trim();
+  if (!out) throw new Error("empty reply");
+  return out;
 }
 
 export async function POST(req: Request) {

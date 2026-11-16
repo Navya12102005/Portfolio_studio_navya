@@ -76,7 +76,8 @@ export async function POST(req: Request) {
       signal: ctl.signal,
     });
     if (!res.ok || !res.body) {
-      console.error("jarvis-tts: ElevenLabs responded", res.status);
+      const detail = await res.text().then((t) => t.replace(/\s+/g, " ").slice(0, 300)).catch(() => "");
+      console.error("jarvis-tts: ElevenLabs responded", res.status, detail); // the error body names the reason (e.g. voice not found); it never contains the key
       return NextResponse.json({ error: "tts_failed", status: res.status }, { status: 502 });
     }
     return new Response(res.body, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" } });
