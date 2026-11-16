@@ -86,3 +86,21 @@ body {
 
 /* orb gallery hint pill fades once the visitor drags */
 .orb-hint.gone { opacity: 0; transform: translateY(5px); }
+
+/* OPS background: city-pop signage that drifts upward at different speeds (see components/OpsCityPop.tsx) */
+.cp-drift { animation: cp-up var(--d, 90s) linear infinite; will-change: transform; }
+@keyframes cp-up { to { transform: translateY(-50%); } }
+.cp-float { animation: cp-bob 7s ease-in-out infinite alternate; }
+@keyframes cp-bob { from { transform: translateY(-0.6em) rotate(-4deg); } to { transform: translateY(0.6em) rotate(4deg); } }
+.cp-spin { animation: cp-rot 24s linear infinite; }
+@keyframes cp-rot { to { transform: rotate(360deg); } }
+.cp-flick { animation: cp-fl 5s steps(1) infinite; }
+@keyframes cp-fl { 0%, 91%, 95%, 100% { opacity: 1; } 92%, 94% { opacity: 0.35; } 93% { opacity: 0.8; } }
+.cp-cable { transform-origin: 0 50%; animation: cp-sway 9s ease-in-out infinite alternate; }
+@keyframes cp-sway { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
+[data-paused="1"] .cp-drift, [data-paused="1"] .cp-float, [data-paused="1"] .cp-spin, [data-paused="1"] .cp-flick, [data-paused="1"] .cp-cable { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .cp-drift, .cp-float, .cp-spin, .cp-flick, .cp-cable { animation: none; } }
+.cp-film { animation: cp-film 0.9s steps(2) infinite; }
+@keyframes cp-film { 0% { opacity: 1; } 50% { opacity: 0.93; } 100% { opacity: 1; } }
+[data-paused="1"] .cp-film { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .cp-film { animation: none; } }
