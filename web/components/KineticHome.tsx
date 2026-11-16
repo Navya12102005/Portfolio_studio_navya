@@ -91,7 +91,7 @@ function PillarBand({ pillar }: { pillar: Pillar }) {
       <div className="relative z-10 flex items-end justify-between gap-6 flex-wrap">
         <motion.h2 initial={{ x: -80, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="font-anton sn-outline text-[26vw] md:text-[18vw] leading-[0.85]" style={{ color: k.fg }}>{PILLARS[pillar].label}</motion.h2>
-        <p className="sn-hud-text uppercase tracking-[0.14em] text-[12px] max-w-xs pb-4" style={{ color: k.accent }}>● {PILLARS[pillar].tagline}</p>
+        <p className={`sn-hud-text uppercase tracking-[0.14em] text-[12px] max-w-xs pb-4${pillar === "ops" ? " rounded-md bg-[#050505]/75 px-3 pt-2 backdrop-blur-sm" : ""}`} style={{ color: k.accent }}>● {PILLARS[pillar].tagline}</p>
       </div>
       {pillar === "ops" ? (
         <OpsBento list={list} onOpen={(slug) => { soundFX.playClickLock(); open(slug); }} onHover={() => soundFX.playHoverTick()} />

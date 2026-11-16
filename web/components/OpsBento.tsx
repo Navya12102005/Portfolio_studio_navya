@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import type { Service } from "@/lib/services";
 
-const ACCENTS = ["#22d3ee", "#f472b6", "#818cf8", "#fbbf24", "#34d399", "#fb7185"];
+// strict palette: orange, white, grey and the neon blue of the AI button
+const ACCENTS = ["#FF5A14", "#00F0FF", "#F2F2EE", "#FF5A14", "#00F0FF", "#9a9a9a"];
 
 /** OPS services as frosted-glass bento cards. Each card opens that service's dossier, same as the old rows. */
 export default function OpsBento({ list, onOpen, onHover }: { list: Service[]; onOpen: (slug: string) => void; onHover: () => void }) {
@@ -26,7 +27,7 @@ export default function OpsBento({ list, onOpen, onHover }: { list: Service[]; o
                 <p className="mt-2 text-sm leading-relaxed text-white/60">{s.tagline}</p>
               </div>
               <div className="relative mt-6 flex items-center gap-2 border-t border-white/10 pt-4 font-mono text-[10px] uppercase tracking-[0.16em] text-white/45">
-                <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.complete ? "#34d399" : "#fbbf24" }} />
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.complete ? "#F2F2EE" : "#FF5A14" }} />
                 {s.complete ? "Ready" : "In progress"}
               </div>
             </button>
