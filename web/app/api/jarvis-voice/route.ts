@@ -76,16 +76,17 @@ function authHeaders(): Record<string, string> {
   return h;
 }
 
-/** Google retires model names over time. On a 404, ask the API which models this key can use and take the newest plain "flash". */
+/**
+ * Google retires model names over time. On a 404, ask the API which models this key can use. A voice assistant wants
+ * short answers fast, so prefer the newest "flash-lite" (no long thinking pass), else the newest plain "flash".
+ */
 async function discoverModel(): Promise<string | null> {
   const res = await fetch(`${API}/models?pageSize=200`, { headers: authHeaders() });
   if (!res.ok) return null;
   const json = (await res.json()) as { models?: { name: string; supportedGenerationMethods?: string[] }[] };
-  const ver = (n: string) => parseFloat(/gemini-(\d+(?:\.\d+)?)-flash$/.exec(n)?.[1] ?? "0");
-  const best = (json.models ?? [])
-    .filter((m) => /gemini-\d+(\.\d+)?-flash$/.test(m.name) && m.supportedGenerationMethods?.includes("generateContent"))
-    .sort((x, y) => ver(y.name) - ver(x.name))[0];
-  return best ? best.name.replace(/^models\//, "") : null;
+  const usable = (json.models ?? []).filter((m) => m.supportedGenerationMethods?.includes("generateContent")).map((m) => m.name.replace(/^models\//, ""));
+  const newest = (re: RegExp) => usable.filter((n) => re.test(n)).sort((x, y) => parseFloat(re.exec(y)?.[1] ?? "0") - parseFloat(re.exec(x)?.[1] ?? "0"))[0];
+  return newest(/^gemini-(\d+(?:\.\d+)?)-flash-lite$/) ?? newest(/^gemini-(\d+(?:\.\d+)?)-flash$/) ?? null;
 }
 
 async function callGemini(m: string, text: string, history: Turn[], signal: AbortSignal, noThinkingConfig = false): Promise<Response> {
@@ -100,7 +101,7 @@ async function callGemini(m: string, text: string, history: Turn[], signal: Abor
       contents: [...history, { role: "user" as const, text }].map((t) => ({ role: t.role, parts: [{ text: t.text }] })),
       // 2.5 models spend output tokens on hidden "thinking" unless told not to, which can leave a short reply empty;
       // other generations get a larger cap instead because their thinking settings differ
-      generationConfig: { maxOutputTokens: is25 ? 200 : 600, temperature: 0.6, ...(is25 ? { thinkingConfig: { thinkingBudget: 0 } } : newer && !noThinkingConfig ? { thinkingConfig: { thinkingLevel: "minimal" } } : {}) },
+      generationConfig: { maxOutputTokens: is25 ? 200 : 600, temperature: 0.6, ...(is25 ? { thinkingConfig: { thinkingBudget: 0 } } : newer && !noThinkingConfig ? { thinkingConfig: { thinkingLevel: "low" } } : {}) },
     }),
   });
 }
