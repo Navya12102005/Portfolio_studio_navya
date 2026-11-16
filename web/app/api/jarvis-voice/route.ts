@@ -11,7 +11,7 @@ import { SERVICES } from "@/lib/services";
  */
 
 const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+const API = "https://generativelanguage.googleapis.com/v1beta";
 const TIMEOUT_MS = 12000;
 const MAX_TEXT = 600;
 const MAX_TURNS = 8;
@@ -65,27 +65,54 @@ function localAnswer(text: string): string {
 
 /* ---------- Gemini ---------- */
 
-async function askGemini(text: string, history: Turn[]): Promise<string> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+let model = MODEL; // replaced by discoverModel() if Google no longer serves it under this name
+
+function authHeaders(): Record<string, string> {
+  const h: Record<string, string> = { "Content-Type": "application/json" };
   // A real key from the host's environment goes in the header Google expects. Without one we send a placeholder
   // Bearer token, which only works where an outbound credential proxy swaps it in (it fails, safely, elsewhere).
-  if (process.env.GEMINI_API_KEY) headers["x-goog-api-key"] = process.env.GEMINI_API_KEY;
-  else headers.Authorization = "Bearer proxy-injected";
+  if (process.env.GEMINI_API_KEY) h["x-goog-api-key"] = process.env.GEMINI_API_KEY;
+  else h.Authorization = "Bearer proxy-injected";
+  return h;
+}
 
+/** Google retires model names over time. On a 404, ask the API which models this key can use and take the newest plain "flash". */
+async function discoverModel(): Promise<string | null> {
+  const res = await fetch(`${API}/models?pageSize=200`, { headers: authHeaders() });
+  if (!res.ok) return null;
+  const json = (await res.json()) as { models?: { name: string; supportedGenerationMethods?: string[] }[] };
+  const ver = (n: string) => parseFloat(/gemini-(\d+(?:\.\d+)?)-flash$/.exec(n)?.[1] ?? "0");
+  const best = (json.models ?? [])
+    .filter((m) => /gemini-\d+(\.\d+)?-flash$/.test(m.name) && m.supportedGenerationMethods?.includes("generateContent"))
+    .sort((x, y) => ver(y.name) - ver(x.name))[0];
+  return best ? best.name.replace(/^models\//, "") : null;
+}
+
+async function callGemini(m: string, text: string, history: Turn[], signal: AbortSignal): Promise<Response> {
+  const is25 = m.includes("2.5");
+  return fetch(`${API}/models/${m}:generateContent`, {
+    method: "POST",
+    headers: authHeaders(),
+    signal,
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: [...history, { role: "user" as const, text }].map((t) => ({ role: t.role, parts: [{ text: t.text }] })),
+      // 2.5 models spend output tokens on hidden "thinking" unless told not to, which can leave a short reply empty;
+      // other generations get a larger cap instead because their thinking settings differ
+      generationConfig: { maxOutputTokens: is25 ? 200 : 600, temperature: 0.6, ...(is25 ? { thinkingConfig: { thinkingBudget: 0 } } : {}) },
+    }),
+  });
+}
+
+async function askGemini(text: string, history: Turn[]): Promise<string> {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
   try {
-    const res = await fetch(ENDPOINT, {
-      method: "POST",
-      headers,
-      signal: ctl.signal,
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [...history, { role: "user" as const, text }].map((m) => ({ role: m.role, parts: [{ text: m.text }] })),
-        // 2.5 models spend output tokens on hidden "thinking" unless told not to, which can leave a short reply empty
-        generationConfig: { maxOutputTokens: 200, temperature: 0.6, ...(MODEL.includes("2.5") ? { thinkingConfig: { thinkingBudget: 0 } } : {}) },
-      }),
-    });
+    let res = await callGemini(model, text, history, ctl.signal);
+    if (res.status === 404 && process.env.GEMINI_API_KEY) {
+      const found = await discoverModel();
+      if (found && found !== model) { console.warn(`jarvis-voice: ${model} not found, switching to ${found}`); model = found; res = await callGemini(model, text, history, ctl.signal); }
+    }
     if (!res.ok) throw new Error(`Gemini ${res.status}`);
     const json = await res.json();
     const out = (json?.candidates?.[0]?.content?.parts ?? []).map((p: { text?: string }) => p.text ?? "").join(" ").trim();
