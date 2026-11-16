@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLenis } from "@/lib/useLenis";
 import KineticHome from "./KineticHome";
 import JarvisAssistant from "./JarvisAssistant";
+import JarvisVoiceAgent from "./JarvisVoiceAgent";
 import ProjectModal from "./ProjectModal";
 import SecondBrainView from "./SecondBrainView";
 import DossierModal from "./DossierModal";
@@ -36,6 +37,7 @@ export default function AppShell() {
       <EasterEggOverlay />
       <ServiceDossier />
       <JarvisAssistant />
+      <JarvisVoiceAgent />
       <ProjectModal />
       <SecondBrainView />
       <IntroOverlay />
