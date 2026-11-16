@@ -8,6 +8,7 @@ import { PILLARS, servicesFor, type Pillar } from "@/lib/services";
 import { soundFX } from "@/utils/soundManager";
 import { REPLAY_INTRO_EVENT } from "./IntroOverlay";
 import NavyaCharacter from "./character/NavyaCharacter";
+import WorkOrbSection from "./orb/WorkOrbSection";
 
 const ROLES = ["BIOENGINEER", "AI / ML BUILDER", "MEDTECH INNOVATOR", "STORYTELLER", "MARKETER", "FINANCE-MINDED", "NEGOTIATOR"];
 
@@ -34,6 +35,8 @@ function Header() {
     <header className="fixed top-0 inset-x-0 z-[600] flex items-center justify-between gap-3 px-4 md:px-8 py-3 bg-[#0A0A0A]/85 backdrop-blur-md border-b border-white/10">
       <a href="#top" onClick={(e) => { e.preventDefault(); scrollToId("top"); }} className="font-anton text-xl tracking-wide text-[#F2F2EE]">NAVYA GUPTA</a>
       <nav aria-label="Primary" className="flex items-center gap-1 md:gap-3 sn-hud-text text-[11px] uppercase tracking-[0.12em] text-[#F2F2EE]">
+        <a href="#work" onClick={(e) => { e.preventDefault(); soundFX.playClickLock(); scrollToId("work"); }} onMouseEnter={() => soundFX.playHoverTick()}
+          className="px-2.5 py-1.5 hover:bg-[#FF5A14] hover:text-[#0A0A0A] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#19E3F0]">WORK</a>
         {(["tech", "bio", "ops"] as Pillar[]).map((p) => (
           <a key={p} href={`#${p}`} onClick={(e) => { e.preventDefault(); soundFX.playClickLock(); scrollToId(p); }} onMouseEnter={() => soundFX.playHoverTick()}
             className="px-2.5 py-1.5 hover:bg-[#FF5A14] hover:text-[#0A0A0A] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#19E3F0]">{PILLARS[p].label}</a>
@@ -145,6 +148,7 @@ export default function KineticHome() {
       <Header />
       <main>
         <Hero />
+        <WorkOrbSection />
         <PillarBand pillar="tech" />
         <Marquee items={["BIOMEDICAL INNOVATION", "MACHINE LEARNING", "HEALTHCARE AI", "DIAGNOSTICS", "GENOMICS"]} bg="#19E3F0" fg="#0A0A0A" />
         <PillarBand pillar="bio" />
