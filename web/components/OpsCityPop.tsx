@@ -9,14 +9,14 @@ import { useEffect, useRef, type CSSProperties } from "react";
  * Pure CSS + DOM: the layout is generated once from a fixed seed (same on server and client), the pointer writes two
  * CSS variables instead of re-rendering, and everything pauses off-screen and under prefers-reduced-motion.
  */
-const WORDS = ["SALE", "NEW", "MAIL", "KPI", "GROWTH", "DEAL", "SEND", "OPEN", "LEADS", "ROI", "CRM", "POST", "LAUNCH", "BRAND", "PLAN", "CLOSE", "REPLY", "GO!"];
+const WORDS = ["SALE", "NEW", "MAIL", "KPI", "GROWTH", "DEAL", "SEND", "OPEN", "LEADS", "ROI", "CRM", "POST", "LAUNCH", "BRAND", "PLAN", "CLOSE", "REPLY", "GO!", "LIVE", "NIGHT", "24/7", "LATE"];
 // Strict palette: orange, black, grey, white, plus the neon blue already used on the AI button. Nothing else.
 const NB = "#00F0FF";
 const OR = "#FF5A14", WH = "#F2F2EE", BK = "#0A0A0A", G1 = "#1a1a1a", G2 = "#2c2c2c", G3 = "#5c5c5c", G4 = "#9a9a9a";
 const INK = "#050505";
 const TILE = 80; // em: height of one repeating tile
 
-type Kind = "sign" | "vsign" | "arrow" | "pill" | "disc" | "arc" | "checker" | "hazard" | "bld";
+type Kind = "sign" | "vsign" | "arrow" | "pill" | "disc" | "arc" | "checker" | "hazard" | "bld" | "ball";
 type Item = { kind: Kind; x: number; y: number; w: number; h: number; c: string; c2: string; word: string; rot: number; flick: boolean; v: number };
 
 function rng(seed: number) {
@@ -28,7 +28,7 @@ const pick = <T,>(r: () => number, a: T[]) => a[Math.floor(r() * a.length)];
 function layout(seed: number, cols: number, rows: number, kinds: Kind[], size: [number, number], sizeH: [number, number], fills: string[]): Item[] {
   const r = rng(seed), out: Item[] = [];
   for (let cy = 0; cy < rows; cy++) for (let cx = 0; cx < cols; cx++) {
-    const kind = pick(r, kinds), w = size[0] + r() * (size[1] - size[0]), h = kind === "disc" || kind === "checker" ? w : sizeH[0] + r() * (sizeH[1] - sizeH[0]);
+    const kind = pick(r, kinds), w = size[0] + r() * (size[1] - size[0]), h = kind === "disc" || kind === "checker" || kind === "ball" ? w : sizeH[0] + r() * (sizeH[1] - sizeH[0]);
     out.push({
       kind, w, h, x: ((cx + 0.1 + r() * 0.5) / cols) * 100, y: ((cy + 0.1 + r() * 0.5) / rows) * TILE,
       c: pick(r, fills), c2: pick(r, [OR, WH, G4]), word: pick(r, WORDS), rot: (r() - 0.5) * 12, flick: r() < 0.25, v: Math.floor(r() * 3),
@@ -39,7 +39,17 @@ function layout(seed: number, cols: number, rows: number, kinds: Kind[], size: [
 
 const FAR = layout(11, 5, 4, ["bld"], [7, 13], [26, 52], [G1, G2, G3]);
 const MID = layout(23, 3, 5, ["sign", "sign", "vsign", "arrow", "pill", "sign"], [10, 17], [4.2, 6.5], [OR, WH, OR, BK]);
-const NEAR = layout(37, 2, 4, ["disc", "arc", "checker", "disc", "hazard"], [8, 12], [3, 4.5], [OR, WH, G4]);
+const NEAR = layout(37, 2, 4, ["disc", "arc", "checker", "ball", "hazard", "ball"], [8, 12], [3, 4.5], [OR, WH, G4]);
+
+/** A scatter of lit windows for a tower: a deterministic box-shadow list (orange, white, a little neon blue). */
+function litWindows(it: Item): string {
+  const r = rng(Math.floor(it.x * 97 + it.y * 13)), cols = Math.max(2, Math.floor((it.w - 1.5) / 1.8)), rows = Math.max(3, Math.floor((it.h - 3) / 1.6)), out: string[] = [];
+  for (let i = 0; i < Math.min(14, cols * rows); i++) {
+    const c = r() < 0.55 ? OR : r() < 0.6 ? WH : NB;
+    out.push(`${(Math.floor(r() * cols) * 1.8).toFixed(1)}em ${(Math.floor(r() * rows) * 1.6).toFixed(1)}em 0 ${c}`);
+  }
+  return out.join(", ");
+}
 
 const halftone = (c: string) => `radial-gradient(${c} 0.14em, transparent 0.16em) 0 0 / 0.75em 0.75em`;
 const textOn = (bg: string) => (bg === OR || bg === WH || bg === G4 ? BK : WH);
@@ -55,7 +65,7 @@ function Piece({ it }: { it: Item }) {
         <div style={{ position: "absolute", left: "50%", top: "-3.4em", width: "0.22em", height: "3.4em", background: G3, boxShadow: `0 -0.5em 0 0.15em ${OR}` }} />
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, ${it.c}, ${INK})`, border: `0.25em solid ${G3}`, backgroundImage: `repeating-linear-gradient(90deg, ${WH}22 0 0.55em, transparent 0.55em 1.8em), repeating-linear-gradient(0deg, transparent 0 1.3em, ${INK} 1.3em 1.6em)` }} />
         <div style={{ position: "absolute", left: "-0.5em", right: "-0.5em", top: "-0.4em", height: "0.8em", background: G3, border: `0.2em solid ${INK}` }} />
-        <div style={{ position: "absolute", left: `${12 + it.v * 22}%`, top: "30%", width: "1.2em", height: "1.4em", background: OR, boxShadow: `0 0 1.2em ${OR}, 2.4em 4.3em 0 ${NB}, -1em 8.6em 0 ${OR}, 3.4em 12em 0 ${NB}` }} />
+        <div style={{ position: "absolute", left: "0.9em", top: "1.6em", width: "0.9em", height: "1.1em", background: OR, boxShadow: litWindows(it) }} />
       </div>
     );
   }
@@ -87,6 +97,15 @@ function Piece({ it }: { it: Item }) {
         {it.word.slice(0, 4).split("").map((ch, i) => <span key={i} className="font-anton" style={{ fontSize: `${it.h * 0.6}em`, lineHeight: 1, color: i % 2 ? WH : it.v === 1 ? NB : OR }}>{ch}</span>)}
       </div>
     );
+  if (it.kind === "ball")
+    return (
+      <div className="cp-float" style={{ ...base, animationDelay: `${-it.x / 8}s` }}>
+        <div style={{ position: "absolute", left: "50%", bottom: "100%", width: "0.2em", height: "30em", background: G3 }} />
+        <div className="cp-spin" style={{ width: "100%", height: "100%", borderRadius: "50%", background: `repeating-linear-gradient(0deg, transparent 0 0.9em, ${INK} 0.9em 1em), repeating-conic-gradient(${WH} 0 7deg, ${G3} 7deg 14deg, ${G4} 14deg 21deg, ${G2} 21deg 28deg)`, border: `0.25em solid ${INK}`, boxShadow: `0.3em 0.3em 0 ${OR}, 0 0 2.4em ${NB}66`, position: "relative" }}>
+          <span style={{ position: "absolute", left: "22%", top: "18%", width: "18%", height: "18%", borderRadius: "50%", background: "radial-gradient(#fff, transparent 70%)" }} />
+        </div>
+      </div>
+    );
   if (it.kind === "hazard")
     return <div style={{ ...base, width: `${it.w * 1.6}em`, height: `${it.h * 0.9}em`, background: `repeating-linear-gradient(-45deg, ${OR} 0 1em, ${BK} 1em 2em)`, border: `0.28em solid ${INK}`, boxShadow: `0.4em 0.4em 0 ${G3}`, transform: `rotate(${it.rot}deg)` }} />;
   if (it.kind === "checker")
@@ -97,6 +116,39 @@ function Piece({ it }: { it: Item }) {
   const bg = it.v === 0 ? `conic-gradient(from 0deg, ${OR} 0 8%, ${INK} 8% 16%, ${OR} 16% 24%, ${INK} 24% 32%, ${OR} 32% 40%, ${INK} 40% 48%, ${OR} 48% 56%, ${INK} 56% 64%, ${OR} 64% 72%, ${INK} 72% 80%, ${OR} 80% 88%, ${INK} 88%)`
     : it.v === 1 ? `repeating-linear-gradient(45deg, ${OR} 0 0.9em, ${WH} 0.9em 1.8em)` : `${halftone(OR)}, radial-gradient(circle, ${BK} 0 20%, ${NB} 20% 46%, ${WH} 46%)`;
   return <div className="cp-float" style={{ ...base, animationDelay: `${-it.x / 10}s` }}><div className={it.v === 0 ? "cp-spin" : undefined} style={{ width: "100%", height: "100%", borderRadius: "50%", background: bg, border: `0.3em solid ${INK}`, boxShadow: `0.4em 0.4em 0 ${it.c2 === OR ? G3 : OR}, 0 0 2em ${OR}66` }} /></div>;
+}
+
+const STARS = Array.from({ length: 46 }, (_, i) => { const r = rng(900 + i); return { x: r() * 100, y: r() * 60, s: 0.12 + r() * 0.22, d: r() * 6, o: 0.4 + r() * 0.6 }; });
+const BOKEH = Array.from({ length: 16 }, (_, i) => { const r = rng(500 + i); return { x: r() * 100, y: 30 + r() * 70, s: 1.6 + r() * 4.4, c: pick(r, [OR, WH, NB, OR]), d: 14 + r() * 18, o: 0.18 + r() * 0.3, l: r() * 12 }; });
+const LANES = Array.from({ length: 7 }, (_, i) => { const r = rng(700 + i); const rev = i % 2 === 1; return { rev, w: 7 + r() * 8, top: 1 + (i % 4) * 1.5, d: 4.5 + r() * 7, l: r() * 12, c: rev ? OR : WH }; });
+
+/** Night sky behind everything: stars, a big moon and two rooftop searchlights. */
+function NightSky() {
+  return (
+    <div className="absolute inset-0">
+      {STARS.map((st, i) => <i key={i} className="cp-twinkle" style={{ position: "absolute", left: `${st.x}%`, top: `${st.y}%`, width: `${st.s}em`, height: `${st.s}em`, borderRadius: "50%", background: i % 7 === 0 ? NB : WH, opacity: st.o, animationDelay: `${-st.d}s` }} />)}
+      <div style={{ position: "absolute", right: "9%", top: "7%", width: "11em", height: "11em", borderRadius: "50%", background: `radial-gradient(circle at 35% 35%, ${WH}, ${G4} 70%, ${G3})`, boxShadow: `0 0 4em ${NB}55, 0 0 12em ${WH}22` }}>
+        <i style={{ position: "absolute", left: "58%", top: "24%", width: "2.4em", height: "2.4em", borderRadius: "50%", background: `${G3}88` }} />
+        <i style={{ position: "absolute", left: "26%", top: "56%", width: "3.2em", height: "3.2em", borderRadius: "50%", background: `${G3}77` }} />
+        <i style={{ position: "absolute", left: "62%", top: "62%", width: "1.6em", height: "1.6em", borderRadius: "50%", background: `${G3}88` }} />
+      </div>
+      {[["8%", "-6deg"], ["78%", "7deg"]].map(([left, rot], i) => <div key={i} className="cp-beam" style={{ position: "absolute", left, bottom: "-4em", width: "10em", height: "70em", transformOrigin: "50% 100%", background: `linear-gradient(0deg, ${WH}30, transparent 85%)`, clipPath: "polygon(42% 100%, 58% 100%, 100% 0, 0 0)", ["--r" as string]: rot, animationDelay: `${-i * 4}s` }} />)}
+    </div>
+  );
+}
+
+/** Out-of-focus city lights drifting up. */
+function Bokeh() {
+  return <div className="absolute inset-0">{BOKEH.map((b, i) => <i key={i} className="cp-bokeh" style={{ position: "absolute", left: `${b.x}%`, top: `${b.y}%`, width: `${b.s}em`, height: `${b.s}em`, borderRadius: "50%", background: b.c, opacity: b.o, filter: "blur(0.45em)", animationDuration: `${b.d}s`, animationDelay: `${-b.l}s` }} />)}</div>;
+}
+
+/** The street along the bottom: headlight (white) and tail-light (orange) streaks passing both ways. */
+function Traffic() {
+  return (
+    <div className="absolute inset-x-0 bottom-0 h-[8em]" style={{ background: `linear-gradient(0deg, ${INK}, transparent)` }}>
+      {LANES.map((l, i) => <i key={i} className={l.rev ? "cp-pass-r" : "cp-pass"} style={{ position: "absolute", bottom: `${l.top}em`, left: 0, width: `${l.w}em`, height: "0.5em", borderRadius: "99em", background: `linear-gradient(${l.rev ? "270deg" : "90deg"}, ${l.c}, ${l.c}00)`, boxShadow: `0 0 1.4em ${l.c}, 0 0 0.4em ${l.c}`, animationDuration: `${l.d}s`, animationDelay: `${-l.l}s` }} />)}
+    </div>
+  );
 }
 
 const DEPTH = [0.5, 1.2, 2.2]; // how far each layer travels with the camera: far layers barely move, near ones a lot
@@ -161,7 +213,9 @@ export default function OpsCityPop({ className = "" }: { className?: string }) {
 
   return (
     <div ref={root} aria-hidden data-paused="1" className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`} style={{ background: INK, fontSize: "clamp(9px, 1.05vw, 15px)" }}>
+      <NightSky />
       <Layer items={FAR} dur={150} opacity={0.9} idx={0} />
+      <Bokeh />
       <Layer items={MID} dur={95} opacity={0.95} idx={1} />
       <Layer items={NEAR} dur={62} opacity={1} idx={2} />
       {/* swaying cable */}
@@ -174,6 +228,7 @@ export default function OpsCityPop({ className = "" }: { className?: string }) {
       <div className="absolute inset-0" style={{ background: "radial-gradient(circle 13em at var(--lx, 50%) var(--ly, 40%), rgba(255,90,20,0.28), rgba(0,240,255,0.12) 55%, transparent)", mixBlendMode: "screen" }} />
       {/* film feel: vignette + faint flicker */}
       <div className="absolute inset-0 cp-film" style={{ background: "radial-gradient(ellipse at center, transparent 55%, #050505cc)" }} />
+      <Traffic />
     </div>
   );
 }

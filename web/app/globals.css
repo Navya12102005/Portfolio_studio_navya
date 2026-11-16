@@ -104,3 +104,17 @@ body {
 @keyframes cp-film { 0% { opacity: 1; } 50% { opacity: 0.93; } 100% { opacity: 1; } }
 [data-paused="1"] .cp-film { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .cp-film { animation: none; } }
+
+/* OPS background: night life */
+.cp-twinkle { animation: cp-tw 3.4s ease-in-out infinite; }
+@keyframes cp-tw { 0%, 100% { opacity: 0.25; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.3); } }
+.cp-beam { animation: cp-bm 11s ease-in-out infinite alternate; }
+@keyframes cp-bm { from { transform: rotate(calc(var(--r, 0deg) - 9deg)); } to { transform: rotate(calc(var(--r, 0deg) + 9deg)); } }
+.cp-bokeh { animation: cp-bk 20s ease-in-out infinite alternate; }
+@keyframes cp-bk { from { transform: translate3d(0, 2em, 0) scale(0.85); } to { transform: translate3d(1.5em, -7em, 0) scale(1.15); } }
+.cp-pass { animation: cp-ps 8s linear infinite; }
+@keyframes cp-ps { from { transform: translateX(-24em); } to { transform: translateX(130vw); } }
+.cp-pass-r { animation: cp-psr 9s linear infinite; }
+@keyframes cp-psr { from { transform: translateX(130vw); } to { transform: translateX(-24em); } }
+[data-paused="1"] .cp-twinkle, [data-paused="1"] .cp-beam, [data-paused="1"] .cp-bokeh, [data-paused="1"] .cp-pass, [data-paused="1"] .cp-pass-r { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .cp-twinkle, .cp-beam, .cp-bokeh, .cp-pass, .cp-pass-r { animation: none; } }
