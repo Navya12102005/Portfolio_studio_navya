@@ -8,8 +8,35 @@ import { NextResponse } from "next/server";
  */
 
 const MAX_CHARS = 500;
-const TIMEOUT_MS = 15000;
-const MODEL = process.env.ELEVENLABS_MODEL || "eleven_flash_v2_5"; // low-latency model
+const TIMEOUT_MS = 20000;
+// Higher-quality model: clones pronounce more naturally than on the low-latency Flash model.
+// Override with ELEVENLABS_MODEL (e.g. "eleven_flash_v2_5" for speed, "eleven_v3" for expressiveness).
+const MODEL = process.env.ELEVENLABS_MODEL || "eleven_multilingual_v2";
+
+/**
+ * Text is respelled for the voice only (the on-screen text is untouched). Add a [pattern, spoken form] pair whenever
+ * a word is mispronounced. Patterns are matched case-sensitively as whole words unless they contain punctuation.
+ */
+const SAY: [RegExp, string][] = [
+  [/J\.A\.R\.V\.I\.S\.?/g, "Jarvis"],
+  [/\bVIT\b/g, "V I T"],
+  [/\bAWS\b/g, "A W S"],
+  [/\bB\.?Tech\b/g, "B Tech"],
+  [/\bNoviCord\b/g, "Novi Cord"],
+  [/\bAI\b/g, "A I"],
+  [/\bML\b/g, "M L"],
+  [/\bMedTech\b/g, "Med Tech"],
+  [/\bPDB\b/g, "P D B"],
+  [/\bKPI\b/g, "K P I"],
+  [/\bCSV\b/g, "C S V"],
+  [/\bOPS\b/g, "ops"],
+  [/&/g, " and "],
+  [/\s*[—–]\s*/g, ", "],
+  [/…/g, "..."],
+];
+function forSpeech(text: string): string {
+  return SAY.reduce((t, [re, to]) => t.replace(re, to), text).replace(/\s{2,}/g, " ").trim();
+}
 
 // Best-effort per-IP limit so a stranger can't burn the credits. In-memory, so it resets per serverless instance.
 const hits = new Map<string, number[]>();
@@ -36,10 +63,15 @@ export async function POST(req: Request) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
   try {
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}?output_format=mp3_44100_64`, {
+    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}?output_format=mp3_44100_128`, {
       method: "POST",
       headers: { "xi-api-key": key, "Content-Type": "application/json", Accept: "audio/mpeg" },
-      body: JSON.stringify({ text, model_id: MODEL }),
+      body: JSON.stringify({
+        text: forSpeech(text),
+        model_id: MODEL,
+        // steadier delivery = more consistent pronunciation; style 0 avoids exaggerated, drifting intonation
+        voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0, use_speaker_boost: true },
+      }),
       signal: ctl.signal,
     });
     if (!res.ok || !res.body) {
