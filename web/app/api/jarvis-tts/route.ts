@@ -9,9 +9,14 @@ import { NextResponse } from "next/server";
 
 const MAX_CHARS = 500;
 const TIMEOUT_MS = 20000;
-// Higher-quality model: clones pronounce more naturally than on the low-latency Flash model.
-// Override with ELEVENLABS_MODEL (e.g. "eleven_flash_v2_5" for speed, "eleven_v3" for expressiveness).
-const MODEL = process.env.ELEVENLABS_MODEL || "eleven_multilingual_v2";
+// Models tried in order. v3 is the most expressive/human; multilingual_v2 is the dependable fallback if v3 is
+// rejected for this account or voice. Override the first with ELEVENLABS_MODEL (e.g. "eleven_flash_v2_5" for speed).
+const MODELS = [process.env.ELEVENLABS_MODEL || "eleven_v3", "eleven_multilingual_v2"].filter((m, i, a) => a.indexOf(m) === i);
+// Looser stability = more natural pitch and pacing; too high sounds flat and robotic. v3 snaps stability to 0 / 0.5 / 1.
+const settingsFor = (model: string) =>
+  model === "eleven_v3"
+    ? { stability: 0.5, similarity_boost: 0.8, style: 0.3, use_speaker_boost: true }
+    : { stability: 0.38, similarity_boost: 0.78, style: 0.3, use_speaker_boost: true };
 
 /**
  * Text is respelled for the voice only (the on-screen text is untouched). Add a [pattern, spoken form] pair whenever
@@ -61,30 +66,27 @@ export async function POST(req: Request) {
   try { const b = await req.json(); text = typeof b?.text === "string" ? b.text.trim().slice(0, MAX_CHARS) : ""; } catch { /* handled below */ }
   if (!text) return NextResponse.json({ error: "text_required" }, { status: 400 });
 
-  const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
-  try {
-    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}?output_format=mp3_44100_128`, {
-      method: "POST",
-      headers: { "xi-api-key": key, "Content-Type": "application/json", Accept: "audio/mpeg" },
-      body: JSON.stringify({
-        text: forSpeech(text),
-        model_id: MODEL,
-        // steadier delivery = more consistent pronunciation; style 0 avoids exaggerated, drifting intonation
-        voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0, use_speaker_boost: true },
-      }),
-      signal: ctl.signal,
-    });
-    if (!res.ok || !res.body) {
+  let lastStatus = 0;
+  for (const model of MODELS) {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
+    try {
+      const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voice)}?output_format=mp3_44100_128`, {
+        method: "POST",
+        headers: { "xi-api-key": key, "Content-Type": "application/json", Accept: "audio/mpeg" },
+        body: JSON.stringify({ text: forSpeech(text), model_id: model, voice_settings: settingsFor(model) }),
+        signal: ctl.signal,
+      });
+      if (res.ok && res.body) return new Response(res.body, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" } });
+      lastStatus = res.status;
       const detail = await res.text().then((t) => t.replace(/\s+/g, " ").slice(0, 300)).catch(() => "");
-      console.error("jarvis-tts: ElevenLabs responded", res.status, detail); // the error body names the reason (e.g. voice not found); it never contains the key
-      return NextResponse.json({ error: "tts_failed", status: res.status }, { status: 502 });
+      console.error(`jarvis-tts: ElevenLabs (${model}) responded`, res.status, detail); // the error body names the reason; it never contains the key
+      if (res.status === 401 || res.status === 402 || res.status === 429) break; // key/quota problems: another model won't help
+    } catch (e) {
+      console.error(`jarvis-tts: request (${model}) failed:`, e instanceof Error ? e.message : e);
+    } finally {
+      clearTimeout(timer);
     }
-    return new Response(res.body, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store" } });
-  } catch (e) {
-    console.error("jarvis-tts: request failed:", e instanceof Error ? e.message : e);
-    return NextResponse.json({ error: "tts_failed" }, { status: 502 });
-  } finally {
-    clearTimeout(timer);
   }
+  return NextResponse.json({ error: "tts_failed", status: lastStatus }, { status: 502 });
 }
