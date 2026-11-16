@@ -132,6 +132,82 @@ export const NODES: GraphNode[] = [
     techStack: ["Workflow automation"],
     outcomes: ["Ran EA-style ops support workflows"],
   },
+
+  // Added from Navya's CV and confirmed details
+  {
+    id: "oculomics-dl",
+    label: "Oculomics Deep Learning (IEEE)",
+    cluster: "tech",
+    position: [-0.9, 2.4, 0.8],
+    methodology: "Deep-learning framework for cardiovascular disease prediction from retinal OCTA imaging and clinical biomarkers, with a quantum machine-learning component.",
+    techStack: ["Deep learning", "Retinal OCTA imaging", "Quantum ML"],
+    outcomes: ["IEEE Silchar Subsection Student Summer Internship Program (IS3IP-2026)"],
+  },
+  {
+    id: "breakhis-dl",
+    label: "BreakHis Histopathology DL",
+    cluster: "tech",
+    position: [-4.2, 1.2, -1.0],
+    methodology: "Comparing ResNet50, MobileNetV3-Small and a custom CNN for benign vs malignant breast histopathology classification, with patient-level data separation and attention to sensitivity, specificity and model efficiency.",
+    techStack: ["Python", "CNNs", "Transfer learning"],
+    outcomes: ["Ongoing project"],
+  },
+  {
+    id: "hackathons",
+    label: "Hackathons & Ideathons",
+    cluster: "tech",
+    position: [-4.3, -0.9, 0.5],
+    methodology: "Rapid prototyping and pitching in competitive health-tech and AI events.",
+    techStack: ["Prototyping", "Pitching"],
+    outcomes: ["AMD Slingshot", "PromptWars 2026", "Health Hacks"],
+  },
+  // Bioengineering additions
+  {
+    id: "iron-nanoparticle-docking",
+    label: "Iron Nanoparticle Project: Docking",
+    cluster: "bio",
+    position: [4.2, 1.0, -0.8],
+    methodology: "Molecular docking of phytochemicals from Tridax, Nerium and Cascabela against microbial target proteins, for plant-based iron nanoparticle formulations with antimicrobial applications.",
+    techStack: ["AutoDock", "PyMOL", "RCSB Protein Data Bank"],
+    outcomes: ["Research team member, Jan to Apr 2026: protein preparation, docking, binding-affinity analysis and visualization"],
+  },
+  {
+    id: "hpv18-docking",
+    label: "HPV-18 E1 Docking",
+    cluster: "bio",
+    position: [4.5, -0.8, 0.3],
+    methodology: "Blind docking of two phytochemicals against the HPV-18 E1 DNA-binding domain, then mapping protein-ligand contacts within 5 angstroms.",
+    techStack: ["AutoDock Vina", "PyMOL"],
+    outcomes: ["Docking scores of -7.2 and -7.3 kcal/mol", "ARG349 identified as a shared contact residue"],
+  },
+  {
+    id: "phyloseek",
+    label: "Phyloseek",
+    cluster: "bio",
+    position: [1.7, 1.9, 0.4],
+    methodology: "Educational bioinformatics application: sequence retrieval, alignment and similarity search, with Needleman-Wunsch and Smith-Waterman implemented to explain how sequence comparison works.",
+    techStack: ["Python", "Sequence alignment"],
+    outcomes: ["Ongoing; phylogenetic analysis and more features planned"],
+  },
+  // Operations & leadership additions
+  {
+    id: "aws-student-group",
+    label: "AWS Student Builder Group",
+    cluster: "ops",
+    position: [-1.8, -3.3, -0.4],
+    methodology: "Operational leadership of a student cloud-builder community.",
+    techStack: ["Community ops", "Cloud initiatives"],
+    outcomes: ["Operational Lead"],
+  },
+  {
+    id: "community-leadership",
+    label: "Community Leadership",
+    cluster: "ops",
+    position: [1.9, -3.0, 0.6],
+    methodology: "Representing and leading design and tech communities beyond the home campus.",
+    techStack: ["Design leadership", "Ambassador programs"],
+    outcomes: ["Techfest IIT Bombay Ambassador", "Metaversity Design Team Lead"],
+  },
 ];
 
 // Cross-cluster edges are the interesting ones — they're what make this a
@@ -160,4 +236,14 @@ export const EDGES: GraphEdge[] = [
   ["agentic-workflows", "liquid-crystal-biosensors"],
   ["fullstack-3d", "financial-dashboards"],
   ["novicord", "executive-assistant"],
+
+  // from the CV
+  ["oculomics-dl", "breakhis-dl"],
+  ["oculomics-dl", "biomedical-optics"],
+  ["iron-nanoparticle-docking", "molecular-docking"],
+  ["iron-nanoparticle-docking", "hpv18-docking"],
+  ["phyloseek", "lncrna-research"],
+  ["aws-student-group", "aws-cloud"],
+  ["aws-student-group", "startup-club"],
+  ["community-leadership", "startup-club"],
 ];
