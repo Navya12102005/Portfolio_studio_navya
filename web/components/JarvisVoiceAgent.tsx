@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { isSpeechRecognitionSupported, speak, stopSpeaking } from "@/lib/speech";
+import { useSecondBrainStore } from "@/lib/secondBrainStore";
 import { START_KINETIC_EVENT } from "./IntroOverlay";
 
 type JState = "IDLE" | "LISTENING" | "PROCESSING" | "SPEAKING";
@@ -81,6 +82,8 @@ export default function JarvisVoiceAgent() {
     audioCtxRef.current = null; analyserRef.current = null; levelRef.current = 0;
   }, []);
 
+  const openGraph = useSecondBrainStore((s) => s.openGraph);
+  const focusCluster = useSecondBrainStore((s) => s.focusCluster);
   const submit = useCallback(async (raw: string) => {
     const text = raw.trim();
     if (!text) { setNotice("I didn't catch that. Try again?"); go("IDLE"); return; }
@@ -88,7 +91,14 @@ export default function JarvisVoiceAgent() {
     abortRef.current?.abort();
     const ctl = new AbortController(); abortRef.current = ctl;
     let out = "I couldn't reach my systems just now. Please try again, or email hello.studionavya@gmail.com.";
-    try {
+    // "open the second brain / knowledge graph" is a command, not a question: do it here, optionally zoomed to a domain
+    const wantsGraph = /second\s*brain|knowledge\s*graph|\bthe graph\b/i.test(text);
+    if (wantsGraph) {
+      const t = text.toLowerCase();
+      const cluster = /\bbio/.test(t) ? "bio" : /\bops\b|operation|marketing/.test(t) ? "ops" : /\btech|\bai\b/.test(t) ? "tech" : null;
+      if (cluster) focusCluster(cluster); else openGraph();
+      out = cluster ? `Opening the Second Brain, focused on ${cluster === "bio" ? "bioengineering" : cluster === "ops" ? "operations" : "tech and A I"}.` : "Opening the Second Brain.";
+    } else try {
       const res = await fetch("/api/jarvis-voice", { method: "POST", headers: { "Content-Type": "application/json" }, signal: ctl.signal, body: JSON.stringify({ text, history: historyRef.current }) });
       const data = await res.json().catch(() => null);
       if (res.ok && typeof data?.reply === "string" && data.reply) out = data.reply;
@@ -116,7 +126,7 @@ export default function JarvisVoiceAgent() {
       stopAudio();
       if (stateRef.current === "PROCESSING") browserVoice();
     }
-  }, [go, stopAudio]);
+  }, [go, stopAudio, openGraph, focusCluster]);
 
   const cancel = useCallback(() => {
     stateRef.current = "IDLE"; // set first so a recognizer's onend can't submit
