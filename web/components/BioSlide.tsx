@@ -31,7 +31,7 @@ export default function BioSlide() {
 
   return (
     <section id="bio" className="relative scroll-mt-12 overflow-hidden bg-[#03050a]">
-      <div className="relative aspect-[3/4] w-full md:aspect-[16/9] md:min-h-[520px]">
+      <div className="relative aspect-[3/2] w-full md:aspect-[16/9] md:min-h-[520px]">
         <BioCollage className="absolute inset-0" />
         <h2 className="sr-only">{PILLARS.bio.label}</h2>
         <p className="pointer-events-none absolute left-4 top-3 hidden max-w-[16rem] rounded-md bg-[#03050a]/70 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#FF5A14] backdrop-blur-sm md:left-6 md:top-5 md:block">● {PILLARS.bio.tagline}</p>
