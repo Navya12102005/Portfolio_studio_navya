@@ -8,6 +8,9 @@ type SecondBrainState = {
   hoveredNodeId: string | null;
   selectedNodeId: string | null;
   focusedCluster: GraphCluster | null;
+  /** Free-text filter: nodes that do not match dim out in the graph. */
+  search: string;
+  setSearch: (q: string) => void;
 
   openGraph: () => void;
   closeGraph: () => void;
@@ -24,6 +27,8 @@ export const useSecondBrainStore = create<SecondBrainState>((set) => ({
   hoveredNodeId: null,
   selectedNodeId: null,
   focusedCluster: null,
+  search: "",
+  setSearch: (q) => set({ search: q }),
 
   openGraph: () => set({ open: true }),
   closeGraph: () => set({ open: false, selectedNodeId: null }),

@@ -27,6 +27,8 @@ export default function SecondBrainView() {
   const closeGraph = useSecondBrainStore((s) => s.closeGraph);
   const focusedCluster = useSecondBrainStore((s) => s.focusedCluster);
   const focusCluster = useSecondBrainStore((s) => s.focusCluster);
+  const search = useSecondBrainStore((s) => s.search);
+  const setSearch = useSecondBrainStore((s) => s.setSearch);
 
   return (
     <AnimatePresence>
@@ -74,6 +76,14 @@ export default function SecondBrainView() {
                 </button>
               ))}
             </div>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search nodes: biosensor, AWS, hackathon…"
+              aria-label="Search the Second Brain"
+              className="sn-hud-text mt-3 w-full rounded-lg border border-white/15 bg-white/[0.03] px-3 py-2 text-[11px] text-white/80 placeholder-white/30 focus:border-[#00F0FF]/60 focus:outline-none"
+            />
           </div>
 
           <button

@@ -19,7 +19,15 @@ function buildAdjacency() {
 }
 const ADJACENCY = buildAdjacency();
 
-function isHighlighted(id: string, hovered: string | null, selected: string | null, cluster: GraphCluster | null): boolean {
+function matchesSearch(id: string, q: string): boolean {
+  const n = nodeById.get(id);
+  if (!n) return false;
+  return [n.label, n.methodology, n.cluster, ...n.techStack, ...n.outcomes].join(" ").toLowerCase().includes(q);
+}
+
+function isHighlighted(id: string, hovered: string | null, selected: string | null, cluster: GraphCluster | null, search = ""): boolean {
+  const q = search.trim().toLowerCase();
+  if (q) return matchesSearch(id, q) && (!cluster || nodeById.get(id)?.cluster === cluster);
   const focus = hovered ?? selected;
   if (focus) return focus === id || !!ADJACENCY.get(focus)?.has(id);
   if (cluster) return nodeById.get(id)?.cluster === cluster;
@@ -32,6 +40,7 @@ function Nodes() {
   const hovered = useSecondBrainStore((s) => s.hoveredNodeId);
   const selected = useSecondBrainStore((s) => s.selectedNodeId);
   const cluster = useSecondBrainStore((s) => s.focusedCluster);
+  const search = useSecondBrainStore((s) => s.search);
   const hoverNode = useSecondBrainStore((s) => s.hoverNode);
   const selectNode = useSecondBrainStore((s) => s.selectNode);
   const matRefs = useRef<Map<string, THREE.MeshStandardMaterial>>(new Map());
@@ -40,7 +49,7 @@ function Nodes() {
     for (const n of NODES) {
       const mat = matRefs.current.get(n.id);
       if (!mat) continue;
-      const target = isHighlighted(n.id, hovered, selected, cluster) ? 1 : 0.12;
+      const target = isHighlighted(n.id, hovered, selected, cluster, search) ? 1 : 0.12;
       mat.opacity = THREE.MathUtils.lerp(mat.opacity, target, 0.15);
       mat.emissiveIntensity = THREE.MathUtils.lerp(mat.emissiveIntensity, target * 0.9, 0.15);
     }
@@ -91,6 +100,7 @@ function Edge({ a, b, index }: { a: string; b: string; index: number }) {
   const hovered = useSecondBrainStore((s) => s.hoveredNodeId);
   const selected = useSecondBrainStore((s) => s.selectedNodeId);
   const cluster = useSecondBrainStore((s) => s.focusedCluster);
+  const search = useSecondBrainStore((s) => s.search);
 
   const positions = useMemo(
     () => new Float32Array([...nodeA.position, ...nodeB.position]),
@@ -102,7 +112,7 @@ function Edge({ a, b, index }: { a: string; b: string; index: number }) {
   const crossCluster = nodeA.cluster !== nodeB.cluster;
 
   useFrame((state) => {
-    const active = isHighlighted(a, hovered, selected, cluster) && isHighlighted(b, hovered, selected, cluster);
+    const active = isHighlighted(a, hovered, selected, cluster, search) && isHighlighted(b, hovered, selected, cluster, search);
     const targetOpacity = active ? (crossCluster ? 0.55 : 0.3) : 0.03;
     if (lineMatRef.current) lineMatRef.current.opacity = THREE.MathUtils.lerp(lineMatRef.current.opacity, targetOpacity, 0.15);
     if (pulseMatRef.current) pulseMatRef.current.opacity = THREE.MathUtils.lerp(pulseMatRef.current.opacity, active ? 0.9 : 0, 0.15);
