@@ -2,7 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, memo, useRef, useState } from "react";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSecondBrainStore } from "@/lib/secondBrainStore";
@@ -16,6 +16,30 @@ const CLUSTER_LABEL: Record<GraphCluster, string> = {
   bio: "Bioengineering",
   ops: "Ops & Marketing",
 };
+
+/** The WebGL scene lives in its own memoised component with no props, so toggling the Graph/Cards switch,
+ *  typing in the search box or turning the voice on never re-renders the canvas tree (that was blocking input for ~200ms). */
+const GraphCanvas = memo(function GraphCanvas() {
+  return (
+    <Canvas
+      dpr={[1, 2]}
+      gl={{ antialias: true, powerPreference: "high-performance" }}
+      camera={{ position: [0, -1, 9], fov: 50, near: 0.1, far: 200 }}
+    >
+      <color attach="background" args={["#030508"]} />
+      <fog attach="fog" args={["#030508", 10, 60]} />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[4, 8, 6]} intensity={0.5} color="#9fd8ff" />
+      <SecondBrainCamera />
+      <Suspense fallback={null}>
+        <SecondBrainGraph />
+      </Suspense>
+      <EffectComposer>
+        <Bloom intensity={1.3} luminanceThreshold={0.1} luminanceSmoothing={0.4} mipmapBlur />
+      </EffectComposer>
+    </Canvas>
+  );
+});
 
 /**
  * Full-screen "Second Brain" knowledge-graph view. Owns its own WebGL
@@ -68,23 +92,7 @@ export default function SecondBrainView() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <Canvas
-            dpr={[1, 2]}
-            gl={{ antialias: true, powerPreference: "high-performance" }}
-            camera={{ position: [0, -1, 9], fov: 50, near: 0.1, far: 200 }}
-          >
-            <color attach="background" args={["#030508"]} />
-            <fog attach="fog" args={["#030508", 10, 60]} />
-            <ambientLight intensity={0.3} />
-            <directionalLight position={[4, 8, 6]} intensity={0.5} color="#9fd8ff" />
-            <SecondBrainCamera />
-            <Suspense fallback={null}>
-              <SecondBrainGraph />
-            </Suspense>
-            <EffectComposer>
-              <Bloom intensity={1.3} luminanceThreshold={0.1} luminanceSmoothing={0.4} mipmapBlur />
-            </EffectComposer>
-          </Canvas>
+          <GraphCanvas />
 
           {mode === "cards" && (
             <div className="absolute inset-0 z-[5] overflow-y-auto bg-[#030508]/92 px-6 pb-10 pt-[230px] md:pl-[500px] md:pt-24">
