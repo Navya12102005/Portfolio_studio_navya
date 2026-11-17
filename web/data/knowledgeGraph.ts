@@ -48,9 +48,9 @@ export const NODES: GraphNode[] = [
     label: "NoviCord",
     cluster: "tech",
     position: [-1.6, -0.6, 0.6],
-    methodology: "Full-stack health-platform build: patient-facing UI backed by a structured data layer.",
-    techStack: ["React", "Node.js"],
-    outcomes: ["Shipped a working prototype health platform"],
+    methodology: "Led a 4-member team to prototype a transparent, secure organ donation and matching application at a Johns Hopkins health hackathon (February 2026).",
+    techStack: ["React", "Node.js", "Healthcare UI/UX"],
+    outcomes: ["Developed the core application architecture during the hackathon", "Optimised the UI/UX for transparent donor-recipient matching"],
   },
   {
     id: "studio-navya",
@@ -68,7 +68,7 @@ export const NODES: GraphNode[] = [
     position: [-2.9, -1.6, -0.8],
     methodology: "Real-time 3D web experiences — WebGL scene graphs, shader-driven backgrounds, GSAP-synced camera work.",
     techStack: ["React Three Fiber", "Three.js", "GLSL", "GSAP"],
-    outcomes: ["This portfolio itself"],
+    outcomes: ["This portfolio itself", "Custom 3D shader pipelines and interactive canvas scenes", "Lenis smooth scrolling and glassmorphic HUD overlays"],
   },
 
   // Bioengineering — amber
@@ -159,7 +159,7 @@ export const NODES: GraphNode[] = [
     position: [-0.9, 2.4, 0.8],
     methodology: "Deep-learning framework for cardiovascular disease prediction from retinal OCTA imaging and clinical biomarkers, with a quantum machine-learning component.",
     techStack: ["Deep learning", "Retinal OCTA imaging", "Quantum ML"],
-    outcomes: ["IEEE Silchar Subsection Student Summer Internship Program (IS3IP-2026)"],
+    outcomes: ["IEEE Silchar Subsection Student Summer Internship Program (IS3IP-2026)", "Trained cardiovascular deep-learning models under academic guidance", "NIT Silchar Deep Learning in Biomedicine workshop, Certificate ID NITS-CSE-DL-2026-038"],
   },
   {
     id: "breakhis-dl",
@@ -177,9 +177,18 @@ export const NODES: GraphNode[] = [
     position: [-4.3, -0.9, 0.5],
     methodology: "Rapid prototyping and pitching in competitive health-tech and AI events.",
     techStack: ["Prototyping", "Pitching"],
-    outcomes: ["AMD Slingshot", "PromptWars 2026", "Health Hacks"],
+    outcomes: ["AMD Slingshot Campus Days: AI health-app concept built with Google Antigravity", "PromptWars 2026", "Health Hacks", "Codeverse 2.0 hackathon: technical leadership and organisation"],
   },
   // Bioengineering additions
+  {
+    id: "nib-training",
+    label: "Research & NIB Training",
+    cluster: "bio",
+    position: [3.4, 2.2, 0.6],
+    methodology: "Training and research focus on microbiology, biological standardisation and diagnostic standards, with computational evaluation of biosensors.",
+    techStack: ["Microscopy", "UV-Vis spectroscopy", "Sterile culture techniques"],
+    outcomes: ["National Institute of Biologicals training preparation", "Evaluation of phytochemical efficacy against bacterial targets"],
+  },
   {
     id: "iron-nanoparticle-docking",
     label: "Iron Nanoparticle Project: Docking",
@@ -264,6 +273,8 @@ export const EDGES: GraphEdge[] = [
   ["oculomics-dl", "breakhis-dl"],
   ["oculomics-dl", "biomedical-optics"],
   ["iron-nanoparticle-docking", "molecular-docking"],
+  ["nib-training", "liquid-crystal-biosensors"],
+  ["nib-training", "iron-nanoparticle-docking"],
   ["iron-nanoparticle-docking", "hpv18-docking"],
   ["phyloseek", "lncrna-research"],
   ["aws-student-group", "aws-cloud"],
