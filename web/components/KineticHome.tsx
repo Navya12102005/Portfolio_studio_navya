@@ -10,6 +10,7 @@ import { REPLAY_INTRO_EVENT } from "./IntroOverlay";
 import OpsCityPop from "./OpsCityPop";
 import OpsBento from "./OpsBento";
 import TechSlide from "./TechSlide";
+import BioSlide from "./BioSlide";
 import WorkOrbSection from "./orb/WorkOrbSection";
 
 const ROLES = ["BIOENGINEER", "AI / ML BUILDER", "MEDTECH INNOVATOR", "STORYTELLER", "MARKETER", "FINANCE-MINDED", "NEGOTIATOR"];
@@ -157,7 +158,7 @@ export default function KineticHome() {
         <WorkOrbSection />
         <TechSlide />
         <Marquee items={["BIOMEDICAL INNOVATION", "MACHINE LEARNING", "HEALTHCARE AI", "DIAGNOSTICS", "GENOMICS"]} bg="#FF5A14" fg="#0A0A0A" />
-        <PillarBand pillar="bio" />
+        <BioSlide />
         <Marquee items={["BRAND STORYTELLING", "GO-TO-MARKET", "FINANCIAL MODELLING", "NEGOTIATION"]} bg="#0A0A0A" fg="#F2F2EE" rev />
         <PillarBand pillar="ops" />
       </main>
