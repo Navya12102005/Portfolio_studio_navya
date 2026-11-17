@@ -2,7 +2,8 @@
 
 import { Canvas } from "@react-three/fiber";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
+import { speak, stopSpeaking } from "@/lib/speech";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSecondBrainStore } from "@/lib/secondBrainStore";
 import SecondBrainGraph from "./scenes/SecondBrainGraph";
@@ -31,6 +32,28 @@ export default function SecondBrainView() {
   const setSearch = useSecondBrainStore((s) => s.setSearch);
   const selectNode = useSecondBrainStore((s) => s.selectNode);
   const [mode, setMode] = useState<"graph" | "cards">("graph");
+  const [voiceOn, setVoiceOn] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  /** Optional spoken intro for a node (opt-in, since the cloned voice spends paid credits). */
+  const speakNode = async (label: string, methodology: string) => {
+    const text = `${label}. ${methodology.split(/(?<=\.)\s/)[0]}`;
+    audioRef.current?.pause(); stopSpeaking();
+    setSpeaking(true);
+    try {
+      const r = await fetch("/api/jarvis-tts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
+      if (!r.ok) throw new Error("tts");
+      const url = URL.createObjectURL(await r.blob());
+      const a = new Audio(url); audioRef.current = a;
+      a.onended = () => { setSpeaking(false); URL.revokeObjectURL(url); };
+      await a.play();
+    } catch {
+      speak(text, { onEnd: () => setSpeaking(false) });
+      window.setTimeout(() => setSpeaking(false), 12000);
+    }
+  };
+  const onCard = (id: string, label: string, methodology: string) => { selectNode(id); if (voiceOn) void speakNode(label, methodology); };
   const q = search.trim().toLowerCase();
   const cards = NODES.filter((n) => (!focusedCluster || n.cluster === focusedCluster)
     && (!q || [n.label, n.methodology, n.cluster, ...n.techStack, ...n.outcomes].join(" ").toLowerCase().includes(q)));
@@ -65,9 +88,17 @@ export default function SecondBrainView() {
 
           {mode === "cards" && (
             <div className="absolute inset-0 z-[5] overflow-y-auto bg-[#030508]/92 px-6 pb-10 pt-[230px] md:pl-[500px] md:pt-24">
+              <div className="mx-auto mb-5 grid max-w-5xl grid-cols-2 gap-3 md:grid-cols-4">
+                {[["ACTIVE NODES", `${NODES.length}`], ["SHOWING", `${cards.length} / ${NODES.length}`], ["DOMAINS", "3 clusters"], ["VOICE", voiceOn ? (speaking ? "Speaking…" : "On") : "Off"]].map(([k, v]) => (
+                  <div key={k} className="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
+                    <span className="sn-hud-text block text-[10px] tracking-widest text-white/40">{k}</span>
+                    <span className="mt-1 block text-lg font-bold text-[#e6edfb]">{v}</span>
+                  </div>
+                ))}
+              </div>
               <div className="mx-auto grid max-w-5xl grid-cols-1 gap-4 md:grid-cols-2">
                 {cards.map((n, i) => (
-                  <button key={n.id} onClick={() => selectNode(n.id)}
+                  <button key={n.id} onClick={() => onCard(n.id, n.label, n.methodology)}
                     className="group flex cursor-pointer flex-col justify-between rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-left backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.05]"
                    >
                     <div>
@@ -114,6 +145,10 @@ export default function SecondBrainView() {
                 </button>
               ))}
             </div>
+            <button onClick={() => { setVoiceOn((v) => !v); audioRef.current?.pause(); stopSpeaking(); setSpeaking(false); }} aria-pressed={voiceOn}
+              className={`sn-hud-text mt-3 w-full cursor-pointer rounded-lg border px-3 py-1.5 text-[10px] uppercase tracking-widest transition-colors ${voiceOn ? "border-[#00F0FF] text-[#00F0FF]" : "border-white/15 text-white/60 hover:bg-white/10"}`}>
+              Voice intro: {voiceOn ? "on" : "off"}
+            </button>
             <input
               type="search"
               value={search}
