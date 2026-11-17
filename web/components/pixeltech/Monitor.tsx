@@ -10,16 +10,19 @@ const CODE: [number, [number, string][]][] = [
   [2, [[6, K.cyan], [9, K.white], [5, K.green]]], [0, [[4, K.pink], [4, K.white]]],
 ];
 const LAYERS = [3, 5, 5, 3];
-const NET = LAYERS.map((n, li) => Array.from({ length: n }, (_, ni) => ({ x: 6 + li * 22, y: Math.round(3 + ((ni + 0.5) * 26) / n) })));
+const NET = LAYERS.map((n, li) => Array.from({ length: n }, (_, ni) => ({ x: 6 + li * 20, y: Math.round(3 + ((ni + 0.5) * 26) / n) })));
 const HEX = "0A1F3C7E5B92D4F8";
 const LOGS = ["BUILD OK", "TESTS 42 42", "DEPLOY 100%", "MODEL V3 READY"];
 
+export type MonitorFx = { hold?: boolean; celebrate?: boolean; netFocus?: number | null; netSweep?: boolean; chartX?: number | null; chartHigh?: boolean; typed?: string };
+
 /** The big monitor: a live "TECH DOMAIN - AI SYSTEMS" screen with an editor, a neural net, a chart and a terminal. */
-export default function Monitor({ x, y, live }: { x: number; y: number; live: boolean }) {
+export default function Monitor({ x, y, live, fx = {} }: { x: number; y: number; live: boolean; fx?: MonitorFx }) {
   const tick = useTick(8, live);
   const t = tick / 8;
-  const scroll = Math.floor(t * 3) % CODE.length;
-  const pulse = Math.floor(t * 3) % 5;
+  const scrollTick = useTick(3, live && !fx.hold); // stops counting while hovered, so the code freezes in place
+  const scroll = scrollTick % CODE.length;
+  const pulse = fx.netSweep ? tick % 5 : Math.floor(t * 3) % 5;
   const log = Math.floor(t / 1.4) % LOGS.length;
 
   return (
@@ -49,32 +52,47 @@ export default function Monitor({ x, y, live }: { x: number; y: number; live: bo
             );
           })}
           <R x={12 + 8} y={2 + 8 * 5.5} w={1} h={3} c={Math.floor(t * 3) % 2 ? K.white : "#0b1428"} />
+          {fx.hold && <><R x={9} y={2 + 3 * 5.5 - 1} w={73} h={5} c={K.orange} o={0.22} /><R x={9} y={2 + 3 * 5.5 - 1} w={1} h={5} c={K.orange} /></>}
         </g>
         {/* neural net */}
         <g transform="translate(89 14)">
           <R x={0} y={0} w={72} h={34} c="#0b1428" />
           {NET.slice(0, -1).map((layer, li) => layer.flatMap((a, ai) => NET[li + 1].map((b, bi) =>
             Array.from({ length: 8 }, (_, k) => {
-              const lit = li === pulse - 1 || li === pulse;
+              const lit = fx.netFocus != null ? li === fx.netFocus || li === fx.netFocus - 1 : li === pulse - 1 || li === pulse;
               return <R key={`${li}-${ai}-${bi}-${k}`} x={Math.round(a.x + 2 + ((b.x - a.x) * k) / 8)} y={Math.round(a.y + 2 + ((b.y - a.y) * k) / 8)} w={1} h={1} c={lit ? K.orange : K.greyD} o={lit ? 0.9 : 0.45} />;
             })
           )))}
-          {NET.map((layer, li) => layer.map((n, ni) => <R key={`${li}-${ni}`} x={n.x} y={n.y} w={4} h={4} c={li === pulse % 4 ? K.neon : K.cyan} />))}
+          {NET.map((layer, li) => layer.map((n, ni) => <R key={`${li}-${ni}`} x={n.x} y={n.y} w={4} h={4} c={(fx.netFocus != null ? li === fx.netFocus : li === pulse % 4) ? K.neon : K.cyan} />))}
         </g>
         {/* chart: bars rise, line climbs */}
         <g transform="translate(89 51)">
           <R x={0} y={0} w={72} h={15} c="#0b1428" />
           {Array.from({ length: 14 }, (_, i) => {
-            const h = 3 + Math.round(8 * (0.5 + 0.5 * Math.sin(i * 0.7 + t * 1.5)) * (0.4 + i / 20));
-            return <R key={i} x={3 + i * 5} y={13 - h} w={3} h={h} c={i % 4 === 3 ? K.orange : K.cyan} />;
+            const base = 3 + Math.round(8 * (0.5 + 0.5 * Math.sin(i * 0.7 + t * 1.5)) * (0.4 + i / 20));
+            const near = fx.chartX != null ? Math.max(0, 1 - Math.abs(3 + i * 5 - fx.chartX) / 18) : 0;
+            const h = fx.chartHigh ? 5 + Math.round(i * 0.5) + 3 : Math.min(13, Math.round(base + near * 9));
+            return <R key={i} x={3 + i * 5} y={13 - h} w={3} h={h} c={fx.chartHigh || near > 0.4 ? K.neon : i % 4 === 3 ? K.orange : K.cyan} />;
           })}
-          <PText x={50} y={1} text="ACC 98%" color={K.yellow} />
+          <PText x={fx.chartHigh ? 36 : 50} y={1} text={fx.chartHigh ? "NEW HIGH" : "ACC 98%"} color={fx.chartHigh ? K.neon : K.yellow} />
         </g>
         {/* terminal ticker */}
         <R x={0} y={SH - 12} w={SW} h={12} c={K.ink} o={0.8} />
-        <PText x={3} y={SH - 10} text=">" color={K.neon} /><PText x={9} y={SH - 10} text={LOGS[log]} color={K.white} />
-        {Array.from({ length: 24 }, (_, i) => <PText key={i} x={66 + i * 4} y={SH - 10} text={HEX[(i + Math.floor(t * 7)) % HEX.length]} color={i % 5 === 0 ? K.orange : K.greyD} />)}
+        <PText x={3} y={SH - 10} text=">" color={K.neon} />
+        {fx.typed != null && fx.typed !== "" ? (
+          <><PText x={9} y={SH - 10} text={fx.typed} color={K.white} /><R x={9 + fx.typed.split("").reduce((a, ch) => a + (ch === " " ? 2 : 4), 0)} y={SH - 10} w={2} h={5} c={Math.floor(t * 3) % 2 ? K.neon : "#000"} /></>
+        ) : (
+          <><PText x={9} y={SH - 10} text={LOGS[log]} color={K.white} />
+          {Array.from({ length: 24 }, (_, i) => <PText key={i} x={66 + i * 4} y={SH - 10} text={HEX[(i + Math.floor(t * 7)) % HEX.length]} color={i % 5 === 0 ? K.orange : K.greyD} />)}</>
+        )}
         <R x={SW - 4} y={SH - 8} w={2} h={4} c={Math.floor(t * 2) % 2 ? K.neon : K.greenD} />
+        {fx.celebrate && (
+          <g>
+            <R x={34} y={30} w={96} h={20} c={K.ink} o={0.85} /><R x={34} y={30} w={96} h={1} c={K.neon} /><R x={34} y={49} w={96} h={1} c={K.neon} />
+            <PText x={44} y={36} text="DEPLOY 100%" color={Math.floor(t * 6) % 2 ? K.neon : K.white} />
+            {Array.from({ length: 28 }, (_, i) => <R key={i} x={(i * 29) % SW} y={Math.floor((t * 34 + i * 11) % SH)} w={2} h={2} c={[K.pink, K.yellow, K.cyan, K.orange, K.neon][i % 5]} />)}
+          </g>
+        )}
         {Array.from({ length: 40 }, (_, i) => <R key={i} x={0} y={i * 2 + 1} w={SW} h={1} c="#000" o={0.12} />)}
         <R x={3} y={13} w={22} h={1} c={K.white} o={0.1} /><R x={SW - 30} y={SH - 18} w={26} h={1} c={K.white} o={0.06} />
       </g>

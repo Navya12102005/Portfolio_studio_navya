@@ -64,6 +64,7 @@ const FONT: Record<string, string[]> = {
   R: ["XX.", "X.X", "XX.", "X.X", "X.X"], U: ["X.X", "X.X", "X.X", "X.X", "XXX"], P: ["XXX", "X.X", "XXX", "X..", "X.."],
   "1": [".X.", "XX.", ".X.", ".X.", "XXX"], "3": ["XXX", "..X", "XXX", "..X", "XXX"], "6": ["XXX", "X..", "XXX", "X.X", "XXX"],
   "7": ["XXX", "..X", ".X.", ".X.", ".X."], "8": ["XXX", "X.X", "XXX", "X.X", "XXX"], "9": ["XXX", "X.X", "XXX", "..X", "XXX"],
+  W: ["X.X", "X.X", "XXX", "XXX", "X.X"], Q: ["XXX", "X.X", "X.X", "XXX", "..X"], K: ["X.X", "X.X", "XX.", "X.X", "X.X"], V: ["X.X", "X.X", "X.X", "X.X", ".X."], "!": [".X.", ".X.", ".X.", "...", ".X."],
   ">": ["X..", ".X.", "..X", ".X.", "X.."], "_": ["...", "...", "...", "...", "XXX"], ".": ["...", "...", "...", "...", ".X."], "/": ["..X", "..X", ".X.", "X..", "X.."],
 };
 export function textWidth(t: string) { return [...t].reduce((a, ch) => a + (ch === " " ? 2 : 4), 0) - 1; }

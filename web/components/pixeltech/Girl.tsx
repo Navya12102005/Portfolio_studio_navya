@@ -1,6 +1,6 @@
 "use client";
 
-import { useTick } from "./pixel";
+import { PText, R, useTick } from "./pixel";
 
 /**
  * The scientist-turned-engineer, drawn pixel by pixel from spans: [y, x0, x1, colour] (inclusive), painted in order.
@@ -24,7 +24,7 @@ const px = (x: number, y: number, c: string): Seg => [y, x, x, c];
 const mirror = (segs: Seg[], cx: number): Seg[] => segs.flatMap(([y, a, b, c]) => [[y, a, b, c] as Seg, [y, 2 * cx - b, 2 * cx - a, c] as Seg]);
 
 /* ---------- profile head, facing left (origin: top-left of the head box) ---------- */
-function profileHead({ blink, hairSway }: { blink: boolean; hairSway: number }): Seg[] {
+function profileHead({ blink, hairSway, gaze, phones }: { blink: boolean; hairSway: number; gaze: { x: number; y: number }; phones: boolean }): Seg[] {
   const s: Seg[] = [];
   // hair: crown, back mass and the long curtain down her back
   s.push([-5, 9, 15, C.H], [-4, 7, 18, C.H], [-3, 5, 20, C.H], [-2, 4, 21, C.H], [-1, 3, 22, C.H]);
@@ -51,13 +51,21 @@ function profileHead({ blink, hairSway }: { blink: boolean; hairSway: number }):
   // round glasses: rim, lens, eye, glint
   s.push([8, 4, 7, C.G], [9, 3, 3, C.G], [9, 8, 8, C.G], [10, 3, 3, C.G], [10, 8, 8, C.G], [11, 3, 3, C.G], [11, 8, 8, C.G], [12, 4, 7, C.G]);
   s.push([9, 4, 7, C.g], [10, 4, 7, C.g], [11, 4, 7, C.g]);
-  if (blink) s.push([10, 4, 7, C.E]); else s.push([10, 4, 5, C.E], px(4, 9, C.E), px(3, 9, C.E), px(5, 11, C.Hm));
+  const sx = gaze.x > 0 ? 1 : 0, py = 10 + (gaze.y > 0 ? 1 : gaze.y < 0 ? -1 : 0);
+  if (blink) s.push([10, 4, 7, C.E]); else s.push([py, 4 + sx, 5 + sx, C.E], px(4 + sx, py - 1, C.E), px(3 + sx, py - 1, C.E), px(5 + sx, py + 1, C.Hm));
   s.push(px(6, 9, C.q), px(7, 9, C.q), px(7, 10, C.Gd), [9, 9, 13, C.G]);   // glint + temple arm
   s.push([7, 2, 5, C.H]);                                                     // brow
   // side-swept bangs over the forehead + a lock falling beside the cheek
   s.push([1, 3, 9, C.H], [2, 3, 8, C.H], [3, 3, 7, C.Hm], [4, 3, 6, C.H], px(3, 5, C.H));
   for (let y = 7; y <= 18; y++) s.push([y, 10, 12, y % 4 === 0 ? C.Hh : C.Hm]);
   s.push([5, 12, 13, C.O], [6, 12, 13, C.Os]);                               // orange hair clip
+  if (phones) {
+    // headphones: a band over the crown and an orange ear cup
+    s.push([-6, 8, 17, "#2c3162"], [-5, 6, 19, "#2c3162"], [-4, 5, 7, "#2c3162"], [-4, 18, 20, "#2c3162"]);
+    for (let y = -3; y <= 6; y++) s.push([y, 5, 6, "#2c3162"], [y, 19, 20, "#2c3162"]);
+    for (let y = 7; y <= 14; y++) s.push([y, 9, 14, y === 7 || y === 14 ? C.Os : C.O]);
+    s.push([8, 10, 12, C.Oh], [9, 10, 11, C.Ot], [15, 10, 13, C.Od]);
+  }
   return s;
 }
 
@@ -97,14 +105,19 @@ function frontHead({ angry, blink }: { angry: boolean; blink: boolean }): Seg[] 
 }
 
 /** Seated at the desk, profile facing the monitor. (x, y) = top of her head box. */
-export function SeatedGirl({ x, y, angry, empty = false }: { x: number; y: number; angry: boolean; empty?: boolean }) {
-  const tick = useTick(6, !empty);
+export type Face = "side" | "angry" | "hello";
+export function SeatedGirl({ x, y, face = "side", empty = false, gaze = { x: 0, y: 0 }, phones = false, stretch = false }: { x: number; y: number; face?: Face; empty?: boolean; gaze?: { x: number; y: number }; phones?: boolean; stretch?: boolean }) {
+  const angry = face === "angry", front = face !== "side";
+  const tick = useTick(phones ? 9 : 6, !empty);
   const typing = Math.floor(tick / 2) % 2;
   const breathe = Math.floor(tick / 5) % 2;
   const blink = tick % 22 === 0;
   const hairSway = Math.floor(tick / 9) % 2;
   const lean = angry ? 1 : 0;
   const hy = typing ? 1 : 0;
+  const nod = phones && Math.floor(tick / 3) % 2 ? 1 : 0;
+  const hx = gaze.x < 0 ? -1 : gaze.x > 0 ? 1 : 0, hyy = gaze.y > 0 ? 1 : gaze.y < 0 ? -1 : 0;
+  const up = stretch ? -3 : 0;
   return (
     <g transform={`translate(${x} ${y})`} shapeRendering="crispEdges">
       {/* office chair: mesh back with a frame, armrest, seat, gas lift, five-star base with wheels */}
@@ -129,10 +142,10 @@ export function SeatedGirl({ x, y, angry, empty = false }: { x: number; y: numbe
               px(-5, 81, C.Sd2), px(-3, 81, C.Sd2), px(-1, 81, C.Sd2), px(-7, 82, C.Sd2),
             ]} />
           </g>
-          <g transform={`translate(${lean} ${breathe})`}>
+          <g transform={`translate(${lean} ${breathe + up})`}>
             {/* hair curtain behind the body, head, neck */}
-            {!angry && <Spans s={profileHead({ blink, hairSway })} ox={9} oy={0} />}
-            {angry && <Spans s={[...Array.from({ length: 22 }, (_, i): Seg => [14 + i, 21, 34 + (i > 14 ? 1 : 0), C.H]), [30, 19, 22, C.S], [31, 19, 22, C.Ss], [32, 19, 22, C.Ss]]} />}
+            {!front && <g transform={`translate(${hx} ${hyy + nod})`}><Spans s={profileHead({ blink, hairSway, gaze, phones })} ox={9} oy={0} /></g>}
+            {front && <Spans s={[...Array.from({ length: 22 }, (_, i): Seg => [14 + i, 21, 34 + (i > 14 ? 1 : 0), C.H]), [30, 19, 22, C.S], [31, 19, 22, C.Ss], [32, 19, 22, C.Ss]]} />}
             {/* torso: hoodie with hood bunched behind the neck, folds, drawstrings and rim light */}
             <Spans s={[
               ...Array.from({ length: 30 }, (_, i): Seg => [21 + i, i < 4 ? 15 - i : i < 14 ? 11 : i < 22 ? 11 + Math.floor((i - 13) / 3) : i < 26 ? 14 : 13, 29, C.O]),
@@ -160,11 +173,14 @@ export function SeatedGirl({ x, y, angry, empty = false }: { x: number; y: numbe
           </g>
         </g>
       )}
-      {!empty && angry && (
-        <g transform={`translate(${lean} 0)`}>
-          <Spans s={frontHead({ angry: true, blink: false })} ox={19} oy={4} />
-          {/* steam puffs + exclamation mark */}
-          <Spans s={[[-10, 14, 16, C.W], [-9, 13, 17, C.W], [-8, 14, 16, C.Wd], [-12, 35, 36, "#ff4040"], [-11, 35, 36, "#ff4040"], [-10, 35, 36, "#ff4040"], [-8, 35, 36, "#ff4040"], [-14, 4, 5, C.Wd], [-13, 3, 6, C.W]]} ox={0} oy={0} />
+      {!empty && front && (
+        <g transform={`translate(${lean} ${up})`}>
+          <Spans s={frontHead({ angry, blink: false })} ox={19} oy={4} />
+          {angry ? (
+            <Spans s={[[-10, 14, 16, C.W], [-9, 13, 17, C.W], [-8, 14, 16, C.Wd], [-12, 35, 36, "#ff4040"], [-11, 35, 36, "#ff4040"], [-10, 35, 36, "#ff4040"], [-8, 35, 36, "#ff4040"], [-14, 4, 5, C.Wd], [-13, 3, 6, C.W]]} ox={0} oy={0} />
+          ) : (
+            <g>{/* speech bubble: HI */}<R x={4} y={-16} w={19} h={11} c={C.W} /><R x={3} y={-15} w={21} h={9} c={C.W} /><R x={9} y={-5} w={4} h={3} c={C.W} /><R x={10} y={-2} w={2} h={1} c={C.W} /><PText x={8} y={-13} text="HI" color="#1c1220" /></g>
+          )}
         </g>
       )}
     </g>
