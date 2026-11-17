@@ -28,19 +28,19 @@ export default function Monitor({ x, y, live, fx = {} }: { x: number; y: number;
   return (
     <g transform={`translate(${x} ${y})`} shapeRendering="crispEdges">
       {/* bezel with a lit edge and a chin LED */}
-      <R x={0} y={0} w={SW + 16} h={SH + 18} c="#0d1024" />
-      <R x={1} y={1} w={SW + 14} h={SH + 16} c="#2a3050" /><R x={1} y={1} w={SW + 14} h={1} c={K.grey} /><R x={1} y={SH + 16} w={SW + 14} h={1} c={K.n9} />
-      <R x={2} y={2} w={1} h={SH + 14} c="#3c4470" />
+      <R x={0} y={0} w={SW + 16} h={SH + 18} c="#17181a" />
+      <R x={1} y={1} w={SW + 14} h={SH + 16} c="#393c41" /><R x={1} y={1} w={SW + 14} h={1} c={K.grey} /><R x={1} y={SH + 16} w={SW + 14} h={1} c={K.n9} />
+      <R x={2} y={2} w={1} h={SH + 14} c="#50545c" />
       <R x={SW / 2 + 5} y={SH + 12} w={6} h={2} c={K.orange} />
       <g transform="translate(8 6)">
-        <R x={0} y={0} w={SW} h={SH} c="#070e1b" />
+        <R x={0} y={0} w={SW} h={SH} c="#101112" />
         {/* header */}
-        <R x={0} y={0} w={SW} h={10} c="#18254a" /><R x={0} y={10} w={SW} h={1} c={K.orange} o={0.8} />
+        <R x={0} y={0} w={SW} h={10} c="#2e3034" /><R x={0} y={10} w={SW} h={1} c={K.orange} o={0.8} />
         <PText x={4} y={2} text="TECH DOMAIN - AI SYSTEMS" color={K.white} />
         {[0, 1, 2].map((i) => <R key={i} x={SW - 20 + i * 5} y={3} w={3} h={3} c={[K.red, K.yellow, K.neon][i]} />)}
         {/* editor */}
         <g transform="translate(4 14)">
-          <R x={0} y={0} w={82} h={52} c="#0b1428" /><R x={0} y={0} w={9} h={52} c="#08101f" />
+          <R x={0} y={0} w={82} h={52} c="#18191b" /><R x={0} y={0} w={9} h={52} c="#121315" />
           {Array.from({ length: 9 }, (_, i) => {
             const line = CODE[(i + scroll) % CODE.length];
             let cx = 12 + line[0] * 4;
@@ -51,12 +51,12 @@ export default function Monitor({ x, y, live, fx = {} }: { x: number; y: number;
               </g>
             );
           })}
-          <R x={12 + 8} y={2 + 8 * 5.5} w={1} h={3} c={Math.floor(t * 3) % 2 ? K.white : "#0b1428"} />
+          <R x={12 + 8} y={2 + 8 * 5.5} w={1} h={3} c={Math.floor(t * 3) % 2 ? K.white : "#18191b"} />
           {fx.hold && <><R x={9} y={2 + 3 * 5.5 - 1} w={73} h={5} c={K.orange} o={0.22} /><R x={9} y={2 + 3 * 5.5 - 1} w={1} h={5} c={K.orange} /></>}
         </g>
         {/* neural net */}
         <g transform="translate(89 14)">
-          <R x={0} y={0} w={72} h={34} c="#0b1428" />
+          <R x={0} y={0} w={72} h={34} c="#18191b" />
           {NET.slice(0, -1).map((layer, li) => layer.flatMap((a, ai) => NET[li + 1].map((b, bi) =>
             Array.from({ length: 8 }, (_, k) => {
               const lit = fx.netFocus != null ? li === fx.netFocus || li === fx.netFocus - 1 : li === pulse - 1 || li === pulse;
@@ -67,7 +67,7 @@ export default function Monitor({ x, y, live, fx = {} }: { x: number; y: number;
         </g>
         {/* chart: bars rise, line climbs */}
         <g transform="translate(89 51)">
-          <R x={0} y={0} w={72} h={15} c="#0b1428" />
+          <R x={0} y={0} w={72} h={15} c="#18191b" />
           {Array.from({ length: 14 }, (_, i) => {
             const base = 3 + Math.round(8 * (0.5 + 0.5 * Math.sin(i * 0.7 + t * 1.5)) * (0.4 + i / 20));
             const near = fx.chartX != null ? Math.max(0, 1 - Math.abs(3 + i * 5 - fx.chartX) / 18) : 0;

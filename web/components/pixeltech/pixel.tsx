@@ -4,13 +4,13 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 
 /** Shared palette: dark teal / navy night room with warm pink-orange accents and neon bio-greens. */
 export const K = {
-  ink: "#0b0a1f", n9: "#0d0f29", n8: "#141838", n7: "#1b2147", n6: "#262d5c", n5: "#34407e",
-  t9: "#0e2a36", t8: "#133846", t7: "#1a4a5a", t6: "#256070",
-  w9: "#2c1a2a", w8: "#4a2a36", w7: "#6e3f44", w6: "#8f5a52", w5: "#b57a64",
-  pink: "#ff6fa8", orange: "#FF5A14", yellow: "#ffd23f", green: "#4bd36b", greenD: "#2a8f47", neon: "#39ff88",
-  cyan: "#27f0ff", blue: "#3a6df0", white: "#f2f2ee", grey: "#9aa0b4", greyD: "#5a6080",
-  skin: "#f2b98f", skinD: "#d28a6a", hair: "#231521", hairH: "#4a2c4a", red: "#e5322d", redD: "#a31f24",
-  jeans: "#2b3f7a", jeansD: "#1d2b57", glass: "#bfe9ff",
+  ink: "#131416", n9: "#191a1d", n8: "#232529", n7: "#2e3034", n6: "#3c3f46", n5: "#53575f",
+  t9: "#202124", t8: "#292b30", t7: "#36393e", t6: "#454950",
+  w9: "#212225", w8: "#36393e", w7: "#50545d", w6: "#696e78", w5: "#848a95",
+  pink: "#bfe9ff", orange: "#ff5a14", yellow: "#f2f2ee", green: "#7fc8de", greenD: "#3f7f95", neon: "#27f0ff",
+  cyan: "#27f0ff", blue: "#4aa8d8", white: "#f2f2ee", grey: "#a1a5ad", greyD: "#656a75",
+  skin: "#f2b98f", skinD: "#d28a6a", hair: "#0f1217", hairH: "#2a3446", red: "#ff5a14", redD: "#c4420f",
+  jeans: "#4d5158", jeansD: "#36393e", glass: "#bfe9ff",
 };
 
 /** A sprite is an ASCII map: one character per pixel, '.' is transparent. */

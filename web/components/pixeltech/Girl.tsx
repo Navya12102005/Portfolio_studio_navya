@@ -8,11 +8,11 @@ import { PText, R, useTick } from "./pixel";
  * hoodie with shading and monitor rim-light, jeans and sneakers. Everything is a pure function of a few flags.
  */
 const C = {
-  H: "#1c1220", Hm: "#33223a", Hh: "#5b3a63", Hs: "#84568c",
+  H: "#0f1217", Hm: "#1c2330", Hh: "#3d5068", Hs: "#6f93b5",
   S: "#f3bd98", Ss: "#d98f6e", Sd: "#b86e55", St: "#ffd9bb", B: "#ec8a9a", L: "#c93f5a", Lh: "#ea6e88",
   E: "#14102a", G: "#e6f2ff", Gd: "#8fb3c8", g: "#a9def5", q: "#ffffff",
-  O: "#FF5A14", Oh: "#ff8c55", Os: "#d9470f", Od: "#9a2f0a", Ot: "#ffb48a",
-  W: "#f2f2ee", Wd: "#c9cbe0", J: "#33509a", Jh: "#4f72c4", Js: "#243a73", Jd: "#17264f", Sh: "#f2f2ee", Sd2: "#b8bccf",
+  O: "#ff5a14", Oh: "#ff8c55", Os: "#d9470f", Od: "#9a2f0a", Ot: "#ffb48a",
+  W: "#f2f2ee", Wd: "#d2d4d7", J: "#5f646e", Jh: "#818792", Js: "#464a51", Jd: "#2f3237", Sh: "#f2f2ee", Sd2: "#bfc2c8",
   rim: "#27f0ff",
 };
 type Seg = [number, number, number, string];
@@ -61,8 +61,8 @@ function profileHead({ blink, hairSway, gaze, phones }: { blink: boolean; hairSw
   s.push([5, 12, 13, C.O], [6, 12, 13, C.Os]);                               // orange hair clip
   if (phones) {
     // headphones: a band over the crown and an orange ear cup
-    s.push([-6, 8, 17, "#2c3162"], [-5, 6, 19, "#2c3162"], [-4, 5, 7, "#2c3162"], [-4, 18, 20, "#2c3162"]);
-    for (let y = -3; y <= 6; y++) s.push([y, 5, 6, "#2c3162"], [y, 19, 20, "#2c3162"]);
+    s.push([-6, 8, 17, "#42454c"], [-5, 6, 19, "#42454c"], [-4, 5, 7, "#42454c"], [-4, 18, 20, "#42454c"]);
+    for (let y = -3; y <= 6; y++) s.push([y, 5, 6, "#42454c"], [y, 19, 20, "#42454c"]);
     for (let y = 7; y <= 14; y++) s.push([y, 9, 14, y === 7 || y === 14 ? C.Os : C.O]);
     s.push([8, 10, 12, C.Oh], [9, 10, 11, C.Ot], [15, 10, 13, C.Od]);
   }
@@ -93,7 +93,7 @@ function frontHead({ angry, blink }: { angry: boolean; blink: boolean }): Seg[] 
   if (!blink) half.push(px(3, 9, C.E), px(2, 9, C.q), px(5, 11, C.q));
   half.push(px(2, 8, C.Gd));
   // brows (angry slants down toward the nose; calm arcs)
-  if (angry) half.push([6, 1, 2, C.H], [7, 3, 4, C.H], [8, 5, 5, C.H], px(2, 5, "#7a2230"), px(3, 6, "#7a2230"));
+  if (angry) half.push([6, 1, 2, C.H], [7, 3, 4, C.H], [8, 5, 5, C.H], px(2, 5, "#5a2a1a"), px(3, 6, "#5a2a1a"));
   else half.push([6, 1, 5, C.H], px(0, 7, C.H));
   const f = mirror(half, 10);
   // centre features
@@ -122,12 +122,12 @@ export function SeatedGirl({ x, y, face = "side", empty = false, gaze = { x: 0, 
     <g transform={`translate(${x} ${y})`} shapeRendering="crispEdges">
       {/* office chair: mesh back with a frame, armrest, seat, gas lift, five-star base with wheels */}
       <Spans s={[
-        [20, 22, 30, "#262b52"], ...Array.from({ length: 36 }, (_, i): Seg => [21 + i, 23, 29, i % 2 ? "#303766" : "#1e2344"]), [57, 22, 30, "#262b52"],
-        [22, 22, 22, "#4a5496"], [22, 23, 23, "#4a5496"],
-        [58, 4, 30, "#2a3060"], [59, 4, 30, "#1d2347"], [60, 6, 28, "#14183a"],
-        [61, 16, 18, "#6a7099"], [62, 16, 18, "#5a6080"], [63, 16, 18, "#6a7099"], [64, 16, 18, "#5a6080"], [65, 16, 18, "#6a7099"], [66, 16, 18, "#5a6080"], [67, 16, 18, "#6a7099"], [68, 16, 18, "#5a6080"], [69, 16, 18, "#6a7099"], [70, 16, 18, "#5a6080"],
-        [71, 4, 30, "#5a6080"], [72, 3, 31, "#3d4268"], [73, 2, 6, "#14102a"], [73, 14, 20, "#14102a"], [73, 28, 32, "#14102a"], [74, 2, 6, "#14102a"], [74, 14, 20, "#14102a"], [74, 28, 32, "#14102a"],
-        [49, 3, 15, "#3d4268"], [50, 3, 15, "#2a3060"],
+        [20, 22, 30, "#383b40"], ...Array.from({ length: 36 }, (_, i): Seg => [21 + i, 23, 29, i % 2 ? "#464950" : "#2e3034"]), [57, 22, 30, "#383b40"],
+        [22, 22, 22, "#686d78"], [22, 23, 23, "#686d78"],
+        [58, 4, 30, "#40434a"], [59, 4, 30, "#2e3136"], [60, 6, 28, "#24262a"],
+        [61, 16, 18, "#797f8a"], [62, 16, 18, "#656a75"], [63, 16, 18, "#797f8a"], [64, 16, 18, "#656a75"], [65, 16, 18, "#797f8a"], [66, 16, 18, "#656a75"], [67, 16, 18, "#797f8a"], [68, 16, 18, "#656a75"], [69, 16, 18, "#797f8a"], [70, 16, 18, "#656a75"],
+        [71, 4, 30, "#656a75"], [72, 3, 31, "#4d5158"], [73, 2, 6, "#14102a"], [73, 14, 20, "#14102a"], [73, 28, 32, "#14102a"], [74, 2, 6, "#14102a"], [74, 14, 20, "#14102a"], [74, 28, 32, "#14102a"],
+        [49, 3, 15, "#4d5158"], [50, 3, 15, "#40434a"],
       ]} />
       {empty ? null : (
         <g>
@@ -177,9 +177,9 @@ export function SeatedGirl({ x, y, face = "side", empty = false, gaze = { x: 0, 
         <g transform={`translate(${lean} ${up})`}>
           <Spans s={frontHead({ angry, blink: false })} ox={19} oy={4} />
           {angry ? (
-            <Spans s={[[-10, 14, 16, C.W], [-9, 13, 17, C.W], [-8, 14, 16, C.Wd], [-12, 35, 36, "#ff4040"], [-11, 35, 36, "#ff4040"], [-10, 35, 36, "#ff4040"], [-8, 35, 36, "#ff4040"], [-14, 4, 5, C.Wd], [-13, 3, 6, C.W]]} ox={0} oy={0} />
+            <Spans s={[[-10, 14, 16, C.W], [-9, 13, 17, C.W], [-8, 14, 16, C.Wd], [-12, 35, 36, "#ff5a14"], [-11, 35, 36, "#ff5a14"], [-10, 35, 36, "#ff5a14"], [-8, 35, 36, "#ff5a14"], [-14, 4, 5, C.Wd], [-13, 3, 6, C.W]]} ox={0} oy={0} />
           ) : (
-            <g>{/* speech bubble: HI */}<R x={4} y={-16} w={19} h={11} c={C.W} /><R x={3} y={-15} w={21} h={9} c={C.W} /><R x={9} y={-5} w={4} h={3} c={C.W} /><R x={10} y={-2} w={2} h={1} c={C.W} /><PText x={8} y={-13} text="HI" color="#1c1220" /></g>
+            <g>{/* speech bubble: HI */}<R x={4} y={-16} w={19} h={11} c={C.W} /><R x={3} y={-15} w={21} h={9} c={C.W} /><R x={9} y={-5} w={4} h={3} c={C.W} /><R x={10} y={-2} w={2} h={1} c={C.W} /><PText x={8} y={-13} text="HI" color="#0f1217" /></g>
           )}
         </g>
       )}

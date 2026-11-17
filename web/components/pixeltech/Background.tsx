@@ -30,7 +30,7 @@ const Note = ({ x, y, c = K.cyan }: { x: number; y: number; c?: string }) => <g>
 function TvGame({ channel }: { channel: number }) {
   const t = useTick(8);
   const px = (t * 3) % 60, jump = Math.abs(Math.sin((t % 16) / 16 * Math.PI)) * 12;
-  const pal = [["#4aa8ff", "#7cc5ff", "#7a4a1e", K.green], ["#ff8a4d", "#ffc27a", "#4a2a5e", "#8a5ad0"], ["#141838", "#262d5c", "#1a1a3a", "#2a7a86"]][channel % 3];
+  const pal = [["#4aa8ff", "#7cc5ff", "#7a4a1e", K.green], ["#ff8a4d", "#ffc27a", "#3f4249", "#7ab8e8"], ["#232529", "#3c3f46", "#27292d", "#52565e"]][channel % 3];
   return (
     <g>
       <R x={0} y={0} w={54} h={32} c={pal[0]} /><R x={0} y={14} w={54} h={10} c={pal[1]} />
@@ -94,13 +94,13 @@ const Background = memo(function Background({ fx }: { fx: Fx }) {
         {/* arched night window: sky, moon, stars, clouds, skyline, curtains, sill plants */}
         <R x={28} y={32} w={84} h={104} c={K.w7} />
         {arch.map((ins, i) => <R key={i} x={28 + ins} y={24 + i} w={84 - ins * 2} h={1} c={K.w7} />)}
-        <R x={34} y={36} w={72} h={94} c={K.n6} />
-        {arch.map((ins, i) => <R key={i} x={34 + Math.max(0, ins - 4)} y={28 + i} w={72 - Math.max(0, ins - 4) * 2} h={1} c={K.n6} />)}
-        <R x={34} y={84} w={72} h={46} c={K.n7} /><R x={34} y={108} w={72} h={22} c={K.n8} />
+        <R x={34} y={36} w={72} h={94} c="#1b2838" />
+        {arch.map((ins, i) => <R key={i} x={34 + Math.max(0, ins - 4)} y={28 + i} w={72 - Math.max(0, ins - 4) * 2} h={1} c="#1b2838" />)}
+        <R x={34} y={84} w={72} h={46} c="#16212f" /><R x={34} y={108} w={72} h={22} c="#101923" />
         {stars.map(([x, y], i) => <rect key={i} className="pt-tw" x={x} y={y} width={1.1} height={1.1} fill={K.white} style={{ animationDelay: `${-i * 0.6}s`, animationDuration: is("moon") ? "0.5s" : undefined }} />)}
-        <g className={cls("pt-o", is("moon") && "pt-glow")}><circle cx={88} cy={52} r={9} fill="#ffe9a8" /><circle cx={92} cy={49} r={8} fill={K.n6} /></g>
-        {is("shoot") && <g className="pt-shoot"><R x={100} y={40} w={3} h={1} c="#fff" /><R x={103} y={39} w={3} h={1} c="#ffe9a8" /><R x={98} y={41} w={2} h={1} c="#fff" o={0.6} /></g>}
-        <g className={cls("pt-o", is("cloud") && "pt-flee")}><g className="pt-cloud"><R x={46} y={58} w={16} h={3} c={K.n5} /><R x={50} y={56} w={9} h={2} c={K.n5} /></g></g>
+        <g className={cls("pt-o", is("moon") && "pt-glow")}><circle cx={88} cy={52} r={9} fill="#eaf6ff" /><circle cx={92} cy={49} r={8} fill={K.n6} /></g>
+        {is("shoot") && <g className="pt-shoot"><R x={100} y={40} w={3} h={1} c="#fff" /><R x={103} y={39} w={3} h={1} c="#eaf6ff" /><R x={98} y={41} w={2} h={1} c="#fff" o={0.6} /></g>}
+        <g className={cls("pt-o", is("cloud") && "pt-flee")}><g className="pt-cloud"><R x={46} y={58} w={16} h={3} c="#2d3d50" /><R x={50} y={56} w={9} h={2} c="#2d3d50" /></g></g>
         <g className={is("skyline") ? "pt-winwave" : undefined}>
           {[[34, 100, 10, 30], [44, 94, 8, 36], [52, 104, 12, 26], [64, 90, 9, 40], [73, 98, 11, 32], [84, 102, 8, 28], [92, 92, 14, 38]].map(([x, y, w, h], i) => (
             <g key={i}><R x={x} y={y} w={w} h={h} c={K.n9} />{Array.from({ length: Math.floor(h / 6) }, (_, r) => <rect key={r} className="pt-win" x={x + 2 + (r % 2) * 3} y={y + 3 + r * 6} width={2} height={2} fill={(i + r) % 3 === 0 ? K.yellow : (i + r) % 3 === 1 ? K.orange : K.n7} opacity={0.9} style={{ ["--d" as string]: `${(i * 3 + r) * 0.07}s` }} />)}</g>
@@ -109,8 +109,8 @@ const Background = memo(function Background({ fx }: { fx: Fx }) {
         {is("plane") && <g className="pt-plane"><Px s={PLANE} x={30} y={62} /><R x={30} y={64} w={1} h={1} c={K.red} /></g>}
         <R x={68} y={32} w={3} h={98} c={K.w7} /><R x={34} y={84} w={72} h={3} c={K.w7} />
         <R x={22} y={24} w={96} h={3} c={K.w6} /><R x={22} y={24} w={96} h={1} c={K.w5} />
-        <g className={cls("pt-o", is("curtain") && "pt-sway")}>{Array.from({ length: 8 }, (_, i) => <R key={i} x={24 + i * 2} y={28} w={2} h={100} c={i % 2 ? "#3b2a6e" : "#4a3688"} />)}</g>
-        <g className={cls("pt-o", is("curtain") && "pt-sway")}>{Array.from({ length: 8 }, (_, i) => <R key={i} x={96 + i * 2} y={28} w={2} h={100} c={i % 2 ? "#3b2a6e" : "#4a3688"} />)}</g>
+        <g className={cls("pt-o", is("curtain") && "pt-sway")}>{Array.from({ length: 8 }, (_, i) => <R key={i} x={24 + i * 2} y={28} w={2} h={100} c={i % 2 ? "#474a51" : "#585d66"} />)}</g>
+        <g className={cls("pt-o", is("curtain") && "pt-sway")}>{Array.from({ length: 8 }, (_, i) => <R key={i} x={96 + i * 2} y={28} w={2} h={100} c={i % 2 ? "#474a51" : "#585d66"} />)}</g>
         <R x={20} y={134} w={100} h={4} c={K.w6} /><R x={20} y={134} w={100} h={1} c={K.w5} />
         <g className={cls("pt-o", is("sill") && "pt-wig")}><Px s={CACTUS} x={38} y={124} /></g><g className={cls("pt-o", is("sill") && "pt-wig")}><Px s={PLANT} x={60} y={124} /></g><g className={cls("pt-o", is("sill") && "pt-wig")}><Px s={CACTUS} x={96} y={124} /></g>
         <polygon points="36,136 110,136 190,225 70,225" fill="url(#pt-lite)" opacity={dark ? 0.12 : 0.07} />
@@ -147,7 +147,7 @@ const Background = memo(function Background({ fx }: { fx: Fx }) {
       <R x={0} y={221} w={W} h={4} c={K.w8} /><R x={0} y={221} w={W} h={1} c={K.w7} />
 
       {/* left: CRT TV (tiny game), console, controller, cartridge */}
-      <R x={24} y={152} w={74} h={48} c="#2a2f55" /><R x={24} y={152} w={74} h={1} c={K.n5} /><R x={26} y={154} w={58} h={36} c="#14183a" />
+      <R x={24} y={152} w={74} h={48} c="#3b3e44" /><R x={24} y={152} w={74} h={1} c={K.n5} /><R x={26} y={154} w={58} h={36} c="#24262a" />
       <g transform="translate(29 158)"><TvGame key={`${channel}-${jump}`} channel={channel} /></g>
       <R x={87} y={160} w={4} h={4} c={K.grey} /><R x={87} y={168} w={4} h={4} c={K.grey} /><R x={87} y={176} w={7} h={2} c={K.greyD} /><R x={88} y={182} w={6} h={2} c={K.orange} />
       <R x={24} y={200} w={74} h={22} c={K.w8} /><R x={26} y={202} w={34} h={18} c={K.w9} /><R x={62} y={202} w={34} h={18} c={K.w9} /><R x={42} y={210} w={4} h={2} c={K.w5} /><R x={78} y={210} w={4} h={2} c={K.w5} />
@@ -180,35 +180,35 @@ const Background = memo(function Background({ fx }: { fx: Fx }) {
       {is("floppy") && <g><PText x={410} y={SHELF_B - 30} text="LOADING" color={K.white} /><R x={410} y={SHELF_B - 24} w={26} h={3} c={K.n6} /><g className="pt-bar"><R x={410} y={SHELF_B - 24} w={26} h={3} c={K.neon} /></g></g>}
       <g className={cls("pt-o", is("lava1") && "pt-fast")} style={lavaStyle}><Px s={LAVA} x={448} y={SHELF_B - 13} />{[0, 1, 2].map((i) => <rect key={i} className="pt-blob" x={450 + (i % 2) * 2} y={SHELF_B - 7 + i * 2} width={1.6} height={1.6} fill={K.yellow} style={{ ["--d" as string]: `${-i * 0.8}s` }} />)}</g>
       <Px s={HEART} x={460} y={SHELF_B - 6} />
-      <g className={cls("pt-o", is("catj1") && "pt-jumpy")}><Px s={CAT} x={372} y={SHELF_C - 10} />{is("cat1") && <><R x={374} y={SHELF_C - 7} w={2} h={1} c="#c9692a" /><R x={379} y={SHELF_C - 7} w={2} h={1} c="#c9692a" /></>}</g>
+      <g className={cls("pt-o", is("catj1") && "pt-jumpy")}><Px s={CAT} x={372} y={SHELF_C - 10} />{is("cat1") && <><R x={374} y={SHELF_C - 7} w={2} h={1} c="#8e95a3" /><R x={379} y={SHELF_C - 7} w={2} h={1} c="#8e95a3" /></>}</g>
       {is("cat1") && <g className="pt-heartf"><TinyHeart x={376} y={SHELF_C - 18} c={K.pink} /></g>}
       <g className={cls("pt-o", is("console2") && "pt-wig")}><Px s={CONSOLE} x={392} y={SHELF_C - 6} /></g><g className={cls("pt-o", is("pad2") && "pt-rumble")}><Px s={CONTROLLER} x={412} y={SHELF_C - 5} /></g>
-      <R x={430} y={SHELF_C - 22} w={22} h={22} c="#2a2f55" /><R x={432} y={SHELF_C - 20} w={18} h={12} c={K.ink} /><R x={434} y={SHELF_C - 18} w={14} h={8} c={is("arcade") ? "#7cf6ff" : "#14c8b4"} /><R x={436} y={SHELF_C - 6} w={3} h={3} c={K.red} /><R x={442} y={SHELF_C - 6} w={3} h={3} c={K.yellow} />
+      <R x={430} y={SHELF_C - 22} w={22} h={22} c="#3b3e44" /><R x={432} y={SHELF_C - 20} w={18} h={12} c={K.ink} /><R x={434} y={SHELF_C - 18} w={14} h={8} c={is("arcade") ? "#7cf6ff" : "#27f0ff"} /><R x={436} y={SHELF_C - 6} w={3} h={3} c={K.red} /><R x={442} y={SHELF_C - 6} w={3} h={3} c={K.yellow} />
       {is("arcade") && <g className="pt-march"><R x={436} y={SHELF_C - 17} w={5} h={1} c={K.ink} /><R x={435} y={SHELF_C - 16} w={7} h={2} c={K.ink} /><R x={436} y={SHELF_C - 14} w={1} h={1} c={K.ink} /><R x={440} y={SHELF_C - 14} w={1} h={1} c={K.ink} /></g>}
       <g className="pt-o"><Px s={CACTUS} x={458} y={SHELF_C - 10} />{is("cactus") && <g className="pt-grow"><R x={460} y={SHELF_C - 14} w={3} h={2} c={K.pink} /><R x={461} y={SHELF_C - 13} w={1} h={1} c={K.yellow} /></g>}</g>
       <R x={338} y={66} w={4} h={4} c={K.greyD} /><R x={337} y={69} w={6} h={1} c={K.grey} />
 
       {/* desk, under-desk shadow, drawers, PC tower */}
-      <R x={120} y={DESK} w={284} h={5} c={K.w5} /><R x={120} y={DESK} w={284} h={1} c="#d09a80" /><R x={120} y={DESK + 5} w={284} h={2} c={K.w9} />
+      <R x={120} y={DESK} w={284} h={5} c={K.w5} /><R x={120} y={DESK} w={284} h={1} c="#a2a6ae" /><R x={120} y={DESK + 5} w={284} h={2} c={K.w9} />
       <R x={120} y={DESK + 7} w={284} h={14} c={K.ink} o={0.25} /><R x={392} y={DESK + 7} w={5} h={FLOOR - DESK - 7} c={K.w8} />
       <R x={156} y={DESK + 7} w={50} h={44} c={K.w8} />
       {is("drawer") && <g><R x={158} y={DESK + 10} w={46} h={4} c={K.ink} /><Px s={HEART} x={162} y={DESK + 8} /><Px s={FLOPPY} x={176} y={DESK + 6} /><Px s={DUCK} x={190} y={DESK + 6} /></g>}
       <g className={is("drawer") ? "pt-drawer" : undefined}><R x={158} y={DESK + 10} w={46} h={18} c={K.w7} /><R x={178} y={DESK + 17} w={8} h={3} c={K.w5} /></g>
       <R x={158} y={DESK + 30} w={46} h={18} c={K.w7} /><R x={178} y={DESK + 37} w={8} h={3} c={K.w5} />
       <g style={{ filter: pcHue ? `hue-rotate(${pcHue * 70}deg)` : undefined }}>
-        <R x={124} y={186} w={26} h={39} c="#14183a" /><R x={124} y={186} w={26} h={1} c={K.n5} /><R x={126} y={188} w={22} h={30} c={K.n9} />
+        <R x={124} y={186} w={26} h={39} c="#24262a" /><R x={124} y={186} w={26} h={1} c={K.n5} /><R x={126} y={188} w={22} h={30} c={K.n9} />
         <circle cx={137} cy={200} r={7} fill="none" stroke={K.greyD} strokeWidth={1.4} /><circle cx={137} cy={200} r={2} fill={K.greyD} />
         {[0, 1, 2, 3, 4, 5].map((i) => <rect key={i} className={is("pc") ? "pt-rgbfast" : "pt-rgb"} x={126 + i * 3.6} y={214} width={3.4} height={3} fill={[K.pink, K.orange, K.yellow, K.neon, K.cyan, K.blue][i]} style={{ animationDelay: `${-i * 0.3}s` }} />)}
       </g>
       {/* desk items */}
-      <g className={cls("pt-o", is("speaker") && "pt-cone")} style={{ transformOrigin: "50% 50%" }}><R x={128} y={142} w={20} h={32} c="#1f2347" /><R x={128} y={142} w={20} h={1} c={K.n5} /><circle cx={138} cy={150} r={4} fill={K.n9} /><circle cx={138} cy={150} r={1.6} fill={K.greyD} /><circle cx={138} cy={164} r={6} fill={K.n9} /><circle cx={138} cy={164} r={3} fill={K.greyD} /><circle cx={138} cy={164} r={1} fill={K.n9} /></g>
+      <g className={cls("pt-o", is("speaker") && "pt-cone")} style={{ transformOrigin: "50% 50%" }}><R x={128} y={142} w={20} h={32} c="#2f3237" /><R x={128} y={142} w={20} h={1} c={K.n5} /><circle cx={138} cy={150} r={4} fill={K.n9} /><circle cx={138} cy={150} r={1.6} fill={K.greyD} /><circle cx={138} cy={164} r={6} fill={K.n9} /><circle cx={138} cy={164} r={3} fill={K.greyD} /><circle cx={138} cy={164} r={1} fill={K.n9} /></g>
       {is("speaker") && [[148, 140], [152, 146], [146, 150]].map(([x, y], i) => <g key={i} className="pt-notef" style={{ ["--d" as string]: `${i * 0.25}s` }}><Note x={x} y={y} c={[K.cyan, K.pink, K.yellow][i]} /></g>)}
       {!phones && <g className={cls("pt-o", is("phones") && "pt-wig")}><Px s={HEADPHONES} x={156} y={DESK - 9} /></g>}
-      <R x={208} y={DESK - 2} w={96} h={2} c={K.n6} /><R x={216} y={DESK - 3} w={68} h={3} c="#161a3a" />
+      <R x={208} y={DESK - 2} w={96} h={2} c={K.n6} /><R x={216} y={DESK - 3} w={68} h={3} c="#25272b" />
       {Array.from({ length: 16 }, (_, i) => <R key={i} x={218 + i * 4} y={DESK - 3} w={3} h={1} c={K.greyD} />)}
       {Array.from({ length: 14 }, (_, i) => <rect key={i} className={is("keys") ? "pt-keywave" : undefined} x={220 + i * 4} y={DESK - 2} width={3} height={1.1} fill={K.grey} style={{ ["--d" as string]: `${i * 0.06}s` }} />)}
       <g className={cls("pt-o")} style={lavaStyle}><g className={is("lava2") ? "pt-fast" : undefined}><Px s={LAVA} x={368} y={DESK - 13} />{[0, 1, 2].map((i) => <rect key={i} className="pt-blob" x={370 + (i % 2) * 2} y={DESK - 7 + i * 2} width={1.6} height={1.6} fill={K.yellow} style={{ ["--d" as string]: `${-i * 0.8}s` }} />)}</g></g>
-      <g className={cls("pt-o", is("catj2") && "pt-jumpy")}><Px s={CAT} x={380} y={DESK - 10} />{is("cat2") && <><R x={382} y={DESK - 7} w={2} h={1} c="#c9692a" /><R x={387} y={DESK - 7} w={2} h={1} c="#c9692a" /></>}</g>
+      <g className={cls("pt-o", is("catj2") && "pt-jumpy")}><Px s={CAT} x={380} y={DESK - 10} />{is("cat2") && <><R x={382} y={DESK - 7} w={2} h={1} c="#8e95a3" /><R x={387} y={DESK - 7} w={2} h={1} c="#8e95a3" /></>}</g>
       {is("cat2") && <g className="pt-heartf"><TinyHeart x={384} y={DESK - 18} c={K.pink} /></g>}
       <g className={cls("pt-o", is("duck") && "pt-bob")}><Px s={DUCK} x={154} y={65} /></g>{quack(150, 54)}
       <g className="pt-o"><Px s={CACTUS} x={106} y={DESK - 10} />{is("cactus") && <g className="pt-grow"><R x={108} y={DESK - 14} w={3} h={2} c={K.pink} /><R x={109} y={DESK - 13} w={1} h={1} c={K.yellow} /></g>}</g>
@@ -221,9 +221,9 @@ const Background = memo(function Background({ fx }: { fx: Fx }) {
         <R x={222} y={236} w={190} h={26} c={K.n6} /><R x={226} y={239} w={182} h={20} c={K.n7} /><R x={226} y={239} w={182} h={2} c={K.orange} o={0.6} /><R x={226} y={257} w={182} h={2} c={K.orange} o={0.6} />
         {Array.from({ length: 22 }, (_, i) => <rect key={i} className={is("rug") ? "pt-rugwave" : undefined} x={232 + i * 8} y={247} width={3} height={3} fill={K.n5} style={{ ["--d" as string]: `${i * 0.05}s` }} />)}
         {/* storage box that pops open */}
-        <R x={420} y={202} w={34} h={23} c="#a8764a" /><R x={434} y={202} w={6} h={23} c="#d8b98a" /><R x={424} y={212} w={8} h={5} c={K.white} o={0.7} />
+        <R x={420} y={202} w={34} h={23} c="#717681" /><R x={434} y={202} w={6} h={23} c="#acafb6" /><R x={424} y={212} w={8} h={5} c={K.white} o={0.7} />
         {is("box") && <g className="pt-popout"><Px s={HEART} x={433} y={190} /></g>}
-        <g className={is("box") ? "pt-lid" : undefined}><R x={420} y={202} w={34} h={3} c="#c9925f" /></g>
+        <g className={is("box") ? "pt-lid" : undefined}><R x={420} y={202} w={34} h={3} c="#8d929b" /></g>
         {/* big leafy plant */}
         <R x={456} y={192} w={20} h={33} c={K.orange} /><R x={456} y={192} w={20} h={3} c="#ff8a52" /><R x={456} y={219} w={20} h={6} c="#c4420f" />
         {[[455, 168, false], [466, 160, true], [447, 178, true], [474, 176, false], [460, 150, true], [468, 184, false], [452, 190, false]].map(([x, y, fl], i) => <g key={i} className={cls("pt-o", is("bigplant") && "pt-rustle")} style={{ ["--d" as string]: `${i * 0.08}s` }}><Px s={LEAF} x={x as number} y={y as number} flip={fl as boolean} /></g>)}

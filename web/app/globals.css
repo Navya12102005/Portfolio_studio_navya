@@ -120,13 +120,13 @@ body {
 .pt-relight { animation: pt-relight 2s steps(1) 1 both; animation-delay: var(--d, 0s); }
 @keyframes pt-relight { 0% { opacity: 0.08; } 100% { opacity: 1; } }
 .pt-chase { animation: pt-hue 0.8s steps(4) 3; animation-delay: var(--d, 0s); }
-@keyframes pt-hue { 0% { fill: #ff6fa8; } 25% { fill: #ffd23f; } 50% { fill: #27f0ff; } 75% { fill: #FF5A14; } 100% { fill: #ff6fa8; } }
+@keyframes pt-hue { 0% { fill: #bfe9ff; } 25% { fill: #f2f2ee; } 50% { fill: #27f0ff; } 75% { fill: #ff5a14; } 100% { fill: #bfe9ff; } }
 .pt-tubecycle rect { animation: pt-tube 1.2s steps(1) 2; }
-@keyframes pt-tube { 0% { fill: #ff6fa8; } 33% { fill: #27f0ff; } 66% { fill: #FF5A14; } 100% { fill: #ff6fa8; } }
+@keyframes pt-tube { 0% { fill: #bfe9ff; } 33% { fill: #27f0ff; } 66% { fill: #ff5a14; } 100% { fill: #bfe9ff; } }
 .pt-flee { animation: pt-flee 0.9s steps(6) 2 alternate; }
 @keyframes pt-flee { to { transform: translateX(22px); } }
 .pt-glow { animation: pt-glw 0.6s steps(3) 3; }
-@keyframes pt-glw { 0%, 100% { filter: drop-shadow(0 0 1px #ffe9a8); } 50% { filter: drop-shadow(0 0 6px #ffe9a8); } }
+@keyframes pt-glw { 0%, 100% { filter: drop-shadow(0 0 1px #eaf6ff); } 50% { filter: drop-shadow(0 0 6px #eaf6ff); } }
 .pt-winwave .pt-win { animation: pt-win 0.5s steps(2) 4; animation-delay: var(--d, 0s); }
 @keyframes pt-win { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
 .pt-shoot { animation: pt-shoot 0.9s steps(9) 1 both; }
@@ -162,7 +162,7 @@ body {
 .pt-notef { animation: pt-nf 1.6s steps(8) 1 both; animation-delay: var(--d, 0s); }
 @keyframes pt-nf { from { transform: translate(0, 0); opacity: 1; } to { transform: translate(8px, -32px); opacity: 0; } }
 .pt-keywave { animation: pt-kw 0.9s steps(3) 2; animation-delay: var(--d, 0s); }
-@keyframes pt-kw { 0%, 100% { fill: #27f0ff; } 33% { fill: #FF5A14; } 66% { fill: #ff6fa8; } }
+@keyframes pt-kw { 0%, 100% { fill: #27f0ff; } 33% { fill: #ff5a14; } 66% { fill: #bfe9ff; } }
 .pt-drawer { animation: pt-dr 2.6s steps(13) 1; }
 @keyframes pt-dr { 0%, 100% { transform: translateY(0); } 15%, 85% { transform: translateY(7px); } }
 .pt-rgbfast { animation: pt-rgbf 0.4s steps(1) 12; }
@@ -176,7 +176,7 @@ body {
 .pt-roll { animation: pt-rl 1.5s steps(15) 2 alternate; }
 @keyframes pt-rl { from { transform: translateX(0); } to { transform: translateX(250px); } }
 .pt-rugwave { animation: pt-rg 0.6s steps(2) 3; animation-delay: var(--d, 0s); }
-@keyframes pt-rg { 0%, 100% { fill: #34407e; } 50% { fill: #FF5A14; } }
+@keyframes pt-rg { 0%, 100% { fill: #53575f; } 50% { fill: #ff5a14; } }
 .pt-grow { animation: pt-gr 1.6s steps(4) 1 both; transform-origin: 50% 100%; }
 @keyframes pt-gr { from { transform: scale(0.2); } to { transform: scale(1); } }
 .pt-sparkle { animation: pt-tw 0.4s steps(2) 6; animation-delay: var(--d, 0s); }
@@ -189,7 +189,7 @@ body {
 .pt-ring { animation: pt-rn 1s steps(5) 2; transform-origin: 50% 50%; transform-box: fill-box; }
 @keyframes pt-rn { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(1.6); opacity: 0; } }
 .pt-chip { animation: pt-chp 0.3s steps(1) 8; animation-delay: var(--d, 0s); }
-@keyframes pt-chp { 0%, 100% { fill: #27f0ff; } 50% { fill: #39ff88; } }
+@keyframes pt-chp { 0%, 100% { fill: #27f0ff; } 50% { fill: #27f0ff; } }
 [data-paused="1"] .pt-fx-pause { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
   .pt-wig, .pt-bob, .pt-jumpy, .pt-sway, .pt-swing, .pt-flick, .pt-relight, .pt-chase, .pt-tubecycle rect, .pt-flee, .pt-glow, .pt-winwave .pt-win, .pt-shoot, .pt-plane, .pt-launch, .pt-blast, .pt-heartf, .pt-flutter, .pt-rumble, .pt-domino, .pt-cartin, .pt-slideout, .pt-bar, .pt-blob, .pt-spinchair, .pt-cone, .pt-notef, .pt-keywave, .pt-drawer, .pt-rgbfast, .pt-lid, .pt-popout, .pt-rustle, .pt-roll, .pt-rugwave, .pt-grow, .pt-sparkle, .pt-march, .pt-confetti, .pt-ring, .pt-chip { animation-duration: 0.01s; animation-iteration-count: 1; }

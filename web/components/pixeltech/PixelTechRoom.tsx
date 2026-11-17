@@ -227,7 +227,7 @@ export default function PixelTechRoom({ className = "" }: { className?: string }
       <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" className="block h-full w-full" style={{ imageRendering: "pixelated" }} role="group" aria-label="Pixel-art workstation. Hover or tap the objects in the room, click the red cap, or click the lamp to turn the lights off.">
         <defs>
           <radialGradient id="pt-hole"><stop offset="0" stopColor="#000" stopOpacity="1" /><stop offset="0.5" stopColor="#000" stopOpacity="0.85" /><stop offset="1" stopColor="#000" stopOpacity="0" /></radialGradient>
-          <radialGradient id="pt-spot"><stop offset="0" stopColor="#fff2d0" stopOpacity="0.16" /><stop offset="1" stopColor="#fff2d0" stopOpacity="0" /></radialGradient>
+          <radialGradient id="pt-spot"><stop offset="0" stopColor="#eaf6ff" stopOpacity="0.16" /><stop offset="1" stopColor="#eaf6ff" stopOpacity="0" /></radialGradient>
           <mask id="pt-darkmask" maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
             <rect width={W} height={H} fill="#fff" />
             <circle cx={240} cy={122} r={115} fill="url(#pt-hole)" />
