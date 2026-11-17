@@ -97,3 +97,8 @@ body {
 .pt-hot { outline: none; }
 .pt-hot:focus-visible { outline: 1px solid #FF5A14; outline-offset: 1px; }
 @media (prefers-reduced-motion: reduce) { .pt-tw, .pt-led, .pt-steam { animation: none; } }
+.pt-cloud { animation: pt-cl 40s linear infinite; }
+@keyframes pt-cl { from { transform: translateX(-14px); } to { transform: translateX(44px); } }
+.pt-rgb { animation: pt-rgb 2.4s steps(3) infinite; }
+@keyframes pt-rgb { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .pt-cloud, .pt-rgb { animation: none; } }
