@@ -26,8 +26,13 @@ export const NODES: GraphNode[] = [
     cluster: "tech",
     position: [-2.6, 1.4, 0],
     methodology: "Multi-step LLM tool-calling loops (Gemini function-calling) orchestrating external actions instead of single-shot prompts.",
-    techStack: ["Gemini API", "Next.js API routes", "n8n webhooks"],
-    outcomes: ["Built the J.A.R.V.I.S. assistant's own tool-calling loop for this site"],
+    techStack: ["Gemini API", "ElevenLabs", "Next.js API routes", "n8n webhooks", "Claude Code", "Google BigQuery"],
+    outcomes: [
+      "Built the J.A.R.V.I.S. assistant's own tool-calling loop for this site",
+      "Developed the J.A.R.V.I.S. voice agent with cloned vocal synthesis (ElevenLabs + Gemini)",
+      "Google Gen AI APAC Academy cohort graduate",
+      "AI health-app prototyping using Google Antigravity",
+    ],
   },
   {
     id: "aws-cloud",
@@ -46,6 +51,15 @@ export const NODES: GraphNode[] = [
     methodology: "Full-stack health-platform build: patient-facing UI backed by a structured data layer.",
     techStack: ["React", "Node.js"],
     outcomes: ["Shipped a working prototype health platform"],
+  },
+  {
+    id: "studio-navya",
+    label: "Studio Navya",
+    cluster: "tech",
+    position: [-4.2, -0.9, -0.2],
+    methodology: "Creative direction and personal brand: a design studio crafting brand identity, marketing copy and immersive 3D digital experiences.",
+    techStack: ["Next.js", "Tailwind CSS", "GSAP", "React Three Fiber", "Figma"],
+    outcomes: ["Creator of the Studio Navya brand and this immersive web portfolio", "Minimalist dark-mode aesthetics, custom gradients and glassmorphism"],
   },
   {
     id: "fullstack-3d",
@@ -121,7 +135,11 @@ export const NODES: GraphNode[] = [
     position: [0.9, -3.6, -0.9],
     methodology: "Organizing and leading a student startup club — event ops, member growth, partner outreach.",
     techStack: ["Community ops"],
-    outcomes: ["Leadership role at VIT Bhopal's Startup Club"],
+    outcomes: [
+      "President of the Startup Club at VIT Bhopal (2026–2027 tenure)",
+      "Spearheading the CODEVERSE 2.0 overnight hackathon (₹30K prize pool)",
+      "Mentoring core teams across design, technical and sponsorship verticals; 15+ hackathons and meetups led",
+    ],
   },
   {
     id: "executive-assistant",
@@ -196,8 +214,11 @@ export const NODES: GraphNode[] = [
     cluster: "ops",
     position: [-1.8, -3.3, -0.4],
     methodology: "Operational leadership of a student cloud-builder community.",
-    techStack: ["Community ops", "Cloud initiatives"],
-    outcomes: ["Operational Lead"],
+    techStack: ["AWS", "Linux", "Docker", "Serverless architecture"],
+    outcomes: [
+      "Operational Lead",
+      "Coordinating cloud bootcamps and serverless architecture labs; bridging training with real student deployments",
+    ],
   },
   {
     id: "community-leadership",
@@ -218,6 +239,8 @@ export const EDGES: GraphEdge[] = [
   ["agentic-workflows", "fullstack-3d"],
   ["agentic-workflows", "aws-cloud"],
   ["novicord", "fullstack-3d"],
+  ["studio-navya", "fullstack-3d"],
+  ["studio-navya", "agentic-workflows"],
   ["novicord", "aws-cloud"],
 
   // bio internal
