@@ -118,3 +118,113 @@ body {
 @keyframes cp-psr { from { transform: translateX(130vw); } to { transform: translateX(-24em); } }
 [data-paused="1"] .cp-twinkle, [data-paused="1"] .cp-beam, [data-paused="1"] .cp-bokeh, [data-paused="1"] .cp-pass, [data-paused="1"] .cp-pass-r { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .cp-twinkle, .cp-beam, .cp-bokeh, .cp-pass, .cp-pass-r { animation: none; } }
+/* pixel tech room */
+.pt-tw { animation: pt-tw 3s steps(2) infinite; }
+@keyframes pt-tw { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+.pt-led { animation: pt-led 1.6s steps(1) infinite; }
+@keyframes pt-led { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0.25; } }
+.pt-steam { animation: pt-steam 1.6s steps(2) infinite; }
+@keyframes pt-steam { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-2px); opacity: 0.2; } }
+.pt-hot { outline: none; }
+.pt-hot:focus-visible { outline: 1px solid #FF5A14; outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .pt-tw, .pt-led, .pt-steam { animation: none; } }
+.pt-cloud { animation: pt-cl 40s linear infinite; }
+@keyframes pt-cl { from { transform: translateX(-14px); } to { transform: translateX(44px); } }
+.pt-rgb { animation: pt-rgb 2.4s steps(3) infinite; }
+@keyframes pt-rgb { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .pt-cloud, .pt-rgb { animation: none; } }
+
+/* ===== pixel tech room: interaction effects (all stepped, so they move in chunky pixel frames) ===== */
+.pt-o { transform-box: fill-box; transform-origin: 50% 100%; }
+.pt-wig { animation: pt-wig 0.3s steps(1) 4; }
+@keyframes pt-wig { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1px) rotate(-3deg); } 75% { transform: translateX(1px) rotate(3deg); } }
+.pt-bob { animation: pt-bob 0.28s steps(1) 6; }
+@keyframes pt-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+.pt-jumpy { animation: pt-jumpy 0.7s steps(7) 1; }
+@keyframes pt-jumpy { 0% { transform: translateY(0); } 40% { transform: translateY(-9px); } 80% { transform: translateY(0); } 100% { transform: translateY(0); } }
+.pt-sway { transform-origin: 50% 0; animation: pt-sway 0.8s steps(4) 3 alternate; }
+@keyframes pt-sway { from { transform: skewX(-3deg); } to { transform: skewX(3deg); } }
+.pt-swing { animation: pt-swing 0.7s steps(4) 4 alternate; }
+@keyframes pt-swing { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+.pt-flick { animation: pt-flicker 0.5s steps(1) 3; }
+@keyframes pt-flicker { 0%, 100% { opacity: 1; } 20% { opacity: 0.15; } 40% { opacity: 1; } 60% { opacity: 0.3; } 80% { opacity: 0.9; } }
+.pt-relight { animation: pt-relight 2s steps(1) 1 both; animation-delay: var(--d, 0s); }
+@keyframes pt-relight { 0% { opacity: 0.08; } 100% { opacity: 1; } }
+.pt-chase { animation: pt-hue 0.8s steps(4) 3; animation-delay: var(--d, 0s); }
+@keyframes pt-hue { 0% { fill: #bfe9ff; } 25% { fill: #f2f2ee; } 50% { fill: #27f0ff; } 75% { fill: #ff5a14; } 100% { fill: #bfe9ff; } }
+.pt-tubecycle rect { animation: pt-tube 1.2s steps(1) 2; }
+@keyframes pt-tube { 0% { fill: #bfe9ff; } 33% { fill: #27f0ff; } 66% { fill: #ff5a14; } 100% { fill: #bfe9ff; } }
+.pt-flee { animation: pt-flee 0.9s steps(6) 2 alternate; }
+@keyframes pt-flee { to { transform: translateX(22px); } }
+.pt-glow { animation: pt-glw 0.6s steps(3) 3; }
+@keyframes pt-glw { 0%, 100% { filter: drop-shadow(0 0 1px #eaf6ff); } 50% { filter: drop-shadow(0 0 6px #eaf6ff); } }
+.pt-winwave .pt-win { animation: pt-win 0.5s steps(2) 4; animation-delay: var(--d, 0s); }
+@keyframes pt-win { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
+.pt-shoot { animation: pt-shoot 0.9s steps(9) 1 both; }
+@keyframes pt-shoot { from { transform: translate(0, 0); opacity: 1; } to { transform: translate(-40px, 26px); opacity: 0; } }
+.pt-plane { animation: pt-plane 2.4s steps(24) 1 both; }
+@keyframes pt-plane { from { transform: translateX(0); } to { transform: translateX(92px); } }
+.pt-launch { animation: pt-launch 1.6s steps(16) 1; }
+@keyframes pt-launch { 0% { transform: translateY(0); } 55% { transform: translateY(-46px); } 56% { transform: translateY(46px); } 100% { transform: translateY(0); } }
+.pt-blast { animation: pt-blast 2.2s steps(22) 1; }
+@keyframes pt-blast { 0% { transform: translateY(0); opacity: 1; } 40% { transform: translateY(-110px); opacity: 0; } 60% { transform: translateY(0); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+.pt-heartf { animation: pt-hf 1.6s steps(8) 1 both; animation-delay: var(--d, 0s); }
+@keyframes pt-hf { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-34px); opacity: 0; } }
+.pt-flutter { transform-origin: 50% 0; animation: pt-fl 0.3s steps(1) 4; }
+@keyframes pt-fl { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+.pt-rumble { animation: pt-rum 0.1s steps(1) 14; }
+@keyframes pt-rum { 0%, 100% { transform: translate(0, 0); } 33% { transform: translate(1px, 0); } 66% { transform: translate(-1px, 1px); } }
+.pt-pull { transform: translateY(-2px); }
+.pt-domino { transform-origin: 100% 100%; animation: pt-dom 0.4s steps(4) forwards; animation-delay: var(--d, 0s); }
+@keyframes pt-dom { from { transform: rotate(0); } to { transform: rotate(78deg); } }
+.pt-cartin { animation: pt-cart 1.4s steps(7) 1; }
+@keyframes pt-cart { 0% { transform: translate(0, 0); } 50% { transform: translate(-27px, 9px); } 100% { transform: translate(0, 0); } }
+.pt-slideout { animation: pt-so 2.2s steps(11) 1; }
+@keyframes pt-so { 0%, 100% { transform: translateX(0); } 20%, 80% { transform: translateX(9px); } }
+.pt-bar { transform-origin: 0 50%; animation: pt-barg 2s steps(10) 1 both; }
+@keyframes pt-barg { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.pt-blob { animation: pt-blb 3.2s steps(8) infinite alternate; animation-delay: var(--d, 0s); }
+.pt-fast .pt-blob { animation-duration: 0.9s; }
+@keyframes pt-blb { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+.pt-spinchair { animation: pt-sc 1.2s steps(6) 1; transform-box: view-box; transform-origin: 308px 0; }
+@keyframes pt-sc { 0% { transform: scaleX(1); } 25% { transform: scaleX(0.06); } 50% { transform: scaleX(-1); } 75% { transform: scaleX(0.06); } 100% { transform: scaleX(1); } }
+.pt-cone { animation: pt-cn 0.25s steps(1) 10; }
+@keyframes pt-cn { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+.pt-notef { animation: pt-nf 1.6s steps(8) 1 both; animation-delay: var(--d, 0s); }
+@keyframes pt-nf { from { transform: translate(0, 0); opacity: 1; } to { transform: translate(8px, -32px); opacity: 0; } }
+.pt-keywave { animation: pt-kw 0.9s steps(3) 2; animation-delay: var(--d, 0s); }
+@keyframes pt-kw { 0%, 100% { fill: #27f0ff; } 33% { fill: #ff5a14; } 66% { fill: #bfe9ff; } }
+.pt-drawer { animation: pt-dr 2.6s steps(13) 1; }
+@keyframes pt-dr { 0%, 100% { transform: translateY(0); } 15%, 85% { transform: translateY(7px); } }
+.pt-rgbfast { animation: pt-rgbf 0.4s steps(1) 12; }
+@keyframes pt-rgbf { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+.pt-lid { transform-origin: 0 100%; animation: pt-ld 2.4s steps(12) 1; }
+@keyframes pt-ld { 0%, 100% { transform: rotate(0); } 15%, 85% { transform: rotate(-72deg); } }
+.pt-popout { animation: pt-po 2.4s steps(12) 1 both; }
+@keyframes pt-po { 0%, 12% { transform: translateY(8px); opacity: 0; } 30% { transform: translateY(-14px); opacity: 1; } 45% { transform: translateY(-6px); } 60%, 85% { transform: translateY(-12px); opacity: 1; } 100% { transform: translateY(8px); opacity: 0; } }
+.pt-rustle { animation: pt-rs 0.4s steps(1) 6; animation-delay: var(--d, 0s); transform-origin: 50% 100%; }
+@keyframes pt-rs { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
+.pt-roll { animation: pt-rl 1.5s steps(15) 2 alternate; }
+@keyframes pt-rl { from { transform: translateX(0); } to { transform: translateX(250px); } }
+.pt-rugwave { animation: pt-rg 0.6s steps(2) 3; animation-delay: var(--d, 0s); }
+@keyframes pt-rg { 0%, 100% { fill: #53575f; } 50% { fill: #ff5a14; } }
+.pt-grow { animation: pt-gr 1.6s steps(4) 1 both; transform-origin: 50% 100%; }
+@keyframes pt-gr { from { transform: scale(0.2); } to { transform: scale(1); } }
+.pt-sparkle { animation: pt-tw 0.4s steps(2) 6; animation-delay: var(--d, 0s); }
+.pt-march { animation: pt-mr 1.6s steps(8) infinite alternate; }
+@keyframes pt-mr { from { transform: translateX(0); } to { transform: translateX(10px); } }
+.pt-pop { animation: pt-pp 2s steps(10) 1 both; }
+@keyframes pt-pp { 0% { transform: translateY(4px); opacity: 0; } 15%, 80% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-3px); opacity: 0; } }
+.pt-confetti { animation: pt-cf 1.8s steps(9) 1 both; animation-delay: var(--d, 0s); }
+@keyframes pt-cf { from { transform: translateY(-8px); opacity: 1; } to { transform: translateY(60px); opacity: 0; } }
+.pt-ring { animation: pt-rn 1s steps(5) 2; transform-origin: 50% 50%; transform-box: fill-box; }
+@keyframes pt-rn { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(1.6); opacity: 0; } }
+.pt-chip { animation: pt-chp 0.3s steps(1) 8; animation-delay: var(--d, 0s); }
+@keyframes pt-chp { 0%, 100% { fill: #27f0ff; } 50% { fill: #27f0ff; } }
+[data-paused="1"] .pt-fx-pause { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .pt-wig, .pt-bob, .pt-jumpy, .pt-sway, .pt-swing, .pt-flick, .pt-relight, .pt-chase, .pt-tubecycle rect, .pt-flee, .pt-glow, .pt-winwave .pt-win, .pt-shoot, .pt-plane, .pt-launch, .pt-blast, .pt-heartf, .pt-flutter, .pt-rumble, .pt-domino, .pt-cartin, .pt-slideout, .pt-bar, .pt-blob, .pt-spinchair, .pt-cone, .pt-notef, .pt-keywave, .pt-drawer, .pt-rgbfast, .pt-lid, .pt-popout, .pt-rustle, .pt-roll, .pt-rugwave, .pt-grow, .pt-sparkle, .pt-march, .pt-confetti, .pt-ring, .pt-chip { animation-duration: 0.01s; animation-iteration-count: 1; }
+}
+.pt-par-wall { transform: translate(calc(var(--px, 0) * 1px), calc(var(--py, 0) * 1px)); }
+.pt-par-floor { transform: translate(calc(var(--px, 0) * -1px), calc(var(--py, 0) * -1px)); }
+.pt-cursor { transform: translate(calc(var(--sx, 240) * 1px), calc(var(--sy, 135) * 1px)); }

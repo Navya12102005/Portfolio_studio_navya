@@ -24,6 +24,23 @@ class SoundManager {
     this.isMuted = muted;
   }
 
+  /** A short retro square-wave blip (pixel-room interactions). Respects the site's mute toggle. */
+  playBlip(freq = 520, ms = 70, slideTo?: number) {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime, osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(freq, t);
+    if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t + ms / 1000);
+    gain.gain.setValueAtTime(0.025, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + ms / 1000);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(t);
+    osc.stop(t + ms / 1000 + 0.02);
+  }
+
   playHoverTick() {
     if (this.isMuted) return;
     this.init();

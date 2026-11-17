@@ -7,9 +7,9 @@ import { useServiceStore } from "@/lib/serviceStore";
 import { PILLARS, servicesFor, type Pillar } from "@/lib/services";
 import { soundFX } from "@/utils/soundManager";
 import { REPLAY_INTRO_EVENT } from "./IntroOverlay";
-import MagneticLines from "./MagneticLines";
 import OpsCityPop from "./OpsCityPop";
 import OpsBento from "./OpsBento";
+import TechSlide from "./TechSlide";
 import WorkOrbSection from "./orb/WorkOrbSection";
 
 const ROLES = ["BIOENGINEER", "AI / ML BUILDER", "MEDTECH INNOVATOR", "STORYTELLER", "MARKETER", "FINANCE-MINDED", "NEGOTIATOR"];
@@ -86,7 +86,6 @@ function PillarBand({ pillar }: { pillar: Pillar }) {
   const k = SKIN[pillar], open = useServiceStore((s) => s.open), list = servicesFor(pillar);
   return (
     <section id={pillar} className="relative overflow-hidden px-5 md:px-[8vw] py-20 md:py-28 scroll-mt-12" style={{ background: k.bg, color: k.fg }}>
-      {pillar === "tech" && <MagneticLines className="z-0 opacity-80" />}
       {pillar === "ops" && <OpsCityPop />}
       <div className="relative z-10 flex items-end justify-between gap-6 flex-wrap">
         <motion.h2 initial={{ x: -80, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true, amount: 0.4 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
@@ -156,7 +155,7 @@ export default function KineticHome() {
       <main>
         <Hero />
         <WorkOrbSection />
-        <PillarBand pillar="tech" />
+        <TechSlide />
         <Marquee items={["BIOMEDICAL INNOVATION", "MACHINE LEARNING", "HEALTHCARE AI", "DIAGNOSTICS", "GENOMICS"]} bg="#FF5A14" fg="#0A0A0A" />
         <PillarBand pillar="bio" />
         <Marquee items={["BRAND STORYTELLING", "GO-TO-MARKET", "FINANCIAL MODELLING", "NEGOTIATION"]} bg="#0A0A0A" fg="#F2F2EE" rev />
