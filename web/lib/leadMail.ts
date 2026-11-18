@@ -11,7 +11,7 @@ const oneLine = (s: string) => s.replace(/[\r\n]+/g, " ").trim();
 export async function sendLeadEmail(lead: { name: string; email: string; interest: string; message: string }): Promise<LeadMailResult> {
   const key = process.env.RESEND_API_KEY;
   if (!key) return { ok: false, reason: "not_configured" };
-  const to = (process.env.LEAD_TO_EMAIL || "hello.studionavya@gmail.com").split(",").map((s) => s.trim()).filter(Boolean);
+  const to = (process.env.LEAD_TO_EMAIL || process.env.CONTACT_EMAIL || "hello.studionavya@gmail.com").split(",").map((s) => s.trim()).filter(Boolean);
   const from = process.env.LEAD_FROM_EMAIL || "Studio Navya <onboarding@resend.dev>";
 
   const ctl = new AbortController();

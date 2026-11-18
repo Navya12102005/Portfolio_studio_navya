@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { scopeAndLogLead } from "@/lib/n8n";
 import { sendLeadEmail } from "@/lib/leadMail";
+import { saveLead } from "@/lib/leadStore";
 import { INTERESTS, validateLead, type Interest } from "@/lib/leadValidation";
 
 // Route files may only export HTTP handlers, so everything else stays module-private.
@@ -14,7 +15,7 @@ function limited(ip: string): boolean {
   return recent.length > max;
 }
 
-/** Visitor inquiries. Validated, origin-checked, rate-limited, then emailed to the owner via Resend (RESEND_API_KEY), falling back to the n8n lead workflow (N8N_LEAD_WEBHOOK_URL).
+/** Visitor inquiries. Validated, origin-checked, rate-limited, then saved to Supabase (SUPABASE_SERVICE_ROLE_KEY) and emailed to the owner via Resend (RESEND_API_KEY), falling back to the n8n lead workflow (N8N_LEAD_WEBHOOK_URL).
  *  Nothing is logged or stored here: this is personal data. If neither delivery route is set up we say so honestly (503). */
 export async function POST(req: Request) {
   const origin = req.headers.get("origin"), host = req.headers.get("host");
@@ -34,10 +35,11 @@ export async function POST(req: Request) {
   if (Object.keys(errors).length) return NextResponse.json({ error: "invalid", fields: errors }, { status: 400 });
 
   const lead = { name: input.name.trim(), email: input.email.trim(), interest, message: input.message.trim() };
-  // Email via Resend is the main route; the n8n lead workflow is used if Resend is not set up.
-  const mail = await sendLeadEmail(lead);
-  if (mail.ok) return NextResponse.json({ ok: true });
-  if (mail.reason === "not_configured") {
+  // Save to the Supabase table and email the owner via Resend, in parallel. The visitor sees success if at least one
+  // of them worked (the lead is not lost); the n8n workflow is the last fallback when neither is set up.
+  const [stored, mail] = await Promise.all([saveLead(lead), sendLeadEmail(lead)]);
+  if (stored.ok || mail.ok) return NextResponse.json({ ok: true });
+  if (stored.reason === "not_configured" && mail.reason === "not_configured") {
     const n8n = await scopeAndLogLead({ clientName: lead.name || "Website visitor", email: lead.email, domain: interest === "Not sure" ? "Unspecified" : interest, projectSummary: lead.message });
     if (n8n.ok) return NextResponse.json({ ok: true });
     return NextResponse.json({ error: n8n.reason === "not_configured" ? "not_configured" : "delivery_failed" }, { status: n8n.reason === "not_configured" ? 503 : 502 });
