@@ -13,7 +13,7 @@ import { useEffect, useRef } from "react";
 export default function JarvisWaveform({ speaking }: { speaking: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const speakingRef = useRef(speaking);
-  speakingRef.current = speaking;
+  useEffect(() => { speakingRef.current = speaking; }, [speaking]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

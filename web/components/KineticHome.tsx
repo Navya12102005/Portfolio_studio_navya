@@ -11,6 +11,7 @@ import OpsCityPop from "./OpsCityPop";
 import OpsBento from "./OpsBento";
 import TechSlide from "./TechSlide";
 import BioSlide from "./BioSlide";
+import LeadCapture from "./LeadCapture";
 import WorkOrbSection from "./orb/WorkOrbSection";
 
 const ROLES = ["BIOENGINEER", "AI / ML BUILDER", "MEDTECH INNOVATOR", "STORYTELLER", "MARKETER", "FINANCE-MINDED", "NEGOTIATOR"];
@@ -161,6 +162,7 @@ export default function KineticHome() {
         <BioSlide />
         <Marquee items={["BRAND STORYTELLING", "GO-TO-MARKET", "FINANCIAL MODELLING", "NEGOTIATION"]} bg="#0A0A0A" fg="#F2F2EE" rev />
         <PillarBand pillar="ops" />
+        <LeadCapture />
       </main>
       <Footer />
     </>

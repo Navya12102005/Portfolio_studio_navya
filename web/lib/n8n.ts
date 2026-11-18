@@ -37,7 +37,7 @@ async function callWebhook<T>(envVar: string, payload: unknown): Promise<Webhook
 export function scopeAndLogLead(payload: {
   clientName: string;
   email: string;
-  domain: "Tech" | "Bio" | "Ops";
+  domain: "Tech" | "Bio" | "Ops" | "Unspecified";
   projectSummary: string;
   timeline?: string;
 }) {

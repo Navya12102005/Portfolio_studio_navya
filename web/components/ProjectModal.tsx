@@ -26,10 +26,12 @@ export default function ProjectModal() {
   const [tab, setTab] = useState<ProjectId | null>(activeProject);
 
   // whichever node was clicked becomes the default tab each time the
-  // modal (re)opens
-  useEffect(() => {
+  // modal (re)opens (derived during render rather than in an effect)
+  const [seenProject, setSeenProject] = useState<ProjectId | null>(activeProject);
+  if (activeProject !== seenProject) {
+    setSeenProject(activeProject);
     if (activeProject) setTab(activeProject);
-  }, [activeProject]);
+  }
 
   useEffect(() => {
     if (!activeProject) return;

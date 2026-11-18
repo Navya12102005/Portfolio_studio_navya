@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Standalone browser scripts for the intro iframe, served as-is (not part of the app bundle).
+    "public/**",
   ]),
 ]);
 

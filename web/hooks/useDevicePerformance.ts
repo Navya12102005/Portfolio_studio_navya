@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 export type PerfTier = "high" | "low";
 
@@ -61,20 +61,22 @@ function computeTier(): DevicePerformance {
  * memory, and screen width/pointer type. Runs once on mount — the
  * result doesn't change mid-session.
  */
+const SERVER_PERF: DevicePerformance = { tier: "high", isMobile: false, isTouch: false, reason: "ssr-default", determined: false };
+let cachedPerf: DevicePerformance | null = null;
+
+function readPerf(): DevicePerformance {
+  if (cachedPerf) return cachedPerf;
+  // ?forceTier=low|high — lets this be verified deterministically in
+  // environments (like this sandbox) whose own GPU renderer is a
+  // software implementation and would otherwise always report "low".
+  const forced = new URLSearchParams(window.location.search).get("forceTier");
+  cachedPerf = forced === "low" || forced === "high" ? { ...computeTier(), tier: forced, reason: `forced:${forced}`, determined: true } : computeTier();
+  return cachedPerf;
+}
+
+const subscribe = () => () => {}; // the result never changes mid-session
+
 export function useDevicePerformance(): DevicePerformance {
-  const [perf, setPerf] = useState<DevicePerformance>({ tier: "high", isMobile: false, isTouch: false, reason: "ssr-default", determined: false });
-
-  useEffect(() => {
-    // ?forceTier=low|high — lets this be verified deterministically in
-    // environments (like this sandbox) whose own GPU renderer is a
-    // software implementation and would otherwise always report "low".
-    const forced = new URLSearchParams(window.location.search).get("forceTier");
-    if (forced === "low" || forced === "high") {
-      setPerf({ ...computeTier(), tier: forced, reason: `forced:${forced}`, determined: true });
-      return;
-    }
-    setPerf(computeTier());
-  }, []);
-
-  return perf;
+  // Server and first hydration render use SERVER_PERF; the client then switches to the real reading.
+  return useSyncExternalStore(subscribe, readPerf, () => SERVER_PERF);
 }

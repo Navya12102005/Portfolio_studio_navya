@@ -18,7 +18,6 @@ export default function IntroOverlay() {
   const [show, setShow] = useState(false);
   const [run, setRun] = useState(0);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const onMsg = (e: MessageEvent) => {
       if (e.data?.type === "navya-intro-done") {
@@ -37,7 +36,6 @@ export default function IntroOverlay() {
     window.addEventListener(REPLAY_INTRO_EVENT, onReplay);
     return () => { window.removeEventListener("message", onMsg); window.removeEventListener(REPLAY_INTRO_EVENT, onReplay); window.removeEventListener(START_KINETIC_EVENT, onStart); };
   }, []);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   return (
     <AnimatePresence>
