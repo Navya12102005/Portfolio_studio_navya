@@ -15,7 +15,7 @@ export default function OpsBento({ list, onOpen, onHover }: { list: Service[]; o
         return (
           <motion.li key={s.slug} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ delay: (i % 3) * 0.07, duration: 0.45 }}>
             <button type="button" onClick={() => onOpen(s.slug)} onMouseEnter={onHover}
-              className="group relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-left backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="group relative flex h-full w-full cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-white/[0.07] p-6 text-left backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               style={{ outlineColor: c }}>
               <span aria-hidden className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ background: `radial-gradient(120% 90% at 0% 0%, ${c}26, transparent 60%)` }} />
               <div className="relative">

@@ -139,7 +139,7 @@ function NightSky() {
 
 /** Out-of-focus city lights drifting up. */
 function Bokeh() {
-  return <div className="absolute inset-0">{BOKEH.map((b, i) => <i key={i} className="cp-bokeh" style={{ position: "absolute", left: `${b.x}%`, top: `${b.y}%`, width: `${b.s}em`, height: `${b.s}em`, borderRadius: "50%", background: b.c, opacity: b.o, filter: "blur(0.45em)", animationDuration: `${b.d}s`, animationDelay: `${-b.l}s` }} />)}</div>;
+  return <div className="absolute inset-0">{BOKEH.map((b, i) => <i key={i} className="cp-bokeh" style={{ position: "absolute", left: `${b.x}%`, top: `${b.y}%`, width: `${b.s}em`, height: `${b.s}em`, borderRadius: "50%", background: `radial-gradient(circle, ${b.c} 0%, ${b.c} 35%, transparent 72%)`, opacity: b.o, animationDuration: `${b.d}s`, animationDelay: `${-b.l}s` }} />)}</div>;
 }
 
 /** The street along the bottom: headlight (white) and tail-light (orange) streaks passing both ways. */
@@ -219,13 +219,14 @@ export default function OpsCityPop({ className = "" }: { className?: string }) {
       <Layer items={MID} dur={95} opacity={0.95} idx={1} />
       <Layer items={NEAR} dur={62} opacity={1} idx={2} />
       {/* swaying cable */}
-      <svg className="cp-cable absolute left-0 top-[38%] w-full" viewBox="0 0 400 60" preserveAspectRatio="none" style={{ height: "10em", filter: `drop-shadow(0 0 6px ${OR})` }}>
+      <svg className="cp-cable absolute left-0 top-[38%] w-full" viewBox="0 0 400 60" preserveAspectRatio="none" style={{ height: "10em" }}>
+        <path d="M0 30 Q 200 -10 400 30" fill="none" stroke={OR} strokeOpacity="0.28" strokeWidth="7" vectorEffect="non-scaling-stroke" />
         <path d="M0 30 Q 200 -10 400 30" fill="none" stroke={OR} strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
       </svg>
       {/* scrim keeps text readable, but thins out under the cursor so the art lights up where you point */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/74 via-[#050505]/48 to-[#050505]/78"
         style={{ WebkitMaskImage: "radial-gradient(circle 17em at var(--lx, 50%) var(--ly, 40%), rgba(0,0,0,0.3), #000)", maskImage: "radial-gradient(circle 17em at var(--lx, 50%) var(--ly, 40%), rgba(0,0,0,0.3), #000)" }} />
-      <div className="absolute inset-0" style={{ background: "radial-gradient(circle 13em at var(--lx, 50%) var(--ly, 40%), rgba(255,90,20,0.28), rgba(0,240,255,0.12) 55%, transparent)", mixBlendMode: "screen" }} />
+      <div className="absolute inset-0" style={{ background: "radial-gradient(circle 13em at var(--lx, 50%) var(--ly, 40%), rgba(255,90,20,0.28), rgba(0,240,255,0.12) 55%, transparent)" }} />
       {/* film feel: vignette + faint flicker */}
       <div className="absolute inset-0 cp-film" style={{ background: "radial-gradient(ellipse at center, transparent 55%, #050505cc)" }} />
       <Traffic />

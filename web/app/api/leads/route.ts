@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { scopeAndLogLead } from "@/lib/n8n";
+import { sendLeadEmail } from "@/lib/leadMail";
 import { INTERESTS, validateLead, type Interest } from "@/lib/leadValidation";
 
 // Route files may only export HTTP handlers, so everything else stays module-private.
@@ -13,8 +14,8 @@ function limited(ip: string): boolean {
   return recent.length > max;
 }
 
-/** Visitor inquiries. Validated, origin-checked, rate-limited, then forwarded to the n8n lead workflow (N8N_LEAD_WEBHOOK_URL).
- *  Nothing is logged or stored here: this is personal data. If the webhook is not set up we say so honestly (503). */
+/** Visitor inquiries. Validated, origin-checked, rate-limited, then emailed to the owner via Resend (RESEND_API_KEY), falling back to the n8n lead workflow (N8N_LEAD_WEBHOOK_URL).
+ *  Nothing is logged or stored here: this is personal data. If neither delivery route is set up we say so honestly (503). */
 export async function POST(req: Request) {
   const origin = req.headers.get("origin"), host = req.headers.get("host");
   if (origin && host && new URL(origin).host !== host) return NextResponse.json({ error: "forbidden" }, { status: 403 });
@@ -32,14 +33,14 @@ export async function POST(req: Request) {
   const errors = validateLead(input);
   if (Object.keys(errors).length) return NextResponse.json({ error: "invalid", fields: errors }, { status: 400 });
 
-  const result = await scopeAndLogLead({
-    clientName: input.name.trim() || "Website visitor",
-    email: input.email.trim(),
-    domain: interest === "Not sure" ? "Unspecified" : interest,
-    projectSummary: input.message.trim(),
-  });
-  if (!result.ok) {
-    return NextResponse.json({ error: result.reason === "not_configured" ? "not_configured" : "delivery_failed" }, { status: result.reason === "not_configured" ? 503 : 502 });
+  const lead = { name: input.name.trim(), email: input.email.trim(), interest, message: input.message.trim() };
+  // Email via Resend is the main route; the n8n lead workflow is used if Resend is not set up.
+  const mail = await sendLeadEmail(lead);
+  if (mail.ok) return NextResponse.json({ ok: true });
+  if (mail.reason === "not_configured") {
+    const n8n = await scopeAndLogLead({ clientName: lead.name || "Website visitor", email: lead.email, domain: interest === "Not sure" ? "Unspecified" : interest, projectSummary: lead.message });
+    if (n8n.ok) return NextResponse.json({ ok: true });
+    return NextResponse.json({ error: n8n.reason === "not_configured" ? "not_configured" : "delivery_failed" }, { status: n8n.reason === "not_configured" ? 503 : 502 });
   }
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ error: "delivery_failed" }, { status: 502 });
 }
