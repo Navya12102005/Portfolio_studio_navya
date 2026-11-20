@@ -1,0 +1,42 @@
+{
+  "ngspice": {
+    "description": "Circuit simulator used by eSim",
+    "min_version": "36",
+    "version_cmd": ["ngspice", "--version"],
+    "version_regex": "ngspice-(\\d+(?:\\.\\d+)?)",
+    "packages": {"apt": "ngspice", "brew": "ngspice", "choco": "ngspice"},
+    "required": true
+  },
+  "kicad": {
+    "description": "Schematic and PCB editor",
+    "min_version": "6.0",
+    "version_cmd": ["kicad-cli", "version"],
+    "version_regex": "(\\d+\\.\\d+(?:\\.\\d+)?)",
+    "packages": {"apt": "kicad", "brew": "kicad", "choco": "kicad"},
+    "required": true
+  },
+  "ghdl": {
+    "description": "VHDL simulator (NgVeri / digital models)",
+    "min_version": "1.0",
+    "version_cmd": ["ghdl", "--version"],
+    "version_regex": "GHDL (\\d+\\.\\d+(?:\\.\\d+)?)",
+    "packages": {"apt": "ghdl", "brew": "ghdl"},
+    "required": false
+  },
+  "verilator": {
+    "description": "Verilog simulator used by NgVeri",
+    "min_version": "4.0",
+    "version_cmd": ["verilator", "--version"],
+    "version_regex": "Verilator (\\d+\\.\\d+)",
+    "packages": {"apt": "verilator", "brew": "verilator"},
+    "required": false
+  },
+  "python3": {
+    "description": "Python runtime for eSim",
+    "min_version": "3.8",
+    "version_cmd": ["python3", "--version"],
+    "version_regex": "Python (\\d+\\.\\d+(?:\\.\\d+)?)",
+    "packages": {"apt": "python3", "brew": "python", "choco": "python"},
+    "required": true
+  }
+}
